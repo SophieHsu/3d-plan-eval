@@ -61,6 +61,10 @@ def end_achieved(grid, x, y, ex, ey):
         return dx + dy <= 1
 
 def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
+
+    if grid[ex1][ey1] == 'X' or grid[ex2][ey2] == 'X':
+        print('Warning: End goal is open space so agent may spin in place')
+    
     actions = ["E", "W", "S", "N", "I", "F"] 
     visited = set()
     visited.add(start_state)

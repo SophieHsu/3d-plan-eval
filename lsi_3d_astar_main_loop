@@ -23,24 +23,25 @@ import logging
 from igibson.utils.utils import quatToXYZW
 from transforms3d.euler import euler2quat
 from agent import FixedMediumPlan
+from lsi_3d.agents.igibson_agent import iGibsonAgent
 from two_agent_astar import run_astar_two_agent
 
-TARGET_ORNS = {
-    "S": 0,
-    "E": 1.5707,
-    "N": 3.1415926,
-    "W": -1.5707,
-    None: -1
-}
+# TARGET_ORNS = {
+#     "S": 0,
+#     "E": 1.5707,
+#     "N": 3.1415926,
+#     "W": -1.5707,
+#     None: -1
+# }
 
-DIRE2POSDIFF = {
-    "E": (0, 1),
-    "W": (0, -1),
-    "S": (1, 0),
-    "N": (-1, 0)
-}
+# DIRE2POSDIFF = {
+#     "E": (0, 1),
+#     "W": (0, -1),
+#     "S": (1, 0),
+#     "N": (-1, 0)
+# }
 
-ONE_STEP = 0.02
+# ONE_STEP = 0.02
 
 def read_from_grid_text(grid_str):
     obj_x_y = []
@@ -183,254 +184,15 @@ def grid2raw(grid_str):
                 return_str += "{} {} {}\n".format(name, x, y)
     return return_str
 
-
-class MainLoopWrappedAgent:
-    def __init__(self, robot, start, direction, path, name, target_x=None, target_y=None, target_direction=None):
-        self.object = robot
-        self.direction = direction
-        self.start = start + (direction,)
-        self.path = path
-        self.target_x = target_x
-        self.target_y = target_y
-        self.target_direction = target_direction
-        self.action_index = 0
-        self.name = name
-    
-    def update(self, target_x, target_y, direction, target_direction):
-        self.target_x = target_x
-        self.target_y = target_y
-        self.direction = direction
-        self.target_direction = target_direction
-
-    def action_completed(self, current_action):
-        if self.action_index >= len(self.path):
-            return None
-        #current_action = self.path[self.action_index]
-        ready_for_next_action = False
-        x, y, z = self.object.get_position()
-        #print(self.name, current_action, self.get_current_orn_z(), self.target_direction, turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]))
-        # if self.target_x == None:
-        #     ready_for_next_action = True
-        #     x, y, z = self.object.get_position()
-        #     self.target_x = x
-        #     self.target_y = y
-        if current_action == "F" and forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
-            #self.action_index += 1
-            ready_for_next_action = True
-        elif current_action in "NWES" and turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
-            #self.action_index += 1
-            self.direction = current_action
-            ready_for_next_action = True
-        
-        if self.action_index >= len(self.path):
-            return None
-        
-        # if ready_for_next_action:
-        #     next_action = self.path[self.action_index]
-        #     if next_action == "F":
-        #         diff_x, diff_y = DIRE2POSDIFF[self.direction]
-        #         self.target_x += diff_x
-        #         self.target_y += diff_y
-        #     elif next_action in "NWES":
-        #         self.target_direction = next_action
-        return ready_for_next_action
-
-    def prepare_for_next_action(self, next_action):
-
-        if self.target_x == None or self.target_y == None:
-            x, y, z = self.object.get_position()
-            self.target_x = x
-            self.target_y = y
-        
-        if next_action == "F":
-            diff_x, diff_y = DIRE2POSDIFF[self.direction]
-            self.target_x += diff_x
-            self.target_y += diff_y
-        elif next_action in "NWES":
-            self.target_direction = next_action
-            x, y, z = self.object.get_position()
-            self.target_x = x
-            self.target_y = y
-
-    # def target_reached(self, action):
-    #     '''
-    #     Returns true when current action has been completed by agent
-    #     '''
-    #     if action == "F":
-    #         diff_x, diff_y = DIRE2POSDIFF[self.direction]
-    #         self.target_x += diff_x
-    #         self.target_y += diff_y
-    #     elif action in "NWES":
-    #         self.target_direction = action
-
-    #     action_completed = False
-    #     x, y, z = self.object.get_position()
-    #     if self.target_x == None:
-    #         action_completed = True
-    #         x, y, z = self.object.get_position()
-    #         self.target_x = x
-    #         self.target_y = y
-    #     elif action == "F" and forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
-    #         action_completed = True
-    #     elif action in "NWES" and turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
-    #         self.direction = action
-    #         action_completed = True
-
-    #     return action_completed
-            
-    def get_current_orn_z(self):
-        x, y, z, w = self.object.get_orientation()
-        x, y, z = quat2euler(x, y, z, w)
-        return z
-
-def turn_distance(cur_orn_z, target_orn_z):
-    return abs(cur_orn_z - target_orn_z)
-
-def forward_distance(cur_x, cur_y, target_x, target_y, direction):
-    if direction in "NS":
-        return abs(cur_x-target_x)
-    else:
-        return abs(cur_y-target_y)
-
-def agent_move_one_step(env, agent, action):
-    if action == None:
-        if agent.name == "robot":
-            action = np.zeros(env.action_space.shape)
-            agent.object.apply_action(action)
-        return
-    if action in "NWES":
-        agent_turn_one_step(env, agent, action)
-    elif action == "F":
-        agent_forward_one_step(env, agent)
-    else:
-        pass
-
-def agent_forward_one_step(env, agent):
-    if agent.name == "human":
-        x,y,z = agent.object.get_position()
-        if agent.direction == "N":
-            agent.object.set_position_orientation([x-ONE_STEP,y,z], agent.object.get_orientation())
-        elif agent.direction == "S":
-            agent.object.set_position_orientation([x+ONE_STEP,y,z], agent.object.get_orientation())
-        elif agent.direction == "E":
-            agent.object.set_position_orientation([x,y+ONE_STEP,z], agent.object.get_orientation())
-        elif agent.direction == "W":
-            agent.object.set_position_orientation([x,y-ONE_STEP,z], agent.object.get_orientation())
-    else:
-        action = np.zeros(env.action_space.shape)
-        action[0] = 0.15
-        action[1] = 0
-        start_x, start_y = agent.object.get_position()[:2]
-
-        cur_x, cur_y = agent.object.get_position()[:2]
-        distance_to_target = forward_distance(cur_x, cur_y, agent.target_x, agent.target_y, agent.direction)
-
-        if distance_to_target < 0.2:
-            action[0] /= 2
-        elif distance_to_target < 0.1:
-            action[0] /= 4
-        elif distance_to_target < 0.05:
-            action[0] /= 8
-        agent.object.apply_action(action)
-
-
-def agent_turn_one_step(env, agent, action):
-    if agent.name == "human":
-        x, y, z, w = agent.object.get_orientation()
-        x, y, z = quat2euler(x, y, z, w)
-        #print("turn z:", z, action)
-        target_orn_z = TARGET_ORNS[agent.target_direction]
-        
-        pos = z - target_orn_z
-        neg = target_orn_z - z
-        if pos < 0:
-            pos += 3.1415926*2
-        elif neg < 0:
-            neg += 3.1415926*2
-        if pos < neg:
-            z -= ONE_STEP
-        else:
-            z += ONE_STEP
-        agent.object.set_position_orientation(agent.object.get_position(), quatToXYZW(euler2quat(x, y, z), "wxyz"))
-    else:
-        x, y, z, w = agent.object.get_orientation()
-        x, y, z = quat2euler(x, y, z, w)
-        cur_orn_z = z
-        target_orn_z = TARGET_ORNS[agent.target_direction]
-        action = np.zeros(env.action_space.shape)
-        action[0] = 0
-        if(cur_orn_z < target_orn_z):
-            action[1] = -0.2
-        else:
-            action[1] = 0.2
-        #print((cur_orn_z-target_orn_z) / (action[1]/action[1]), action[1], cur_orn_z, target_orn_z)
-        if ((cur_orn_z-target_orn_z) / (action[1]/abs(action[1]))) > 4: # > 3.14
-            action[1] = -action[1] 
-        if abs(target_orn_z - cur_orn_z) < 0.5:
-            action[1] /= 2
-        elif abs(target_orn_z - cur_orn_z) < 0.2:
-            action[1] /= 4
-        agent.object.apply_action(action)
-
-def quat2euler(x, y, z, w):
-        """
-        https://automaticaddison.com/how-to-convert-a-quaternion-into-euler-angles-in-python/
-        """
-
-        """
-        Convert a quaternion into euler angles (roll, pitch, yaw)
-        roll is rotation around x in radians (counterclockwise)
-        pitch is rotation around y in radians (counterclockwise)
-        yaw is rotation around z in radians (counterclockwise)
-        """
-        t0 = +2.0 * (w * x + y * z)
-        t1 = +1.0 - 2.0 * (x * x + y * y)
-        roll_x = math.atan2(t0, t1)
-     
-        t2 = +2.0 * (w * y - z * x)
-        t2 = +1.0 if t2 > +1.0 else t2
-        t2 = -1.0 if t2 < -1.0 else t2
-        pitch_y = math.asin(t2)
-     
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        yaw_z = math.atan2(t3, t4)
-     
-        return roll_x, pitch_y, yaw_z # in radians
-
-
-def take_joint_action(env, human:MainLoopWrappedAgent, a_h, robot:MainLoopWrappedAgent, a_r):
-    '''
-    Returns true when action is completed
-    '''
-    human.prepare_for_next_action(a_h)
-    robot.prepare_for_next_action(a_r)
-    
-    # TODO: Remove while loop
-    while not human.action_completed(a_h) or not robot.action_completed(a_r):
-        if not human.action_completed(a_h):
-            agent_move_one_step(env, human, a_h)
-        if not robot.action_completed(a_r):
-            agent_move_one_step(env, robot, a_r)
-
-        #agent_move_one_step(env, robot, robot.get_action())
-        #print(human.get_action(), robot.get_action())
-        #for obj, pos in bowlpans:
-        #    obj.set_position(pos)
-
-        env.simulator.step()
-
-def main_loop(env, grid, ig_human:MainLoopWrappedAgent, ig_robot:MainLoopWrappedAgent, bowlpans):
+def main_loop(env, grid, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, bowlpans):
     print('Press enter to start...')
     input()
     
     start = ig_human.start + ig_robot.start
-    end = ((3,1),(5,3))
+    end = ((3,0),(5,3))
     plan = run_astar_two_agent(grid, start, end)
     human_plan, robot_plan = plan
-    #human_plan = ['W', 'F', 'W', 'F', 'E', 'W', 'E']
-    #robot_plan = ['W', 'F', 'F', 'S', 'F', 'F', 'F']
-    # A_star_planner() returns ^ plan
+
     human = FixedMediumPlan(human_plan)
     robot = FixedMediumPlan(robot_plan)
 
@@ -441,27 +203,17 @@ def main_loop(env, grid, ig_human:MainLoopWrappedAgent, ig_robot:MainLoopWrapped
     ig_robot.prepare_for_next_action(a_r)
     
     while(True):
-        # actions
-        
-
-        agent_move_one_step(env, ig_human, a_h)
-        agent_move_one_step(env, ig_robot, a_r)
+        ig_human.agent_move_one_step(env, a_h)
+        ig_robot.agent_move_one_step(env, a_r)
 
         if ig_human.action_completed(a_h):
+            # human.action() gets next FNESW medium level action to take
             a_h = human.action()
             ig_human.prepare_for_next_action(a_h)
         if ig_robot.action_completed(a_r):
             a_r = robot.action()
             ig_robot.prepare_for_next_action(a_r)
 
-    # TODO: Remove while loop
-    # while not human.action_completed(a_h) or not robot.action_completed(a_r):
-        #if not human.action_completed(a_h):
-        
-        #take_joint_action(env, ig_human, a_h, ig_robot, a_r)
-        #agent_move_one_step(env, ig_human, ig_human.get_action())
-        #agent_move_one_step(env, ig_robot, ig_robot.get_action())
-        #print(human.get_action(), robot.get_action())
         for obj, pos in bowlpans:
             obj.set_position(pos)
 
@@ -521,7 +273,7 @@ def load_objects(env, obj_x_y, orientation_map, robot_x, robot_y, human):
     return bowlpans
      
 def run_example(args):
-    layout_config = toml.load('lsi_config/layout/demo_layout.tml')
+    layout_config = toml.load('lsi_3d/lsi_config/layout/demo_layout.tml')
     obj_x_y, orientation_map, grid = read_from_grid_text(layout_config['layout'])
     #mdp = LsiGridworld.from_layout_name('demo_layout.txt')
 
@@ -541,8 +293,8 @@ def run_example(args):
     motion_planner = MotionPlanningWrapper(nav_env)
     print("**************loading done***************")
     
-    human = MainLoopWrappedAgent(human, human_start, "S", ["W", "F", "F", "F", "F", "S", "F", "E", "F", "N", "F"], "human")
-    robot = MainLoopWrappedAgent(nav_env.robots[0], robot_start, "S", ["W", "F", "F", "F", "F", "S", "F", "E", "F", "N", "F"], "robot")
+    human = iGibsonAgent(human, human_start, "S", "human")
+    robot = iGibsonAgent(nav_env.robots[0], robot_start, "S", "robot")
     
     main_loop(nav_env, grid, human, robot, bowlpans)
     
