@@ -5,6 +5,7 @@ import numpy as np
 import math
 from igibson.utils.utils import quatToXYZW
 from transforms3d.euler import euler2quat
+from lsi_3d.utils.action import Action
 
 TARGET_ORNS = {
     "S": 0,
@@ -103,7 +104,6 @@ class iGibsonAgent:
         return ready_for_next_action
 
     def prepare_for_next_action(self, next_action):
-
         if self.target_x == None or self.target_y == None:
             x, y, z = self.object.get_position()
             self.target_x = x
@@ -139,7 +139,7 @@ class iGibsonAgent:
                 action = np.zeros(env.action_space.shape)
                 self.object.apply_action(action)
             return
-        if action in "NWES":
+        elif action in "NWES":
             self.agent_turn_one_step(env, action)
         elif action == "F":
             self.agent_forward_one_step(env)

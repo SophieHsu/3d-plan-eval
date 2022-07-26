@@ -14,6 +14,7 @@ from time import time
 from time import sleep
 from igibson.objects.ycb_object import YCBObject
 from igibson.objects.articulated_object import URDFObject, URDFObject
+from lsi_3d.utils.action import Action
 from lsi_3d_mdp import LsiGridworld
 from render_layouts import HEIGHT, WIDTH, name2abbr
 from igibson.robots.behavior_robot import BehaviorRobot
@@ -24,6 +25,7 @@ from igibson.utils.utils import quatToXYZW
 from transforms3d.euler import euler2quat
 from agent import FixedMediumPlan
 from lsi_3d.agents.igibson_agent import iGibsonAgent
+from lsi_3d.config.reader import read_in_lsi_config
 from two_agent_astar import run_astar_two_agent
 
 # TARGET_ORNS = {
@@ -203,6 +205,9 @@ def main_loop(env, grid, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, bowlpans)
     ig_robot.prepare_for_next_action(a_r)
     
     while(True):
+        if a_h == Action.STAY and a_r == Action.STAY:
+            break
+        
         ig_human.agent_move_one_step(env, a_h)
         ig_robot.agent_move_one_step(env, a_r)
 
@@ -273,13 +278,12 @@ def load_objects(env, obj_x_y, orientation_map, robot_x, robot_y, human):
     return bowlpans
      
 def run_example(args):
-    layout_config = toml.load('lsi_3d/lsi_config/layout/demo_layout.tml')
-    obj_x_y, orientation_map, grid = read_from_grid_text(layout_config['layout'])
-    #mdp = LsiGridworld.from_layout_name('demo_layout.txt')
+    exp_config, alg_config, map_config, agent_configs = read_in_lsi_config('two_agent_a_star.tml')
+    #layout_config = toml.load('lsi_3d/lsi_config/layout/demo_layout.tml')
+    obj_x_y, orientation_map, grid = read_from_grid_text(map_config['layout'])
 
-    robot_start = (robot_x, robot_y) = 2, 5
-    human_start = (human_x, human_y) = 1, 2
-    #env = OvercookedEnv.from_mdp(mdp, horizon)
+    robot_start = (robot_x, robot_y) = (agent_configs[1]['start_x'], agent_configs[1]['start_y'])
+    human_start = (human_x, human_y) = (agent_configs[0]['start_x'], agent_configs[0]['start_y'])
 
     nav_env = iGibsonEnv(
         config_file=args.config, mode=args.mode, action_timestep=1.0 / 12, physics_timestep=1.0 / 12, use_pb_gui=True

@@ -1,0 +1,3 @@
+map_config = 'demo_layout.tml'
+agent_config = ['human_agent.tml','robot_agent.tml']
+algorithm_config = 'a_star_two_agent.tml'

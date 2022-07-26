@@ -7,3 +7,4 @@ class Action(Enum):
     EAST = 3
     SOUTH = 4
     WEST = 5
+    FORWARD = 6
