@@ -237,3 +237,53 @@ class HighLevelMdpPlanner(object):
 
         print("It took {} seconds to create MediumLevelMdpPlanner".format(time.time() - start_time))
         return 
+
+    def map_action_to_location(self, state_obj, action_obj, p0_obj = 'None'):
+        """
+        Get the next location the agent will be in based on current world state and medium level actions.
+        """
+        #p0_obj = p0_obj if p0_obj is not None else self.state_dict[state_obj][0]
+        action, obj = action_obj
+        #pots_states_dict = self.mdp.get_pot_states()
+        location = []
+        if action == 'pickup' and obj != 'soup':
+            if p0_obj != 'None':
+                location = self.drop_item(world_state)
+            else:
+                if obj == 'onion':
+                    location = self.mdp.get_onion_dispenser_locations()
+                elif obj == 'tomato':
+                    location = self.mdp.get_tomato_dispenser_locations()
+                elif obj == 'dish':
+                    location = self.mdp.get_dish_dispenser_locations()
+                else:
+                    print(p0_obj, action, obj)
+                    ValueError()
+        elif action == 'pickup' and obj == 'soup':
+            if p0_obj != 'dish' and p0_obj != 'None':
+                location = self.drop_item(world_state)
+            elif p0_obj == 'None':
+                location = self.mdp.get_dish_dispenser_locations()
+            else:
+                location = self.mdp.get_ready_pots(pots_states_dict) + self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
+
+        elif action == 'drop':
+            if obj == 'onion' or obj == 'tomato':
+                location = self.mdp.get_partially_full_pots(pots_states_dict) + self.mdp.get_empty_pots(pots_states_dict)
+            elif obj == 'dish':
+                location = self.drop_item(world_state)
+            else:
+                print(p0_obj, action, obj)
+                ValueError()
+
+        elif action == 'deliver':
+            if p0_obj != 'soup':
+                location = self.mdp.get_empty_counter_locations(world_state)
+            else:
+                location = self.mdp.get_serving_locations()
+
+        else:
+            print(p0_obj, action, obj)
+            ValueError()
+
+        return location

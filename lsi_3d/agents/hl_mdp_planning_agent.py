@@ -1,16 +1,11 @@
-class MediumMdpPlanningAgent(Agent):
+from lsi_3d.agents.agent import Agent
+from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 
-    def __init__(self, mdp_planner, delivery_horizon=1, logging_level=0, auto_unstuck=False):
-        # self.other_agent = other_agent
-        self.delivery_horizon = delivery_horizon
-        self.mdp_planner = mdp_planner
-        self.logging_level = logging_level
-        self.auto_unstuck = auto_unstuck
-        self.reset()
+class HlMdpPlanningAgent(Agent):
 
-    def reset(self):
-        super().reset()
-        self.prev_state = None
+    def __init__(self, hlp_planner, mlp:AStarMotionPlanner):
+        self.mdp_planner = hlp_planner
+        self.mlp = mlp
 
     def get_pot_status(self, state):
         pot_states = self.mdp_planner.mdp.get_pot_states(state)
@@ -36,20 +31,22 @@ class MediumMdpPlanningAgent(Agent):
 
         return state_str
 
-    def action(self, state):
-        pot_states = self.mdp_planner.mdp.get_pot_states(state)
-        ready_pots = pot_states["tomato"]["ready"] + pot_states["onion"]["ready"]
-        cooking_pots = ready_pots + pot_states["tomato"]["cooking"] + pot_states["onion"]["cooking"]
-        nearly_ready_pots = cooking_pots + pot_states["tomato"]["partially_full"] + pot_states["onion"]["partially_full"]
+    def action(self, hl_state, ml_state):
 
-        state_str = self.get_ml_states(state)
-        action = []; chosen_action = []
-        if state_str not in self.mdp_planner.state_idx_dict:
-            # print('State = ', state_str, ';\nNot in dictionary. Action = North')
-            action = Action.ALL_ACTIONS[0]#random.choice(Action.ALL_ACTIONS)
-            state.players[self.agent_index].active_log += [0]
+        state_str = hl_state
+
+        # retrieve high level action from policy
+        action_idx = self.mdp_planner.policy_matrix[self.mdp_planner.state_idx_dict[state_str]]
+
+        keys = list(self.mdp_planner.action_idx_dict.keys())
+        vals = list(self.mdp_planner.action_idx_dict.values())
+        action_object_pair = self.mdp_planner.action_dict[keys[vals.index(action_idx)]]
+        # print(self.mdp_planner.state_idx_dict[state_str], action_idx, action_object_pair)
+
+        # map back the medium level action to low level action
+        possible_motion_goals = self.mdp_planner.map_action_to_location(state_str, action_object_pair)
+        goal = possible_motion_goals[0]
+        start = ml_state[0] + ml_state[1]
+        paths = self.mlp.compute_motion_plan(start, (ml_state[0],goal))
         
-        else:
-            # retrieve medium level action from policy
-            action_idx = self.mdp_planner.policy_matrix[self.mdp_planner.state_idx_dict[state_str]]
-            return action
+        return paths[1]

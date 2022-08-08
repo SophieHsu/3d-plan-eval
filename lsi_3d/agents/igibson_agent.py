@@ -1,6 +1,7 @@
 """
 Module interfaces between lsi directives and low level iGibson robot behavior
 """
+from re import A
 import numpy as np
 import math
 from igibson.utils.utils import quatToXYZW
@@ -8,18 +9,18 @@ from transforms3d.euler import euler2quat
 from lsi_3d.utils.action import Action
 
 TARGET_ORNS = {
-    "S": 0,
-    "E": 1.5707,
-    "N": 3.1415926,
-    "W": -1.5707,
+    Action.SOUTH: 0,
+    Action.EAST: 1.5707,
+    Action.NORTH: 3.1415926,
+    Action.WEST: -1.5707,
     None: -1
 }
 
 DIRE2POSDIFF = {
-    "E": (0, 1),
-    "W": (0, -1),
-    "S": (1, 0),
-    "N": (-1, 0)
+    Action.EAST: (0, 1),
+    Action.WEST: (0, -1),
+    Action.SOUTH: (1, 0),
+    Action.NORTH: (-1, 0)
 }
 
 ONE_STEP = 0.02
@@ -82,10 +83,10 @@ class iGibsonAgent:
         #     x, y, z = self.object.get_position()
         #     self.target_x = x
         #     self.target_y = y
-        if current_action == "F" and self.forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
+        if current_action == Action.FORWARD and self.forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
             #self.action_index += 1
             ready_for_next_action = True
-        elif current_action in "NWES" and self.turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
+        elif current_action in Action.directions() and self.turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
             #self.action_index += 1
             self.direction = current_action
             ready_for_next_action = True
@@ -109,15 +110,17 @@ class iGibsonAgent:
             self.target_x = x
             self.target_y = y
         
-        if next_action == "F":
+        if next_action == Action.FORWARD:
             diff_x, diff_y = DIRE2POSDIFF[self.direction]
             self.target_x += diff_x
             self.target_y += diff_y
-        elif next_action in "NWES":
+        elif next_action in Action.directions():
             self.target_direction = next_action
             x, y, z = self.object.get_position()
             self.target_x = x
             self.target_y = y
+        elif next_action == Action.STAY:
+            return
 
     def get_current_orn_z(self):
         x, y, z, w = self.object.get_orientation()
@@ -128,7 +131,7 @@ class iGibsonAgent:
         return abs(cur_orn_z - target_orn_z)
 
     def forward_distance(self, cur_x, cur_y, target_x, target_y, direction):
-        if direction in "NS":
+        if direction in [Action.NORTH, Action.SOUTH]:
             return abs(cur_x-target_x)
         else:
             return abs(cur_y-target_y)
@@ -139,9 +142,9 @@ class iGibsonAgent:
                 action = np.zeros(env.action_space.shape)
                 self.object.apply_action(action)
             return
-        elif action in "NWES":
+        elif action in Action.directions():
             self.agent_turn_one_step(env, action)
-        elif action == "F":
+        elif action == Action.FORWARD:
             self.agent_forward_one_step(env)
         else:
             pass
@@ -149,13 +152,13 @@ class iGibsonAgent:
     def agent_forward_one_step(self, env):
         if self.name == "human":
             x,y,z = self.object.get_position()
-            if self.direction == "N":
+            if self.direction == Action.NORTH:
                 self.object.set_position_orientation([x-ONE_STEP,y,z], self.object.get_orientation())
-            elif self.direction == "S":
+            elif self.direction == Action.SOUTH:
                 self.object.set_position_orientation([x+ONE_STEP,y,z], self.object.get_orientation())
-            elif self.direction == "E":
+            elif self.direction == Action.EAST:
                 self.object.set_position_orientation([x,y+ONE_STEP,z], self.object.get_orientation())
-            elif self.direction == "W":
+            elif self.direction == Action.WEST:
                 self.object.set_position_orientation([x,y-ONE_STEP,z], self.object.get_orientation())
         else:
             action = np.zeros(env.action_space.shape)

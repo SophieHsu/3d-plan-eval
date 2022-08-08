@@ -11,7 +11,7 @@ class FixedMediumPlan(Agent):
     """
 
     def __init__(self, plan):
-        self.plan = plan
+        self.plan = Action.from_strings(plan)
         self.i = 0
     
     def action(self):

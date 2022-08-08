@@ -15,7 +15,6 @@ from time import sleep
 from igibson.objects.ycb_object import YCBObject
 from igibson.objects.articulated_object import URDFObject, URDFObject
 from lsi_3d.utils.action import Action
-from lsi_3d_mdp import LsiGridworld
 from render_layouts import HEIGHT, WIDTH, name2abbr
 from igibson.robots.behavior_robot import BehaviorRobot
 import math
@@ -26,7 +25,7 @@ from transforms3d.euler import euler2quat
 from agent import FixedMediumPlan
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
-from two_agent_astar import run_astar_two_agent
+from lsi_3d.planners.two_agent_astar import run_astar_two_agent
 
 # TARGET_ORNS = {
 #     "S": 0,
@@ -191,7 +190,7 @@ def main_loop(env, grid, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, bowlpans)
     input()
     
     start = ig_human.start + ig_robot.start
-    end = ((3,0),(5,3))
+    end = ((3,2),(0,2))
     plan = run_astar_two_agent(grid, start, end)
     human_plan, robot_plan = plan
 
