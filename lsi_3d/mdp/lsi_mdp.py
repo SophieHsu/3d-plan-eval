@@ -1,5 +1,9 @@
+from collections import defaultdict
 from this import d
+import numpy as np
 from pygame import init
+
+from lsi_3d.utils.enums import MLAction
 
 
 class LsiMdp(object):
@@ -9,17 +13,27 @@ class LsiMdp(object):
         self.num_items_for_soup = 3
         self.delivery_reward = 20
         self.hl_start_state = hl_start_state
+        self.pot_locations = self.get_pot_locations()
 
     @staticmethod
-    def from_config(map_config, agent_configs, exp_config):
-        map = map_config['layout']
+    def from_config(map_config, agent_configs, exp_config, grid):
         #a1_loc = (agent_configs[1]['start_x'], agent_configs[1]['start_y'])
         #a2_loc = (agent_configs[0]['start_x'], agent_configs[0]['start_y'])
+        # rows = map_config['rows']
+        # columns = map_config['columns']
+        # grid = []
+        # split = map.splitlines()
+        # for r in range(len(split)):
+        #     grid.append([])
+        #     for c in range(len(split[r])):
+        #         grid[r].append(split[r][c])
+        
+
 
         hl_start_state = exp_config['hl_start_state']
-        start_locations = [(agent_config['start_x'], agent_config['start_y'], agent_config['start_direction']) for agent_config in agent_configs]
+        start_locations = [(agent_config['start_x'], agent_config['start_y'], MLAction.from_string(agent_config['start_direction'])) for agent_config in agent_configs]
 
-        return LsiMdp(map, start_locations, hl_start_state)
+        return LsiMdp(grid, start_locations, hl_start_state)
 
     def get_state_transition(self, state, joint_action):
         """Gets information about possible transitions for the action.
@@ -64,21 +78,71 @@ class LsiMdp(object):
 
         return new_state, sparse_reward, shaped_reward, events_infos
 
+    def get_pot_states(self, state):
+        """Returns dict with structure:
+        {
+         empty: [ObjStates]
+         onion: {
+            'x_items': [soup objects with x items],
+            'cooking': [ready soup objs]
+            'ready': [ready soup objs],
+            'partially_full': [all non-empty and non-full soups]
+            }
+         tomato: same dict structure as above
+        }
+        """
+        pots_states_dict = {}
+        pots_states_dict['empty'] = []
+        pots_states_dict['onion'] = defaultdict(list)
+        for pot_pos in self.get_pot_locations():
+            if not state.has_object(pot_pos):
+                pots_states_dict['empty'].append(pot_pos)
+            else:
+                soup_obj = state.get_object(pot_pos)
+                soup_type, num_items, cook_time = soup_obj.state
+                if 0 < num_items < self.num_items_for_soup:
+                    pots_states_dict[soup_type]['{}_items'.format(
+                        num_items)].append(pot_pos)
+                elif num_items == self.num_items_for_soup:
+                    assert cook_time <= self.soup_cooking_time
+                    if cook_time == self.soup_cooking_time:
+                        pots_states_dict[soup_type]['ready'].append(pot_pos)
+                    else:
+                        pots_states_dict[soup_type]['cooking'].append(pot_pos)
+                else:
+                    raise ValueError("Pot with more than {} items".format(
+                        self.num_items_for_soup))
+
+                if 0 < num_items < self.num_items_for_soup:
+                    pots_states_dict[soup_type]['partially_full'].append(
+                        pot_pos)
+
+        return pots_states_dict
+
     def get_dish_dispenser_locations(self):
-        return list(self.terrain_pos_dict['D'])
+        return self.where_map_is('B')
 
     def get_onion_dispenser_locations(self):
-        return [(0,2)]
+        return self.where_map_is('F')
         #return list(self.terrain_pos_dict['O'])
 
     def get_tomato_dispenser_locations(self):
         return list(self.terrain_pos_dict['T'])
 
     def get_serving_locations(self):
-        return list(self.terrain_pos_dict['S'])
+        return self.where_map_is('T')
 
     def get_pot_locations(self):
-        return list(self.terrain_pos_dict['P'])
+        return self.where_map_is('P')
 
     def get_counter_locations(self):
         return list(self.terrain_pos_dict['X'])
+
+    def where_map_is(self, letter):
+        indexes = []
+        for i in range(len(self.map)):
+            for j in range(len(self.map[0])):
+                if self.map[i][j] == letter:
+                    indexes.append((i,j))
+
+        return indexes

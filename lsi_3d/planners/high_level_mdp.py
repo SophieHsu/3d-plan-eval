@@ -269,7 +269,8 @@ class HighLevelMdpPlanner(object):
 
         elif action == 'drop':
             if obj == 'onion' or obj == 'tomato':
-                location = self.mdp.get_partially_full_pots(pots_states_dict) + self.mdp.get_empty_pots(pots_states_dict)
+                #location = self.mdp.get_partially_full_pots(pots_states_dict) + self.mdp.get_empty_pots(pots_states_dict)
+                location = self.mdp.get_pot_locations()
             elif obj == 'dish':
                 location = self.drop_item(world_state)
             else:

@@ -18,7 +18,7 @@ from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
-from lsi_3d.utils.action import Action
+from lsi_3d.utils.enums import MLAction
 from render_layouts import HEIGHT, WIDTH, name2abbr
 from igibson.robots.behavior_robot import BehaviorRobot
 import math
@@ -68,6 +68,8 @@ def read_from_grid_text(grid_str):
             grid[x][y+1] = name2abbr(name)
         elif name == "table_v":
             grid[x+1][y] = name2abbr(name)
+        elif name == 'pan':
+            grid[x][y] = name2abbr(name)
         else:
             sum_x += x
             sum_y += y
@@ -193,40 +195,53 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
     print('Press enter to start...')
     input()
     
-    start = ig_human.start + ig_robot.start
-    end = ((3,0),(5,3))
+    # start = ig_human.start + ig_robot.start
+    # end = ((3,0),(5,3))
     #plan = run_astar_two_agent(grid, start, end)
     human_plan = []
-
     human = FixedMediumPlan(human_plan)
-    plan = hl_robot_agent.action(env.hl_state, env.ml_state)
-    robot = FixedMediumPlan(plan)
 
-    a_h = human.action()
-    a_r = robot.action()
-    #lsi_env = LsiEnv(env)
-    ig_human.prepare_for_next_action(a_h)
-    ig_robot.prepare_for_next_action(a_r)
-    
-    while(True):
-        if a_h == Action.STAY and a_r == Action.STAY:
+    while True:
+
+        # indexes policy matrix with high-level states and retrieves
+        # motion goals and calculates a plan
+        next_hl_state, plan = hl_robot_agent.action(env.hl_state, env.ml_state)
+        if plan == []:
+            print("No motion plan to execute")
             break
-        
-        ig_human.agent_move_one_step(env.nav_env, a_h)
-        ig_robot.agent_move_one_step(env.nav_env, a_r)
 
-        if ig_human.action_completed(a_h):
-            # human.action() gets next FNESW medium level action to take
-            a_h = human.action()
-            ig_human.prepare_for_next_action(a_h)
-        if ig_robot.action_completed(a_r):
-            a_r = robot.action()
-            ig_robot.prepare_for_next_action(a_r)
+        robot = FixedMediumPlan(plan)
 
-        for obj, pos in bowlpans:
-            obj.set_position(pos)
+        a_h = human.action()
+        a_r = robot.action()
+        #lsi_env = LsiEnv(env)
+        ig_human.prepare_for_next_action(a_h)
+        ig_robot.prepare_for_next_action(a_r)
 
-        env.nav_env.simulator.step()
+        # Accomplishes plan for low-level motion
+        while(True):
+            if a_h == MLAction.STAY and a_r == MLAction.STAY:
+                break
+            
+            ig_human.agent_move_one_step(env.nav_env, a_h)
+            ig_robot.agent_move_one_step(env.nav_env, a_r)
+
+            if ig_human.action_completed(a_h):
+                # human.action() gets next FNESW medium level action to take
+                a_h = human.action()
+                ig_human.prepare_for_next_action(a_h)
+            if ig_robot.action_completed(a_r):
+                a_r = robot.action()
+                ig_robot.prepare_for_next_action(a_r)
+
+            for obj, pos in bowlpans:
+                obj.set_position(pos)
+
+            env.nav_env.simulator.step()
+
+        env.update_world_state(next_hl_state)
+
+
 
 
 def robot_hand_up(env, bowlpans):
@@ -280,16 +295,16 @@ def load_objects(env, obj_x_y, orientation_map, robot_x, robot_y, human):
         pass
     print("loading done")
     return bowlpans
-     
+
 def run_example(args):
     exp_config, alg_config, map_config, agent_configs = read_in_lsi_config('two_agent_mdp.tml')
     #layout_config = toml.load('lsi_3d/lsi_config/layout/demo_layout.tml')
     obj_x_y, orientation_map, grid = read_from_grid_text(map_config['layout'])
 
-    robot_start = (robot_x, robot_y) = (agent_configs[1]['start_x'], agent_configs[1]['start_y'])
     human_start = (human_x, human_y) = (agent_configs[0]['start_x'], agent_configs[0]['start_y'])
+    robot_start = (robot_x, robot_y) = (agent_configs[1]['start_x'], agent_configs[1]['start_y'])
 
-    mdp = LsiMdp.from_config(map_config, agent_configs, exp_config)
+    mdp = LsiMdp.from_config(map_config, agent_configs, exp_config, grid)
 
     order_list = exp_config['order_list']
     hlp = HighLevelMdpPlanner(mdp)
@@ -312,7 +327,7 @@ def run_example(args):
     human = iGibsonAgent(human, human_start, "S", "human")
     robot = iGibsonAgent(nav_env.robots[0], robot_start, "S", "robot")
 
-    lsi_env = LsiEnv(mdp, nav_env)
+    lsi_env = LsiEnv(mdp, nav_env, human, robot)
     
     main_loop(mdp, lsi_env, human, robot, robot_agent, bowlpans)
     

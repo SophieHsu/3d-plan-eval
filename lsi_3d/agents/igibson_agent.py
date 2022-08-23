@@ -6,48 +6,11 @@ import numpy as np
 import math
 from igibson.utils.utils import quatToXYZW
 from transforms3d.euler import euler2quat
-from lsi_3d.utils.action import Action
-
-TARGET_ORNS = {
-    Action.SOUTH: 0,
-    Action.EAST: 1.5707,
-    Action.NORTH: 3.1415926,
-    Action.WEST: -1.5707,
-    None: -1
-}
-
-DIRE2POSDIFF = {
-    Action.EAST: (0, 1),
-    Action.WEST: (0, -1),
-    Action.SOUTH: (1, 0),
-    Action.NORTH: (-1, 0)
-}
+from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.constants import DIRE2POSDIFF, TARGET_ORNS
+from lsi_3d.utils.functions import quat2euler
 
 ONE_STEP = 0.02
-
-def quat2euler(x, y, z, w):
-    """
-    https://automaticaddison.com/how-to-convert-a-quaternion-into-euler-angles-in-python/
-
-    Convert a quaternion into euler angles (roll, pitch, yaw)
-    roll is rotation around x in radians (counterclockwise)
-    pitch is rotation around y in radians (counterclockwise)
-    yaw is rotation around z in radians (counterclockwise)
-    """
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + y * y)
-    roll_x = math.atan2(t0, t1)
-
-    t2 = +2.0 * (w * y - z * x)
-    t2 = +1.0 if t2 > +1.0 else t2
-    t2 = -1.0 if t2 < -1.0 else t2
-    pitch_y = math.asin(t2)
-
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (y * y + z * z)
-    yaw_z = math.atan2(t3, t4)
-  
-    return roll_x, pitch_y, yaw_z # in radians
 
 class iGibsonAgent:
     '''
@@ -83,10 +46,10 @@ class iGibsonAgent:
         #     x, y, z = self.object.get_position()
         #     self.target_x = x
         #     self.target_y = y
-        if current_action == Action.FORWARD and self.forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
+        if current_action == MLAction.FORWARD and self.forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
             #self.action_index += 1
             ready_for_next_action = True
-        elif current_action in Action.directions() and self.turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
+        elif current_action in MLAction.directions() and self.turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
             #self.action_index += 1
             self.direction = current_action
             ready_for_next_action = True
@@ -110,16 +73,16 @@ class iGibsonAgent:
             self.target_x = x
             self.target_y = y
         
-        if next_action == Action.FORWARD:
+        if next_action == MLAction.FORWARD:
             diff_x, diff_y = DIRE2POSDIFF[self.direction]
             self.target_x += diff_x
             self.target_y += diff_y
-        elif next_action in Action.directions():
+        elif next_action in MLAction.directions():
             self.target_direction = next_action
             x, y, z = self.object.get_position()
             self.target_x = x
             self.target_y = y
-        elif next_action == Action.STAY:
+        elif next_action == MLAction.STAY:
             return
 
     def get_current_orn_z(self):
@@ -131,7 +94,7 @@ class iGibsonAgent:
         return abs(cur_orn_z - target_orn_z)
 
     def forward_distance(self, cur_x, cur_y, target_x, target_y, direction):
-        if direction in [Action.NORTH, Action.SOUTH]:
+        if direction in [MLAction.NORTH, MLAction.SOUTH]:
             return abs(cur_x-target_x)
         else:
             return abs(cur_y-target_y)
@@ -142,9 +105,9 @@ class iGibsonAgent:
                 action = np.zeros(env.action_space.shape)
                 self.object.apply_action(action)
             return
-        elif action in Action.directions():
+        elif action in MLAction.directions():
             self.agent_turn_one_step(env, action)
-        elif action == Action.FORWARD:
+        elif action == MLAction.FORWARD:
             self.agent_forward_one_step(env)
         else:
             pass
@@ -152,13 +115,13 @@ class iGibsonAgent:
     def agent_forward_one_step(self, env):
         if self.name == "human":
             x,y,z = self.object.get_position()
-            if self.direction == Action.NORTH:
+            if self.direction == MLAction.NORTH:
                 self.object.set_position_orientation([x-ONE_STEP,y,z], self.object.get_orientation())
-            elif self.direction == Action.SOUTH:
+            elif self.direction == MLAction.SOUTH:
                 self.object.set_position_orientation([x+ONE_STEP,y,z], self.object.get_orientation())
-            elif self.direction == Action.EAST:
+            elif self.direction == MLAction.EAST:
                 self.object.set_position_orientation([x,y+ONE_STEP,z], self.object.get_orientation())
-            elif self.direction == Action.WEST:
+            elif self.direction == MLAction.WEST:
                 self.object.set_position_orientation([x,y-ONE_STEP,z], self.object.get_orientation())
         else:
             action = np.zeros(env.action_space.shape)

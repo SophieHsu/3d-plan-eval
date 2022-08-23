@@ -100,9 +100,11 @@ def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
                         visited.add(new_state)
                         path_prev[new_state] = (cur_state, action1, action2)
                         
-                if end_achieved(grid, nx1, ny1, ex1, ey1) and end_achieved(grid, nx2, ny2, ex2, ey2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
-                    path_prev[new_state] = (cur_state, action1, action2)
-                    heappush(queue, (cur_g+cost1+cost2+0, cur_g+cost1+cost2, new_state)) # heuristic=0
+                    # placed this inside conditional (valid) becuase invalid position was getting
+                    # pushed onto heap
+                    if end_achieved(grid, nx1, ny1, ex1, ey1) and end_achieved(grid, nx2, ny2, ex2, ey2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
+                        path_prev[new_state] = (cur_state, action1, action2)
+                        heappush(queue, (cur_g+cost1+cost2+0, cur_g+cost1+cost2, new_state)) # heuristic=0
 
     path = []
     if not break_all:

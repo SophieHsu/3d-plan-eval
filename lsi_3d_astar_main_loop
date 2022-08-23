@@ -14,7 +14,7 @@ from time import time
 from time import sleep
 from igibson.objects.ycb_object import YCBObject
 from igibson.objects.articulated_object import URDFObject, URDFObject
-from lsi_3d.utils.action import Action
+from lsi_3d.utils.enums import MLAction
 from render_layouts import HEIGHT, WIDTH, name2abbr
 from igibson.robots.behavior_robot import BehaviorRobot
 import math
@@ -204,7 +204,7 @@ def main_loop(env, grid, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, bowlpans)
     ig_robot.prepare_for_next_action(a_r)
     
     while(True):
-        if a_h == Action.STAY and a_r == Action.STAY:
+        if a_h == MLAction.STAY and a_r == MLAction.STAY:
             break
         
         ig_human.agent_move_one_step(env, a_h)

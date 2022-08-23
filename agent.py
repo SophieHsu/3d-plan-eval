@@ -1,4 +1,4 @@
-from lsi_3d.utils.action import Action
+from lsi_3d.utils.enums import MLAction
 
 class Agent(object):
     def action(self, state):
@@ -11,12 +11,12 @@ class FixedMediumPlan(Agent):
     """
 
     def __init__(self, plan):
-        self.plan = Action.from_strings(plan)
+        self.plan = MLAction.from_strings(plan)
         self.i = 0
     
     def action(self):
         if self.i >= len(self.plan):
-            return Action.STAY
+            return MLAction.STAY
         else:
             action = self.plan[self.i]
             self.i += 1
