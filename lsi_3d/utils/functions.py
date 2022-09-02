@@ -2,22 +2,33 @@ import math
 import numpy as np
 from numpy import diff
 from lsi_3d.utils.constants import TARGET_ORNS
+from lsi_3d.utils.enums import MLAction
 
 def orn_to_cardinal(angle):
+
     # converts an angle to whatever cardinal direction angle is closest to
-    diff = np.inf
-    direction = None
+    rad_45 = 0.785
+    if angle >= rad_45 and angle < 3*rad_45:
+        return MLAction.EAST
+    if (angle >= 3*rad_45 and angle < math.pi) or (angle >= -math.pi and angle < -3*rad_45):
+        return MLAction.NORTH
+    if angle >= -3*rad_45 and angle < -rad_45:
+        return MLAction.WEST
+    if (angle >= -rad_45 and angle < 0) or (angle < rad_45 and angle >= 0):
+        return MLAction.SOUTH
+    # diff = np.inf
+    # direction = None
 
-    for k,v in TARGET_ORNS.items():
-        if angle < 0: angle += 6.28319
-        if v < 0: v += 6.28319
+    # for k,v in TARGET_ORNS.items():
+    #     if angle < 0: angle += 6.28319
+    #     if v < 0: v += 6.28319
 
-        d = abs(angle-v)
-        if d < diff:
-            direction = k
-            diff = d
+    #     d = abs(angle-v)
+    #     if d < diff:
+    #         direction = k
+    #         diff = d
 
-    return direction
+    #return direction
 
 def quat2euler(x, y, z, w):
     """

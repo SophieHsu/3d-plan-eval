@@ -1,4 +1,4 @@
 name="human"
-start_x=3
-start_y=2
+start_x=0
+start_y=0
 start_direction = 'S'

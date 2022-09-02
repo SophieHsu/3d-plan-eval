@@ -136,6 +136,7 @@ def run_astar_two_agent(layout, start, end):
     z = zip(*path)
     a_1_path = [l[1] for l in path]
     a_2_path = [l[2] for l in path]
+    print(f'Robot path computed is: {a_2_path}')
     return (a_1_path, a_2_path)
 
 if __name__ == "__main__":

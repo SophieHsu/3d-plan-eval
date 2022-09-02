@@ -9,6 +9,7 @@ from transforms3d.euler import euler2quat
 from lsi_3d.utils.enums import MLAction
 from lsi_3d.utils.constants import DIRE2POSDIFF, TARGET_ORNS
 from lsi_3d.utils.functions import quat2euler
+from scipy.spatial.transform import Rotation
 
 ONE_STEP = 0.02
 
@@ -105,10 +106,24 @@ class iGibsonAgent:
                 action = np.zeros(env.action_space.shape)
                 self.object.apply_action(action)
             return
+        
         elif action in MLAction.directions():
             self.agent_turn_one_step(env, action)
         elif action == MLAction.FORWARD:
-            self.agent_forward_one_step(env)
+            cur_x, cur_y = self.object.get_position()[:2]
+            goal_angle = math.atan2((self.target_y - cur_y), (self.target_x- cur_x))
+            current_heading = self.get_current_orn_z()
+            dist = self.calc_angle_distance(goal_angle, current_heading)
+
+            if dist > 0.1:
+                self.turn_toward(env, goal_angle)
+                # goal_angle = math.atan2((self.target_y - cur_y), (self.target_x- cur_x))
+                # current_heading = self.get_current_orn_z()
+                # dist = self.calc_angle_distance(goal_angle, current_heading)
+                #env.simulator.step()
+
+            else:
+                self.agent_forward_one_step(env)
         else:
             pass
 
@@ -131,6 +146,9 @@ class iGibsonAgent:
 
             cur_x, cur_y = self.object.get_position()[:2]
             distance_to_target = self.forward_distance(cur_x, cur_y, self.target_x, self.target_y, self.direction)
+            #
+
+
 
             if distance_to_target < 0.2:
                 action[0] /= 2
@@ -139,6 +157,37 @@ class iGibsonAgent:
             elif distance_to_target < 0.05:
                 action[0] /= 8
             self.object.apply_action(action)
+
+    def calc_angle_distance(self, a1, a2):
+
+        if a1 < 0: a1 += 6.28319
+        if a2 < 0: a2 += 6.28319
+
+        d = abs(a2-a1)
+
+        if d > 3.14159:
+            d = 6.28319-d
+
+        return d
+
+    def turn_toward(self, env, goal_angle):
+        cur_orn_z = self.get_current_orn_z()
+        target_orn_z = goal_angle
+        action = np.zeros(env.action_space.shape)
+        action[0] = 0
+        if(cur_orn_z < target_orn_z):
+            action[1] = -0.2
+        else:
+            action[1] = 0.2
+        #print((cur_orn_z-target_orn_z) / (action[1]/action[1]), action[1], cur_orn_z, target_orn_z)
+        if ((cur_orn_z-target_orn_z) / (action[1]/abs(action[1]))) > 4: # > 3.14
+            action[1] = -action[1] 
+        if abs(target_orn_z - cur_orn_z) < 0.5:
+            action[1] /= 2
+        elif abs(target_orn_z - cur_orn_z) < 0.2:
+            action[1] /= 4
+        self.object.apply_action(action)
+        #env.simulator.step()
 
 
     def agent_turn_one_step(self, env, action):

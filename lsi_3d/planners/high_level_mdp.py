@@ -238,11 +238,11 @@ class HighLevelMdpPlanner(object):
         print("It took {} seconds to create MediumLevelMdpPlanner".format(time.time() - start_time))
         return 
 
-    def map_action_to_location(self, state_obj, action_obj, p0_obj = 'None'):
+    def map_action_to_location(self, state_obj, action_obj, p0_obj = None):
         """
         Get the next location the agent will be in based on current world state and medium level actions.
         """
-        #p0_obj = p0_obj if p0_obj is not None else self.state_dict[state_obj][0]
+        p0_obj = p0_obj if p0_obj is not None else state_obj.holding
         action, obj = action_obj
         #pots_states_dict = self.mdp.get_pot_states()
         location = []
@@ -264,8 +264,9 @@ class HighLevelMdpPlanner(object):
                 location = self.drop_item(world_state)
             elif p0_obj == 'None':
                 location = self.mdp.get_dish_dispenser_locations()
+                print(f'Next Dish Location: {location}')
             else:
-                location = self.mdp.get_ready_pots(pots_states_dict) + self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
+                location = state_obj.get_ready_pots()[0] # + self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
 
         elif action == 'drop':
             if obj == 'onion' or obj == 'tomato':

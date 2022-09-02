@@ -21,8 +21,7 @@ class LsiEnv(object):
         self.mdp = mdp
         self.ig_human = ig_human
         self.ig_robot = ig_robot
-
-        self.state = OvercookedState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations])
+        self.state = OvercookedState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
 
     def update_world_state(self, next_hl_state):
         '''
@@ -30,6 +29,7 @@ class LsiEnv(object):
         '''
         self.hl_state = next_hl_state # eventually replace with game logice
         self.ml_state = self.update_joint_ml_state()
+        self.state = self.state.update(self.hl_state, self.ml_state)
 
 
     def update_joint_ml_state(self):

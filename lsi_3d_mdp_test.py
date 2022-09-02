@@ -107,7 +107,7 @@ def name2shift(name):
         "table_h": (0, 0.5, 0),
         "stove": (0, 0, 0),
         "bowl": (0, 0, 1.2),
-        "pan": (0, 0, 1.24),
+        "pan": (0, 0, 1.2),
         "sink": (0, 0, 0.1),
         "fridge": (0, 0, 0.2),
     }
@@ -205,7 +205,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
 
         # indexes policy matrix with high-level states and retrieves
         # motion goals and calculates a plan
-        next_hl_state, plan = hl_robot_agent.action(env.hl_state, env.ml_state)
+        next_hl_state, plan = hl_robot_agent.action(env.state)
         if plan == []:
             print("No motion plan to execute")
             break
@@ -245,13 +245,28 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
 
 
 def robot_hand_up(env, bowlpans):
-    action = np.zeros(env.action_space.shape[0])
-    action[7] = 0.5
-    action[8] = 0.5
+    # action = np.zeros(env.action_space.shape[0])
+    action = [
+                0.0,
+                0.0,  # wheels
+                0.385,  # trunk
+                0.0,
+                0.0,  # head
+                1.1707963267948966,
+                1.4707963267948965,
+                -0.4,
+                1.6707963267948966,
+                0.0,
+                1.5707963267948966,
+                0.0,  # arm
+                0.05,
+                0.05,  # gripper
+            ]
+    env.robots[0].set_joint_positions(action)
     for i in range(70):
         for obj, pos in bowlpans:
             obj.set_position(pos)
-        env.step(action)
+        env.step()
 
 
 def load_objects(env, obj_x_y, orientation_map, robot_x, robot_y, human):
@@ -330,7 +345,6 @@ def run_example(args):
     lsi_env = LsiEnv(mdp, nav_env, human, robot)
     
     main_loop(mdp, lsi_env, human, robot, robot_agent, bowlpans)
-    
 
 
 if __name__ == "__main__":

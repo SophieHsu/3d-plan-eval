@@ -32,9 +32,9 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
-    def action(self, hl_state, ml_state):
+    def action(self, state):
 
-        state_str = hl_state
+        state_str = state.hl_state
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # retrieve high level action from policy
@@ -44,16 +44,16 @@ class HlMdpPlanningAgent(Agent):
         # TODO: Eliminate need for this indexing
         next_state_idx = np.where(self.mdp_planner.transition_matrix[action_idx][state_idx] == 1)[0][0]
         next_state = list(self.mdp_planner.state_idx_dict.keys())[list(self.mdp_planner.state_idx_dict.values()).index(next_state_idx)]
-
+        print(f"Next HL Goal State: {next_state}")
         keys = list(self.mdp_planner.action_idx_dict.keys())
         vals = list(self.mdp_planner.action_idx_dict.values())
         action_object_pair = self.mdp_planner.action_dict[keys[vals.index(action_idx)]]
         # print(self.mdp_planner.state_idx_dict[state_str], action_idx, action_object_pair)
-
+        
         # map back the medium level action to low level action
-        possible_motion_goals = self.mdp_planner.map_action_to_location(state_str, action_object_pair)
+        possible_motion_goals = self.mdp_planner.map_action_to_location(state, action_object_pair)
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
-        paths = self.mlp.compute_motion_plan(ml_state, (ml_state[0],goal))
+        paths = self.mlp.compute_motion_plan(state.ml_state, (state.ml_state[0],goal))
         
         return (next_state, paths[1])
