@@ -113,14 +113,10 @@ class iGibsonAgent:
             cur_x, cur_y = self.object.get_position()[:2]
             goal_angle = math.atan2((self.target_y - cur_y), (self.target_x- cur_x))
             current_heading = self.get_current_orn_z()
-            dist = self.calc_angle_distance(goal_angle, current_heading)
+            angle_delta = self.calc_angle_distance(goal_angle, current_heading)
 
-            if dist > 0.1:
-                self.turn_toward(env, goal_angle)
-                # goal_angle = math.atan2((self.target_y - cur_y), (self.target_x- cur_x))
-                # current_heading = self.get_current_orn_z()
-                # dist = self.calc_angle_distance(goal_angle, current_heading)
-                #env.simulator.step()
+            if angle_delta > 0.1:
+                self.turn_toward(env, goal_angle, angle_delta, cur_x, cur_y)
 
             else:
                 self.agent_forward_one_step(env)
@@ -146,9 +142,6 @@ class iGibsonAgent:
 
             cur_x, cur_y = self.object.get_position()[:2]
             distance_to_target = self.forward_distance(cur_x, cur_y, self.target_x, self.target_y, self.direction)
-            #
-
-
 
             if distance_to_target < 0.2:
                 action[0] /= 2
@@ -170,15 +163,19 @@ class iGibsonAgent:
 
         return d
 
-    def turn_toward(self, env, goal_angle):
+    def turn_toward(self, env, goal_angle, angle_delta, cur_x, cur_y):
         cur_orn_z = self.get_current_orn_z()
         target_orn_z = goal_angle
         action = np.zeros(env.action_space.shape)
         action[0] = 0
+
+        distance_to_target = self.forward_distance(cur_x, cur_y, self.target_x, self.target_y, self.direction)
+
+        # Decides to turn right or left
         if(cur_orn_z < target_orn_z):
-            action[1] = -0.2
+            action[1] = -angle_delta
         else:
-            action[1] = 0.2
+            action[1] = angle_delta
         #print((cur_orn_z-target_orn_z) / (action[1]/action[1]), action[1], cur_orn_z, target_orn_z)
         if ((cur_orn_z-target_orn_z) / (action[1]/abs(action[1]))) > 4: # > 3.14
             action[1] = -action[1] 

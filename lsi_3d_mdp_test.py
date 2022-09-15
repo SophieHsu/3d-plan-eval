@@ -4,7 +4,7 @@ from tokenize import String
 import toml
 
 import numpy as np
-from agent import FixedMediumPlan
+from agent import Agent, FixedMediumPlan
 
 import igibson
 from igibson.envs.igibson_env import iGibsonEnv
@@ -14,6 +14,7 @@ from time import time
 from time import sleep
 from igibson.objects.ycb_object import YCBObject
 from igibson.objects.articulated_object import URDFObject, URDFObject
+from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
@@ -191,21 +192,27 @@ def grid2raw(grid_str):
                 return_str += "{} {} {}\n".format(name, x, y)
     return return_str
 
-def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_robot_agent:HlMdpPlanningAgent, bowlpans):
+def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_robot_agent:HlMdpPlanningAgent, hl_human_agent:FixedPolicyAgent, bowlpans):
     print('Press enter to start...')
     input()
     
     # start = ig_human.start + ig_robot.start
     # end = ((3,0),(5,3))
     #plan = run_astar_two_agent(grid, start, end)
-    human_plan = []
-    human = FixedMediumPlan(human_plan)
+    #human_plan = ['pickup_onion', 'drop_onion', 'pickup_onion', 'drop_onion', 'pickup_dish', 'deliver_soup']
+    
 
     while True:
 
         # indexes policy matrix with high-level states and retrieves
         # motion goals and calculates a plan
-        next_hl_state, plan = hl_robot_agent.action(env.state)
+
+        human_plan = hl_human_agent.action(env.human_state)
+        human = FixedMediumPlan(human_plan)
+
+        # TODO: should pass human ml_plan into robot plan so no collision?
+        next_hl_state, plan = hl_robot_agent.action(env.robot_state)
+
         if plan == []:
             print("No motion plan to execute")
             break
@@ -239,7 +246,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
 
             env.nav_env.simulator.step()
 
-        env.update_world_state(next_hl_state)
+        env.update_robot_world_state(next_hl_state)
 
 
 
@@ -326,6 +333,7 @@ def run_example(args):
     mlp = AStarMotionPlanner(grid)
     hlp.compute_mdp_policy(order_list)
     robot_agent = HlMdpPlanningAgent(hlp, mlp)
+    human_agent = FixedPolicyAgent(hlp,mlp)
 
     nav_env = iGibsonEnv(
         config_file=args.config, mode=args.mode, action_timestep=1.0 / 12, physics_timestep=1.0 / 12, use_pb_gui=True
@@ -339,12 +347,12 @@ def run_example(args):
     motion_planner = MotionPlanningWrapper(nav_env)
     print("**************loading done***************")
     
-    human = iGibsonAgent(human, human_start, "S", "human")
-    robot = iGibsonAgent(nav_env.robots[0], robot_start, "S", "robot")
+    human = iGibsonAgent(human, human_start, MLAction.SOUTH, "human")
+    robot = iGibsonAgent(nav_env.robots[0], robot_start, MLAction.SOUTH, "robot")
 
     lsi_env = LsiEnv(mdp, nav_env, human, robot)
     
-    main_loop(mdp, lsi_env, human, robot, robot_agent, bowlpans)
+    main_loop(mdp, lsi_env, human, robot, robot_agent, human_agent, bowlpans)
 
 
 if __name__ == "__main__":

@@ -42,7 +42,7 @@ class OvercookedState(object):
         new_in_pot = self.in_pot
 
         if new_in_pot == (prev_in_pot+1):
-            self.soup_states[0].add_onion()
+            self.soup_states[0].onions_in_soup = self.in_pot
 
         return self
 

@@ -47,25 +47,35 @@ def cost_func(grid, ex, ey, x, y, f, action):
         "N": (-1, 0),
     }
     dx, dy = name2dire[f]
-    if end_achieved(grid, x, y, ex, ey) and action == "I" and (x+dx, y+dy) == (ex, ey):
+    if end_achieved(grid, x, y, ex, ey, f) and action == "I" and (x+dx, y+dy) == (ex, ey):
         return 0
     else:
         return 1
 
-def end_achieved(grid, x, y, ex, ey):
+def end_achieved(grid, x, y, ex, ey, f):
     if(grid[ex][ey] == "X"):
         return (x, y) == (ex, ey)
     else:
         dx = abs(x-ex)
         dy = abs(y-ey)
-        return dx + dy <= 1
+
+        name2dire = {
+            "E": (0, 1),
+            "W": (0, -1),
+            "S": (1, 0),
+            "N": (-1, 0),
+        }
+
+        offset = name2dire[f]
+        
+        return (dx + dy <= 1) and (offset == ((ex-x),(ey-y)))
 
 def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
 
     if grid[ex1][ey1] == 'X' or grid[ex2][ey2] == 'X':
         print('Warning: End goal is open space so agent may spin in place')
     
-    actions = ["E", "W", "S", "N", "I", "F"] 
+    actions = ["E", "W", "S", "N", "I", "F"]
     visited = set()
     visited.add(start_state)
     path_prev = dict()
@@ -78,7 +88,7 @@ def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
     while queue and not break_all:
         _, cur_g, cur_state = heappop(queue)
         cx1, cy1, cf1, cx2, cy2, cf2 = cur_state
-        if end_achieved(grid, cx1, cy1, ex1, ey1) and end_achieved(grid, cx2, cy2, ex2, ey2):
+        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1) and end_achieved(grid, cx2, cy2, ex2, ey2, cf2):
             last_state = cur_state
             break_all = True
             break
@@ -100,11 +110,11 @@ def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
                         visited.add(new_state)
                         path_prev[new_state] = (cur_state, action1, action2)
                         
-                    # placed this inside conditional (valid) becuase invalid position was getting
-                    # pushed onto heap
-                    if end_achieved(grid, nx1, ny1, ex1, ey1) and end_achieved(grid, nx2, ny2, ex2, ey2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
-                        path_prev[new_state] = (cur_state, action1, action2)
-                        heappush(queue, (cur_g+cost1+cost2+0, cur_g+cost1+cost2, new_state)) # heuristic=0
+                # placed this inside conditional (valid) becuase invalid position was getting
+                # pushed onto heap
+                if valid(grid, nx1, ny1, nx2, ny2) and end_achieved(grid, nx1, ny1, ex1, ey1, cf1) and end_achieved(grid, nx2, ny2, ex2, ey2, cf2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
+                    path_prev[new_state] = (cur_state, action1, action2)
+                    heappush(queue, (cur_g+cost1+cost2+0, cur_g+cost1+cost2, new_state)) # heuristic=0
 
     path = []
     if not break_all:
@@ -117,6 +127,8 @@ def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
         px1, py1, pf1, px2, py2, pf2 = p_state
 
     return path[::-1]
+
+# TODO: write 2 agent a star where human path is known
 
 def run_astar_two_agent(layout, start, end):
     """Runs astar algorithm for two agent

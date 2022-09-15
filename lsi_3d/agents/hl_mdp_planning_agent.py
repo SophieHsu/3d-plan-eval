@@ -54,6 +54,8 @@ class HlMdpPlanningAgent(Agent):
         possible_motion_goals = self.mdp_planner.map_action_to_location(state, action_object_pair)
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
+
+        # should this happen outside
         paths = self.mlp.compute_motion_plan(state.ml_state, (state.ml_state[0],goal))
         
         return (next_state, paths[1])
