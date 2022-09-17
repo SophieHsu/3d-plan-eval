@@ -8,6 +8,7 @@ class MLAction(Enum):
     SOUTH = 4
     WEST = 5
     FORWARD = 6
+    WAIT = 7
 
     @classmethod
     def directions(self):
@@ -68,3 +69,7 @@ class Object(Enum):
     NONE = 0
     ONION = 1
     SOUP = 2
+
+class ExecutingState(Enum):
+    EXEC_ML_PATH = 0
+    NO_ML_PATH = 1

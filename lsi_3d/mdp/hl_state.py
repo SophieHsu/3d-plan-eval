@@ -2,6 +2,8 @@
 import string
 from tokenize import String
 
+from lsi_3d.utils.enums import ExecutingState
+
 
 class SoupState(object):
     def __init__(self, location, onions_in_soup) -> None:
@@ -11,11 +13,12 @@ class SoupState(object):
     def add_onion(self):
         self.onions_in_soup += 1
 
-class OvercookedState(object):
+class AgentState(object):
     def __init__(self, hl_state, ml_state, ll_state = None, soup_locations = []) -> None:
         self.hl_state = hl_state
         self.ml_state = ml_state
         self.ll_state = ll_state
+        self.executing_state = ExecutingState.NO_ML_PATH
 
         if soup_locations != None:
             self.soup_states = [SoupState(location, 0) for location in soup_locations]

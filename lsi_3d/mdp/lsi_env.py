@@ -1,7 +1,7 @@
 import math
 from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.mdp.hl_state import OvercookedState, SoupState
+from lsi_3d.mdp.hl_state import AgentState, SoupState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
 
@@ -21,8 +21,8 @@ class LsiEnv(object):
         self.mdp = mdp
         self.ig_human = ig_human
         self.ig_robot = ig_robot
-        self.human_state = OvercookedState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
-        self.robot_state = OvercookedState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
+        self.human_state = AgentState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
+        self.robot_state = AgentState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
 
     def update_robot_world_state(self, next_hl_state):
         '''
@@ -31,6 +31,14 @@ class LsiEnv(object):
         self.hl_state = next_hl_state # eventually replace with game logice
         self.ml_state = self.update_joint_ml_state()
         self.robot_state = self.robot_state.update(self.hl_state, self.ml_state)
+
+    def update_human_world_state(self, next_hl_state):
+        '''
+        Looks at agents place in the world and updates current state
+        '''
+        self.hl_state = next_hl_state # eventually replace with game logice
+        self.ml_state = self.update_joint_ml_state()
+        self.human_state = self.human_state.update(self.hl_state, self.ml_state)
 
 
     def update_joint_ml_state(self):

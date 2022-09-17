@@ -19,7 +19,7 @@ from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import ExecutingState, MLAction
 from render_layouts import HEIGHT, WIDTH, name2abbr
 from igibson.robots.behavior_robot import BehaviorRobot
 import math
@@ -203,50 +203,50 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
     
 
     while True:
+        if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
+            next_human_hl_state,human_plan, human_goal = hl_human_agent.action(env.human_state)
+            human = FixedMediumPlan(human_plan)
+            env.human_state.executing_state = ExecutingState.EXEC_ML_PATH
+            a_h = human.action()
+            ig_human.prepare_for_next_action(a_h)
 
-        # indexes policy matrix with high-level states and retrieves
-        # motion goals and calculates a plan
+        if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
+            next_robot_hl_state, plan = hl_robot_agent.action(env.robot_state, human_plan, human_goal)
+            robot = FixedMediumPlan(plan)
+            env.robot_state.executing_state = ExecutingState.EXEC_ML_PATH
+            a_r = robot.action()
+            ig_robot.prepare_for_next_action(a_r)
 
-        human_plan = hl_human_agent.action(env.human_state)
-        human = FixedMediumPlan(human_plan)
+        if env.human_state.executing_state == ExecutingState.EXEC_ML_PATH:
+            if a_h == MLAction.STAY or a_h == MLAction.INTERACT:
+                env.human_state.executing_state = ExecutingState.NO_ML_PATH
+            else:
+                ig_human.agent_move_one_step(env.nav_env, a_h)
+                if ig_human.action_completed(a_h):
+                    # human.action() gets next FNESW medium level action to take
+                    a_h = human.action()
+                    ig_human.prepare_for_next_action(a_h)
 
-        # TODO: should pass human ml_plan into robot plan so no collision?
-        next_hl_state, plan = hl_robot_agent.action(env.robot_state)
+        if env.robot_state.executing_state == ExecutingState.EXEC_ML_PATH:
+            if a_r == MLAction.STAY or a_r == MLAction.INTERACT:
+                env.robot_state.executing_state = ExecutingState.NO_ML_PATH
+            else:
+                ig_robot.agent_move_one_step(env.nav_env, a_r)
 
-        if plan == []:
-            print("No motion plan to execute")
-            break
+                if ig_robot.action_completed(a_r):
+                    a_r = robot.action()
+                    ig_robot.prepare_for_next_action(a_r)
 
-        robot = FixedMediumPlan(plan)
-
-        a_h = human.action()
-        a_r = robot.action()
-        #lsi_env = LsiEnv(env)
-        ig_human.prepare_for_next_action(a_h)
-        ig_robot.prepare_for_next_action(a_r)
-
-        # Accomplishes plan for low-level motion
-        while(True):
-            if a_h == MLAction.STAY and a_r == MLAction.STAY:
-                break
-            
-            ig_human.agent_move_one_step(env.nav_env, a_h)
-            ig_robot.agent_move_one_step(env.nav_env, a_r)
-
-            if ig_human.action_completed(a_h):
-                # human.action() gets next FNESW medium level action to take
-                a_h = human.action()
-                ig_human.prepare_for_next_action(a_h)
-            if ig_robot.action_completed(a_r):
-                a_r = robot.action()
-                ig_robot.prepare_for_next_action(a_r)
-
-            for obj, pos in bowlpans:
+        
+        for obj, pos in bowlpans:
                 obj.set_position(pos)
+        env.nav_env.simulator.step()
+        
+        if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
+            env.update_robot_world_state(next_human_hl_state)
+        if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
+            env.update_human_world_state(next_robot_hl_state)
 
-            env.nav_env.simulator.step()
-
-        env.update_robot_world_state(next_hl_state)
 
 
 

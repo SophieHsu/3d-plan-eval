@@ -21,3 +21,6 @@ class FixedMediumPlan(Agent):
             action = self.plan[self.i]
             self.i += 1
             return action
+
+    def to_string(self):
+        return MLAction.to_string(self.plan)

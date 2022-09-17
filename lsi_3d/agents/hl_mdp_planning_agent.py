@@ -32,7 +32,7 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
-    def action(self, state):
+    def action(self, state, human_ml_plan, human_goal):
 
         state_str = state.hl_state
         state_idx = self.mdp_planner.state_idx_dict[state_str]
@@ -56,6 +56,6 @@ class HlMdpPlanningAgent(Agent):
         #start = ml_state[0] + ml_state[1]
 
         # should this happen outside
-        paths = self.mlp.compute_motion_plan(state.ml_state, (state.ml_state[0],goal))
+        paths = self.mlp.compute_motion_plan(state.ml_state, (human_goal,goal), human_ml_plan)
         
         return (next_state, paths[1])
