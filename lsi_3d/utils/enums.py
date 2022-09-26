@@ -71,5 +71,6 @@ class Object(Enum):
     SOUP = 2
 
 class ExecutingState(Enum):
-    EXEC_ML_PATH = 0
+    EXEC_SUB_PATH = 0
     NO_ML_PATH = 1
+    CALC_SUB_PATH = 2

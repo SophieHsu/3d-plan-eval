@@ -1,9 +1,10 @@
 from agent import Agent
 from lsi_3d.mdp.hl_state import AgentState
 from lsi_3d.utils.enums import HLAction
+from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 
 class FixedPolicyAgent(Agent):
-    def __init__(self, hlp, mlp) -> None:
+    def __init__(self, hlp, mlp:AStarMotionPlanner) -> None:
         self.hlp = hlp
         self.mlp = mlp
 
@@ -14,7 +15,7 @@ class FixedPolicyAgent(Agent):
             action,object = ('pickup', 'dish')
             next_hl_state = f'onion_{state.in_pot}_onion_onion'
         elif state.holding == 'onion':
-            action,ojbect = ('drop','onion')
+            action,object = ('drop','onion')
             next_hl_state = f'None_{state.in_pot+1}_onion_onion'
 
         possible_motion_goals = self.hlp.map_action_to_location(state, (action,object))
@@ -22,9 +23,9 @@ class FixedPolicyAgent(Agent):
         #start = ml_state[0] + ml_state[1]
 
         # should this happen outside
-        paths = self.mlp.compute_motion_plan(state.ml_state, (goal,state.ml_state[0]))
+        paths = self.mlp.compute_single_agent_astar_path(state.ml_state[0], goal)
         
-        return next_hl_state, paths[0], goal
+        return next_hl_state, paths, goal
 
             
 

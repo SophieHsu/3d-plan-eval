@@ -192,6 +192,14 @@ def grid2raw(grid_str):
                 return_str += "{} {} {}\n".format(name, x, y)
     return return_str
 
+def get_human_sub_path(path, current_index):
+    sub_path = path[current_index:(len(path)-1)]
+    ml_path = []
+    for loc in sub_path:
+        ml_path.append(loc[1])
+
+    return ml_path, sub_path[0][0]
+
 def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_robot_agent:HlMdpPlanningAgent, hl_human_agent:FixedPolicyAgent, bowlpans):
     print('Press enter to start...')
     input()
@@ -206,18 +214,23 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
         if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
             next_human_hl_state,human_plan, human_goal = hl_human_agent.action(env.human_state)
             human = FixedMediumPlan(human_plan)
-            env.human_state.executing_state = ExecutingState.EXEC_ML_PATH
+            env.human_state.executing_state = ExecutingState.EXEC_SUB_PATH
             a_h = human.action()
             ig_human.prepare_for_next_action(a_h)
 
         if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
-            next_robot_hl_state, plan = hl_robot_agent.action(env.robot_state, human_plan, human_goal)
+            next_robot_hl_state, plan = hl_robot_agent.prepare_optimal_path(env.robot_state)
             robot = FixedMediumPlan(plan)
-            env.robot_state.executing_state = ExecutingState.EXEC_ML_PATH
+            env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+
+        if env.robot_state.executing_state == ExecutingState.CALC_SUB_PATH:
+            human_sub_path, human_start = get_human_sub_path(human_plan, human.i)
+            next_robot_ml_goal, plan = hl_robot_agent.action(env.robot_state, human_sub_path, human_goal, human_start)
+            env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
             a_r = robot.action()
             ig_robot.prepare_for_next_action(a_r)
 
-        if env.human_state.executing_state == ExecutingState.EXEC_ML_PATH:
+        if env.human_state.executing_state == ExecutingState.EXEC_SUB_PATH:
             if a_h == MLAction.STAY or a_h == MLAction.INTERACT:
                 env.human_state.executing_state = ExecutingState.NO_ML_PATH
             else:
@@ -227,7 +240,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
                     a_h = human.action()
                     ig_human.prepare_for_next_action(a_h)
 
-        if env.robot_state.executing_state == ExecutingState.EXEC_ML_PATH:
+        if env.robot_state.executing_state == ExecutingState.EXEC_SUB_PATH:
             if a_r == MLAction.STAY or a_r == MLAction.INTERACT:
                 env.robot_state.executing_state = ExecutingState.NO_ML_PATH
             else:
@@ -237,7 +250,9 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
                     a_r = robot.action()
                     ig_robot.prepare_for_next_action(a_r)
 
-        
+        if human.i % 3 == 2:
+            env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+
         for obj, pos in bowlpans:
                 obj.set_position(pos)
         env.nav_env.simulator.step()

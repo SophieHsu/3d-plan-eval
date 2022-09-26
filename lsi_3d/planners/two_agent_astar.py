@@ -35,6 +35,10 @@ def heuristic(ex1, ey1, ex2, ey2, state):
     x1, y1, f1, x2, y2, f2 = state
     return (abs(x1-ex1)+abs(y1-ey1)+abs(x2-ex2)+abs(y2-ey2))
 
+def heuristic_one(ex1, ey1, state):
+    x1, y1, f1 = state
+    return (abs(x1-ex1)+abs(y1-ey1))
+
 def valid_one(grid, x, y):
     return 0 <= x and x < len(grid) and 0 <= y and y < len(grid[0]) and grid[x][y] == "X"
 
@@ -71,6 +75,63 @@ def end_achieved(grid, x, y, ex, ey, f):
         offset = name2dire[f]
         
         return (dx + dy <= 1) and (offset == ((ex-x),(ey-y)))
+
+def single_agent_astar(grid, start_state, end_state):
+    ex1, ey1 = end_state
+    if grid[ex1][ey1] == 'X':
+        print('Warning: End goal is open space so agent may spin in place')
+    
+    actions = ["E", "W", "S", "N", "I", "F"]
+    visited = set()
+    visited.add(start_state)
+    path_prev = dict()
+    queue = []
+    heappush(queue, (0, 0, start_state)) # f, g, state, f=h+g
+    f_values = dict()
+    f_values[start_state] = 0
+    break_all = False
+    last_state = None
+    while queue and not break_all:
+        _, cur_g, cur_state = heappop(queue)
+        cx1, cy1, cf1 = cur_state
+        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1):
+            last_state = cur_state
+            break_all = True
+            break
+        for action1 in actions:
+            if break_all:
+                break
+            nx1, ny1, nf1 = transition(cx1, cy1, cf1, action1)
+            cost1 = cost_func(grid, ex1, ey1, nx1, ny1, nf1, action1)
+            
+                
+            new_state = (nx1, ny1, nf1)
+            #print(action1, action2, new_state)
+            if valid_one(grid, nx1, ny1):
+                new_h = heuristic_one(ex1, ey1, new_state)
+                if new_state not in visited or cur_g+cost1+new_h < f_values[new_state]:
+                    heappush(queue, (cur_g+cost1+new_h, cur_g+cost1, new_state))
+                    f_values[new_state] = cur_g+cost1+new_h
+                    visited.add(new_state)
+                    path_prev[new_state] = (cur_state, action1)
+                    
+            # placed this inside conditional (valid) becuase invalid position was getting
+            # pushed onto heap
+            if valid_one(grid, nx1, ny1) and end_achieved(grid, nx1, ny1, ex1, ey1, cf1):
+                path_prev[new_state] = (cur_state, action1)
+                heappush(queue, (cur_g+cost1+0, cur_g+cost1, new_state)) # heuristic=0
+
+    path = []
+    if not break_all:
+        return path
+    px1, py1, pf1 = last_state
+    sx1, sy1, sf1 = start_state
+    while (px1, py1, pf1) != (sx1, sy1, sf1):
+        p_state, command1 = path_prev[(px1, py1, pf1)]
+        path.append(((px1, py1, pf1), command1))
+        px1, py1, pf1 = p_state
+
+    return path[::-1]
 
 def two_agent_astar(grid, start_state, ex1, ey1, ex2, ey2):
 
@@ -299,7 +360,7 @@ if __name__ == "__main__":
     filepath = "kitchen_layouts_grid_text/empty.txt"
     grid = [list(line) for line in open(filepath, "r").read().strip().split("\n")]
     start_state = (0, 0, "S", 2, 0, "S")
-    path = two_agent_astar(grid, start_state, 2,0,0,0)
+    path = astar_avoid_path(grid, start_state, 2,0,0,0, [])
 
     #path = two_agent_astar(layout, (), human_end[0], human_end[1], robot_end[0], robot_end[1]
     #print(5, 2, 6, 3)
