@@ -1,6 +1,4 @@
 from heapq import heappush, heappop
-
-from lsi_3d.utils.enums import MLAction
 # state: x1, y1, f1, x2, y2, f2 (x, y, facing_direction)
 
 def copy_grid(grid):
