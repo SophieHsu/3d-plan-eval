@@ -198,7 +198,7 @@ def get_human_sub_path(path, current_index):
     for loc in sub_path:
         ml_path.append(loc[1])
 
-    return ml_path, sub_path[0][0]
+    return ml_path
 
 def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_robot_agent:HlMdpPlanningAgent, hl_human_agent:FixedPolicyAgent, bowlpans):
     print('Press enter to start...')
@@ -224,8 +224,8 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
             env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
         if env.robot_state.executing_state == ExecutingState.CALC_SUB_PATH:
-            human_sub_path, human_start = get_human_sub_path(human_plan, human.i)
-            next_robot_ml_goal, plan = hl_robot_agent.action(env.robot_state, human_sub_path, human_goal, human_start)
+            human_sub_path = get_human_sub_path(human_plan, human.i)
+            next_robot_ml_goal, plan = hl_robot_agent.action(env.robot_state, human_sub_path, human_goal)
             env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
             a_r = robot.action()
             ig_robot.prepare_for_next_action(a_r)

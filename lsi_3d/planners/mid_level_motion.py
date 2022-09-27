@@ -10,7 +10,7 @@ class AStarMotionPlanner(object):
         print(f'Computing plan from {starts} to {goals}')
         r1,c1,d1 = starts[0]
         r2,c2,d2 = starts[1]
-        starts = (r1,c1,d1,r2,c2,MLAction.to_string(d2))
+        starts = (r1,c1,MLAction.to_string(d1),r2,c2,MLAction.to_string(d2))
 
         return run_astar_two_agent(self.map, starts, goals, avoid_path)
 
