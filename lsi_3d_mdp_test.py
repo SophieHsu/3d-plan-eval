@@ -224,7 +224,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
             env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
         if env.robot_state.executing_state == ExecutingState.CALC_SUB_PATH:
-            human_sub_path = get_human_sub_path(human_plan, human.i)
+            human_sub_path = get_human_sub_path(human_plan, (human.i-1))
             next_robot_ml_goal, plan = hl_robot_agent.action(env.robot_state, human_sub_path, human_goal)
             env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
             a_r = robot.action()
