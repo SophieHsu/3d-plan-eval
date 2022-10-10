@@ -34,7 +34,7 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
-    def action(self, state, human_ml_plan, human_goal):
+    def action(self, state):
 
         state_str = state.hl_state
         state_idx = self.mdp_planner.state_idx_dict[state_str]
@@ -56,35 +56,14 @@ class HlMdpPlanningAgent(Agent):
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
 
-        paths = self.mlp.compute_motion_plan(state.ml_state, (human_goal,goal), human_ml_plan)
-        
-        return (next_state, paths[1])
+        return (next_state, goal)
 
-    def prepare_optimal_path(self, state):
-
-        state_str = state.hl_state
-        state_idx = self.mdp_planner.state_idx_dict[state_str]
-
-        # retrieve high level action from policy
-        action_idx = self.mdp_planner.policy_matrix[state_idx]
-        #next_state = self.mdp_planner.transi
-
-        # TODO: Eliminate need for this indexing
-        next_state_idx = np.where(self.mdp_planner.transition_matrix[action_idx][state_idx] == 1)[0][0]
-        next_state = list(self.mdp_planner.state_idx_dict.keys())[list(self.mdp_planner.state_idx_dict.values()).index(next_state_idx)]
-        print(f"Next HL Goal State: {next_state}")
-        keys = list(self.mdp_planner.action_idx_dict.keys())
-        vals = list(self.mdp_planner.action_idx_dict.values())
-        action_object_pair = self.mdp_planner.action_dict[keys[vals.index(action_idx)]]
-        # print(self.mdp_planner.state_idx_dict[state_str], action_idx, action_object_pair)
-        
-        # map back the medium level action to low level action
-        possible_motion_goals = self.mdp_planner.map_action_to_location(state, action_object_pair)
-        goal = possible_motion_goals[0]
-        #start = ml_state[0] + ml_state[1]
-
-        # should this happen outside
+    def optimal_motion_plan(self, state, goal):
         path = self.mlp.compute_single_agent_astar_path(state.ml_state[1], goal)
         self.optimal_path = path
-        
-        return (next_state, path)
+        return 
+
+    def avoidance_motion_plan(self, state, goal, avoid_path, avoid_goal):
+        paths = self.mlp.compute_motion_plan(state.ml_state, (avoid_goal,goal), avoid_path)
+        return paths[1]
+

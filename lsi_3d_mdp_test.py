@@ -193,12 +193,9 @@ def grid2raw(grid_str):
     return return_str
 
 def get_human_sub_path(path, current_index):
-    sub_path = path[current_index:(len(path)-1)]
-    ml_path = []
-    for loc in sub_path:
-        ml_path.append(loc[1])
+    sub_path = path[current_index:(len(path))]
 
-    return ml_path
+    return sub_path
 
 def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_robot_agent:HlMdpPlanningAgent, hl_human_agent:FixedPolicyAgent, bowlpans):
     print('Press enter to start...')
@@ -209,7 +206,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
     #plan = run_astar_two_agent(grid, start, end)
     #human_plan = ['pickup_onion', 'drop_onion', 'pickup_onion', 'drop_onion', 'pickup_dish', 'deliver_soup']
     
-
+    calced = False
     while True:
         if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
             next_human_hl_state,human_plan, human_goal = hl_human_agent.action(env.human_state)
@@ -219,16 +216,28 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
             ig_human.prepare_for_next_action(a_h)
 
         if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
-            next_robot_hl_state, plan = hl_robot_agent.prepare_optimal_path(env.robot_state)
-            robot = FixedMediumPlan(plan)
+            next_robot_hl_state, robot_goal = hl_robot_agent.action(env.robot_state)
+            optimal_plan = hl_robot_agent.optimal_motion_plan(env.robot_state, robot_goal)
             env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
         if env.robot_state.executing_state == ExecutingState.CALC_SUB_PATH:
             human_sub_path = get_human_sub_path(human_plan, (human.i-1))
-            next_robot_ml_goal, plan = hl_robot_agent.action(env.robot_state, human_sub_path, human_goal)
+            plan = hl_robot_agent.avoidance_motion_plan(env.robot_state,robot_goal, human_sub_path, human_goal)
+            robot = FixedMediumPlan(plan)
             env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
             a_r = robot.action()
             ig_robot.prepare_for_next_action(a_r)
+        elif env.robot_state.executing_state == ExecutingState.EXEC_SUB_PATH:
+            if a_r == MLAction.STAY or a_r == MLAction.INTERACT:
+                env.robot_state.executing_state = ExecutingState.NO_ML_PATH
+            else:
+                ig_robot.agent_move_one_step(env.nav_env, a_r)
+
+                if ig_robot.action_completed(a_r):
+                    a_r = robot.action()
+                    env.update_joint_ml_state()
+                    ig_robot.prepare_for_next_action(a_r)
+                    calced = False
 
         if env.human_state.executing_state == ExecutingState.EXEC_SUB_PATH:
             if a_h == MLAction.STAY or a_h == MLAction.INTERACT:
@@ -237,21 +246,17 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
                 ig_human.agent_move_one_step(env.nav_env, a_h)
                 if ig_human.action_completed(a_h):
                     # human.action() gets next FNESW medium level action to take
+
+                    if human.i % 3 == 0:
+                        env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+
                     a_h = human.action()
+                    env.update_joint_ml_state()
                     ig_human.prepare_for_next_action(a_h)
 
-        if env.robot_state.executing_state == ExecutingState.EXEC_SUB_PATH:
-            if a_r == MLAction.STAY or a_r == MLAction.INTERACT:
-                env.robot_state.executing_state = ExecutingState.NO_ML_PATH
-            else:
-                ig_robot.agent_move_one_step(env.nav_env, a_r)
-
-                if ig_robot.action_completed(a_r):
-                    a_r = robot.action()
-                    ig_robot.prepare_for_next_action(a_r)
-
-        if human.i % 3 == 2:
-            env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+        # if human.i % 3 == 0 and calced == False:
+        #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+        #     calced = True
 
         for obj, pos in bowlpans:
                 obj.set_position(pos)
