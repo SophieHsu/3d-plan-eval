@@ -227,6 +227,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
             env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
             a_r = robot.action()
             ig_robot.prepare_for_next_action(a_r)
+
         elif env.robot_state.executing_state == ExecutingState.EXEC_SUB_PATH:
             if a_r == MLAction.STAY or a_r == MLAction.INTERACT:
                 env.robot_state.executing_state = ExecutingState.NO_ML_PATH
@@ -247,7 +248,7 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
                 if ig_human.action_completed(a_h):
                     # human.action() gets next FNESW medium level action to take
 
-                    if human.i % 3 == 0:
+                    if human.i % 5 == 0:
                         env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
                     a_h = human.action()

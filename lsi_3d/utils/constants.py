@@ -14,3 +14,11 @@ DIRE2POSDIFF = {
     MLAction.SOUTH: (1, 0),
     MLAction.NORTH: (-1, 0)
 }
+
+FORWARD_RADIUS_POS = {
+    # x-min, x-max, y-min, y-max
+    MLAction.EAST: (0,1,-1,1),
+    MLAction.WEST: (-1,0,-1,1),
+    MLAction.SOUTH: (-1,1,0,1),
+    MLAction.NORTH: (-1,1,-1,0)
+}
