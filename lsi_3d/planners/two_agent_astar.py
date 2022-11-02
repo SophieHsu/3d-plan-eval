@@ -351,7 +351,7 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
     while queue and not break_all:
         _, cur_g, cur_state, avoid_path_t_step = heappop(queue)
         cx1, cy1, cf1, cx2, cy2, cf2 = cur_state
-        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1) and end_achieved(grid, cx2, cy2, ex2, ey2, cf2):
+        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1) or end_achieved(grid, cx2, cy2, ex2, ey2, cf2):
             last_state = cur_state
             break_all = True
             break

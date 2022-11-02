@@ -15,12 +15,29 @@ class FixedMediumPlan(Agent):
         self.i = 0
     
     def action(self):
-        if self.i >= len(self.plan):
-            return MLAction.STAY
-        else:
-            action = self.plan[self.i]
-            self.i += 1
-            return action
+        # if self.i >= len(self.plan):
+        #     return MLAction.STAY
+        # else:
+        action = self.plan[self.i]
+        self.i += 1
+        return action
 
     def to_string(self):
         return MLAction.to_string(self.plan)
+
+class FixedMediumSubPlan(Agent):
+    """
+    An Agent with a fixed plan but desired execution is in chunks
+    """
+
+    def __init__(self, plan, res):
+        self.plan = plan
+        self.sub_plan_i = 0
+        self.res = res
+
+    def next_goal(self):
+        self.sub_plan_i += self.res
+        if self.sub_plan_i >= len(self.plan):
+            self.sub_plan_i = len(self.plan)-1
+        return self.plan[self.sub_plan_i][0]
+

@@ -41,11 +41,17 @@ class FixedPolicyAgent(Agent):
         # goes from fridge to onion
         action,object = 'stay',state.holding
         if state.in_pot < 3 and state.holding == 'None':
-            action,object = ('pickup', 'dish')
+            action,object = ('pickup', 'onion')
             next_hl_state = f'onion_{state.in_pot}_onion_onion'
         elif state.holding == 'onion':
-            action,ojbect = ('drop','onion')
+            action,object = ('drop','onion')
             next_hl_state = f'None_{state.in_pot+1}_onion_onion'
+        elif state.in_pot == 3 and state.holding == 'None':
+            action,object = ('pickup','dish')
+            next_hl_state = f'dish_{state.in_pot}_onion_onion'
+        elif state.holding == 'dish' and state.in_pot == 3:
+            action,object = ('pickup','soup')
+            next_hl_state = f'soup_{state.in_pot}_onion_onion'
 
         possible_motion_goals = self.hlp.map_action_to_location(state, (action,object))
         goal = possible_motion_goals[0]

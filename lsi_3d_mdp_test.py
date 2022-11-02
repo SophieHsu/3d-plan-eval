@@ -4,7 +4,7 @@ from tokenize import String
 import toml
 
 import numpy as np
-from agent import Agent, FixedMediumPlan
+from agent import Agent, FixedMediumPlan, FixedMediumSubPlan
 
 import igibson
 from igibson.envs.igibson_env import iGibsonEnv
@@ -197,7 +197,27 @@ def get_human_sub_path(path, current_index):
 
     return sub_path
 
-def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_robot_agent:HlMdpPlanningAgent, hl_human_agent:FixedPolicyAgent, bowlpans):
+def main_loop(
+    mdp, env:LsiEnv,
+    ig_human:iGibsonAgent,
+    ig_robot:iGibsonAgent,
+    hl_robot_agent:HlMdpPlanningAgent,
+    hl_human_agent:FixedPolicyAgent,
+    bowlpans,
+    recalc_res):
+    """_summary_
+
+    Args:
+        mdp (_type_): _description_
+        env (LsiEnv): _description_
+        ig_human (iGibsonAgent): _description_
+        ig_robot (iGibsonAgent): _description_
+        hl_robot_agent (HlMdpPlanningAgent): _description_
+        hl_human_agent (FixedPolicyAgent): _description_
+        bowlpans (_type_): _description_
+        recalc_res (int): defines number of steps before the robot recalculates its path
+    """
+
     print('Press enter to start...')
     input()
     
@@ -206,9 +226,28 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
     #plan = run_astar_two_agent(grid, start, end)
     #human_plan = ['pickup_onion', 'drop_onion', 'pickup_onion', 'drop_onion', 'pickup_dish', 'deliver_soup']
     
-    calced = False
     while True:
+        init_action = np.zeros(env.nav_env.action_space.shape)
+        # init_action = [
+        #         0.0,
+        #         0.0,  # wheels
+        #         0.0,  # trunk
+        #         0.0,
+        #         0.0,  # head
+        #         1.1707963267948966,
+        #         1.4707963267948965,
+        #         -0.4,
+        #         1.6707963267948966,
+        #         0.0,
+        #         1.5707963267948966,
+        #     ]
+        ig_robot.object.apply_action(init_action)
+
         if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
+            '''
+            human gets high level action and plans path to it. when human finishes path
+            it will re-enter this state
+            '''
             next_human_hl_state,human_plan, human_goal = hl_human_agent.action(env.human_state)
             human = FixedMediumPlan(human_plan)
             env.human_state.executing_state = ExecutingState.EXEC_SUB_PATH
@@ -216,44 +255,92 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
             ig_human.prepare_for_next_action(a_h)
 
         if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
+            '''
+            robot gets high level action and translates into mid-level path
+            when robot completes this path, it returns to this state
+            '''
             next_robot_hl_state, robot_goal = hl_robot_agent.action(env.robot_state)
             optimal_plan = hl_robot_agent.optimal_motion_plan(env.robot_state, robot_goal)
+            optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
             env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+            robot = FixedMediumSubPlan(optimal_plan, recalc_res)
+            next_robot_goal = robot.next_goal()
 
         if env.robot_state.executing_state == ExecutingState.CALC_SUB_PATH:
+            '''
+            robot executes mid-level path in stages to avoid collision. collisions occur
+            in real-world scenarios because the agents are not operating in lock-step time.
+            (i.e. the human may move faster/slower than the robot and vice-versa)
+
+            the way this works is an optimal path to the mid-level goal is computed using a-star
+            without considering human path, next intermediate goals along mid-level path are
+            set and a path-avoidance a-star computes an optimal path which avoids the humans current
+            mid-level path. This path begins executing
+
+            Because the human's plan may change at any time, a parameter of the main loop is the 
+            recalculation resolution, which defines how many steps the robot takes in the world
+            before recalculating its sub path.
+            '''
+            env.update_joint_ml_state()
+            if env.get_robot_ml_state() == next_robot_goal:
+                next_robot_goal = robot.next_goal()
+                
             human_sub_path = get_human_sub_path(human_plan, (human.i-1))
-            plan = hl_robot_agent.avoidance_motion_plan(env.robot_state,robot_goal, human_sub_path, human_goal)
-            robot = FixedMediumPlan(plan)
+            plan = hl_robot_agent.avoidance_motion_plan(env.robot_state, next_robot_goal, human_sub_path, human_goal)
+
+            if plan == []:
+                # could not find path to goal, so idle 1 step and then recalculate
+                plan.append('D')
+            elif optimal_plan_goal[0] == next_robot_goal:
+                # if this is final subpath on optimal plan, the append interact at the end
+                plan.append('I')
+            
+
+            robot_plan = FixedMediumPlan(plan)
             env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
-            a_r = robot.action()
-            ig_robot.prepare_for_next_action(a_r)
+            a_r = None
+            # a_r = robot_plan.action()
+            # ig_robot.prepare_for_next_action(a_r)
 
         elif env.robot_state.executing_state == ExecutingState.EXEC_SUB_PATH:
-            if a_r == MLAction.STAY or a_r == MLAction.INTERACT:
-                env.robot_state.executing_state = ExecutingState.NO_ML_PATH
-            else:
-                ig_robot.agent_move_one_step(env.nav_env, a_r)
 
-                if ig_robot.action_completed(a_r):
-                    a_r = robot.action()
+            ig_robot.agent_move_one_step(env.nav_env, a_r)
+            # env.update_joint_ml_state()
+            
+            if ig_robot.action_completed(a_r) or a_r == MLAction.IDLE:
+                # if :
+                #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+
+                if robot_plan.i == len(robot_plan.plan) or robot_plan.i == recalc_res: #or a_r == MLAction.STAY:
+                    env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
+                
+                else:
+                    a_r = robot_plan.action()
                     env.update_joint_ml_state()
                     ig_robot.prepare_for_next_action(a_r)
-                    calced = False
 
+                    if a_r == MLAction.IDLE and env.robot_state.executing_state != ExecutingState.IDLE:
+                        env.robot_state.executing_state = ExecutingState.IDLE
+
+                    if a_r == MLAction.INTERACT: #and env.robot_state == robot_goal:
+                        env.robot_state.executing_state = ExecutingState.NO_ML_PATH
+
+            
         if env.human_state.executing_state == ExecutingState.EXEC_SUB_PATH:
-            if a_h == MLAction.STAY or a_h == MLAction.INTERACT:
+            if human.i == len(human.plan) or a_h == MLAction.INTERACT: #or a_h == MLAction.STAY:
                 env.human_state.executing_state = ExecutingState.NO_ML_PATH
             else:
                 ig_human.agent_move_one_step(env.nav_env, a_h)
                 if ig_human.action_completed(a_h):
                     # human.action() gets next FNESW medium level action to take
-
-                    if human.i % 5 == 0:
-                        env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
-
                     a_h = human.action()
                     env.update_joint_ml_state()
                     ig_human.prepare_for_next_action(a_h)
+
+                    if env.robot_state.executing_state == ExecutingState.IDLE:
+                        env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
+                        #a_r = robot_plan.action()
+                        #ig_robot.prepare_for_next_action(a_r)
 
         # if human.i % 3 == 0 and calced == False:
         #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
@@ -262,15 +349,13 @@ def main_loop(mdp, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent, hl_
         for obj, pos in bowlpans:
                 obj.set_position(pos)
         env.nav_env.simulator.step()
-        
+
         if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
-            env.update_robot_world_state(next_human_hl_state)
+            env.update_robot_world_state(next_robot_hl_state)
         if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
-            env.update_human_world_state(next_robot_hl_state)
+            env.update_human_world_state(next_human_hl_state)
 
-
-
-
+            
 
 def robot_hand_up(env, bowlpans):
     # action = np.zeros(env.action_space.shape[0])
@@ -350,6 +435,7 @@ def run_example(args):
     mdp = LsiMdp.from_config(map_config, agent_configs, exp_config, grid)
 
     order_list = exp_config['order_list']
+    recalc_res = exp_config['recalculation_resolution']
     hlp = HighLevelMdpPlanner(mdp)
     mlp = AStarMotionPlanner(grid)
     hlp.compute_mdp_policy(order_list)
@@ -373,8 +459,7 @@ def run_example(args):
 
     lsi_env = LsiEnv(mdp, nav_env, human, robot)
     
-    main_loop(mdp, lsi_env, human, robot, robot_agent, human_agent, bowlpans)
-
+    main_loop(mdp, lsi_env, human, robot, robot_agent, human_agent, bowlpans, recalc_res)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

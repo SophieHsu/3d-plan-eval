@@ -54,6 +54,9 @@ class iGibsonAgent:
             #self.action_index += 1
             self.direction = current_action
             ready_for_next_action = True
+        elif current_action == None: # None when first action
+            return True
+
         
         # if self.action_index >= len(self.path):
         #     return None
@@ -83,7 +86,7 @@ class iGibsonAgent:
             x, y, z = self.object.get_position()
             self.target_x = x
             self.target_y = y
-        elif next_action == MLAction.STAY:
+        elif next_action == MLAction.STAY or next_action == MLAction.IDLE:
             return
 
     def get_current_orn_z(self):
@@ -101,13 +104,18 @@ class iGibsonAgent:
             return abs(cur_y-target_y)
 
     def agent_move_one_step(self, env, action):
-        if action == None:
-            if self.name == "robot":
-                action = np.zeros(env.action_space.shape)
-                self.object.apply_action(action)
-            return
+        #if action == None or action == MLAction.IDLE:
+            #if self.name == "robot":
+                #action = np.zeros(env.action_space.shape)
+                #action = np.full(env.action_space.shape, 0.000000000000000000001)
+
+                # action = env.action_space
+                # action[0] = 0
+                # action[1] = 0
+                #self.object.apply_action(action)
+            #return
         
-        elif action in MLAction.directions():
+        if action in MLAction.directions():
             self.agent_turn_one_step(env, action)
         elif action == MLAction.FORWARD:
             cur_x, cur_y = self.object.get_position()[:2]

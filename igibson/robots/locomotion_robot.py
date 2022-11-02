@@ -101,7 +101,8 @@ class LocomotionRobot(BaseRobot):
         :param delta: Array[float], (x,y,z) cartesian delta base position
         """
         new_pos = np.array(delta) + self.get_position()
-        self.robot_body.reset_position(new_pos)
+        #self.robot_body.reset_position(new_pos)
+        self.base_link.set_position(new_pos)
 
     def move_forward(self, delta=0.05):
         """

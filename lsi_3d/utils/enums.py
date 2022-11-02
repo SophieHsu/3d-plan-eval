@@ -8,7 +8,7 @@ class MLAction(Enum):
     SOUTH = 4
     WEST = 5
     FORWARD = 6
-    WAIT = 7
+    IDLE = 7
 
     @classmethod
     def directions(self):
@@ -38,6 +38,8 @@ class MLAction(Enum):
             return self.SOUTH
         if s == 'W':
             return self.WEST
+        if s == 'D':
+            return self.IDLE
 
     @classmethod
     def to_string(self, action):
@@ -57,6 +59,8 @@ class MLAction(Enum):
             return 'S'
         if action == self.WEST:
             return 'W'
+        if action == self.IDLE:
+            return 'D'
 
         return list
 

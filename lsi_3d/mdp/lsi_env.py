@@ -3,6 +3,7 @@ from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
+from lsi_3d.utils.enums import MLAction
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
 
 class LsiEnv(object):
@@ -67,3 +68,7 @@ class LsiEnv(object):
         facing = orn_to_cardinal(y)
         
         return (pos_r, pos_c, facing)
+
+    def get_robot_ml_state(self):
+        x,y,f = self.robot_state.ml_state[1]
+        return (x,y,MLAction.to_string(f))
