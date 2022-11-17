@@ -11,7 +11,10 @@ class FixedMediumPlan(Agent):
     """
 
     def __init__(self, plan):
-        self.plan = MLAction.from_strings(plan)
+        self.plan = plan #[(pos,MLAction.from_string(a)) for (pos,a) in plan]
+        
+        if self.plan[len(self.plan)-1][1] != MLAction.INTERACT:
+            self.plan.append((self.plan[len(self.plan)-1][0], MLAction.INTERACT))
         self.i = 0
     
     def action(self):

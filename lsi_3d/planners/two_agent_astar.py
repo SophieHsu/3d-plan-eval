@@ -116,9 +116,12 @@ def cost_func(grid, ex, ey, x, y, f, action):
     else:
         return 1
 
-def end_achieved(grid, x, y, ex, ey, f):
+def end_achieved(grid, x, y, ex, ey, f, ef=None):
     if(grid[ex][ey] == "X"):
-        return (x, y) == (ex, ey)
+        if ef != None:
+            return (x, y, f) == (ex, ey, ef)
+        else:
+            return (x, y) == (ex, ey)
     else:
         dx = abs(x-ex)
         dy = abs(y-ey)
@@ -131,8 +134,33 @@ def end_achieved(grid, x, y, ex, ey, f):
         }
 
         offset = name2dire[f]
-        
         return (dx + dy <= 1) and (offset == ((ex-x),(ey-y)))
+
+def end_achieved_same_goal_check(grid, end1, end2, goal1, goal2,gf2):
+    if goal1 == goal2:
+        return agent1_end_achieved_agent2_within_r(grid, end1, end2, goal1, goal2, gf2, 1)
+    else:
+        x1,y1,f1 = end1
+        x2,y2,f2 = end2
+        gx1, gy1, *_ = goal1
+        gx2, gy2, *_ = goal2
+        # args = [x1, y1, gx1, gy1, f1, x2, y2, gx2, gy2, f2, gf2]
+        # print(f'{args}')
+        return end_achieved(grid,x1,y1,gx1,gy1,f1) and end_achieved(grid,x2,y2,gx2,gy2,f2,gf2)
+
+def agent1_end_achieved_agent2_within_r(grid, end1, end2, goal1, goal2, gf2, radius):
+    x1,y1,f1 = end1
+    x2,y2,f2 = end2
+    gx1, gy1 = goal1
+    gx2, gy2 = goal2
+
+    end_achieved_1 = end_achieved(grid,x1,y1,gx1,gy1,f1)
+    
+    manattan_2 = manhattan((x2,y2),(gx2,gy2))
+
+    return end_achieved_1 and manattan_2 <= radius
+
+
 
 def single_agent_astar(grid, start_state, end_state):
     ex1, ey1 = end_state
@@ -333,14 +361,14 @@ def astar_avoid_path(grid, start_state, ex1, ey1, ex2, ey2, avoid_path):
 
     return path
 
-def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid_path, f_radius):
+def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid_path, f_radius, ef2 = None):
     avoid_path_queue = avoid_path
     if grid[ex1][ey1] == 'X' or grid[ex2][ey2] == 'X':
         print('Warning: End goal is open space so agent may spin in place')
     
     actions = ["E", "W", "S", "N", "I", "F", "D"]
     visited = set()
-    visited.add(start_state)
+    #visited.add(start_state)
     path_prev = dict()
     queue = []
     heappush(queue, (0, 0, start_state, 0)) # f, g, state, f=h+g, avoid_path_t_step
@@ -351,18 +379,22 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
     while queue and not break_all:
         _, cur_g, cur_state, avoid_path_t_step = heappop(queue)
         cx1, cy1, cf1, cx2, cy2, cf2 = cur_state
-        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1) or end_achieved(grid, cx2, cy2, ex2, ey2, cf2):
+
+        #if end_achieved(grid, cx1, cy1, ex1, ey1, cf1) and end_achieved(grid, cx2, cy2, ex2, ey2, cf2, ef2):
+        # args = [cx1, cy1, ex1, ey1, cf1, cx2, cy2, ex2, ey2, cf2, ef2]
+        # print(f'{args}')
+        if end_achieved_same_goal_check(grid, (cx1,cy1,cf1), (cx2,cy2,cf2), (ex1, ey1), (ex2, ey2), ef2) or end_achieved(grid, cx2, cy2, ex2, ey2, cf2, ef2):
             last_state = cur_state
             break_all = True
             break
-
+        
+        # Add human actions at current time step for robot to avoid
         avoid_actions = []
         if len(avoid_path_queue) > avoid_path_t_step:
             avoid_actions.append(avoid_path[avoid_path_t_step])
         
         if avoid_actions == []:
             avoid_actions.append('I')
-        # avoid_path_t_step+=1
 
         for action1 in avoid_actions:
             if break_all:
@@ -379,6 +411,8 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
                 #print(action1, action2, new_state)
                 # if crossing_radius(cur_state, new_state, f_radius):
                 #     asdf = 4
+                if (ex2, ey2, ef2) == (nx2, ny2, nf2):
+                    asdf = 2
                 if valid(grid, nx1, ny1, nx2, ny2) and (nx1, ny1) != (nx2, ny2) and not crossing_radius(cur_state, new_state, f_radius):
                     new_h = heuristic(ex1, ey1, ex2, ey2, new_state)
                     if new_state not in visited or cur_g+cost1+cost2+new_h < f_values[new_state]:
@@ -386,12 +420,12 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
                         f_values[new_state] = cur_g+cost1+cost2+new_h
                         visited.add(new_state)
                         path_prev[new_state] = (cur_state, action1, action2)
-                else:
-                    asdf = 5
+                # else:
+                #     asdf = 5
                         
                 # placed this inside conditional (valid) becuase invalid position was getting
                 # pushed onto heap
-                if valid(grid, nx1, ny1, nx2, ny2) and end_achieved(grid, nx1, ny1, ex1, ey1, cf1) and end_achieved(grid, nx2, ny2, ex2, ey2, cf2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
+                if valid(grid, nx1, ny1, nx2, ny2) and end_achieved(grid, nx1, ny1, ex1, ey1, cf1) and end_achieved(grid, nx2, ny2, ex2, ey2, cf2, ef2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
                     path_prev[new_state] = (cur_state, action1, action2)
                     heappush(queue, (cur_g+cost1+cost2+0, cur_g+cost1+cost2, new_state, avoid_path_t_step+1)) # heuristic=0
 
@@ -402,7 +436,8 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
     sx1, sy1, sf1, sx2, sy2, sf2 = start_state
     while (px1, py1, pf1, px2, py2, pf2) != (sx1, sy1, sf1, sx2, sy2, sf2):
         p_state, command1, command2 = path_prev[(px1, py1, pf1, px2, py2, pf2)]
-        path.append(((px1, py1, pf1, px2, py2, pf2), command1, command2))
+        #path.append(((px1, py1, pf1, px2, py2, pf2), command1, command2))
+        path.append((((px1, py1, pf1),command1), ((px2, py2, pf2), command2)))
         px1, py1, pf1, px2, py2, pf2 = p_state
 
     path = path[::-1]
@@ -572,19 +607,21 @@ def run_astar_two_agent(layout, start, end, avoid_path = None):
     if avoid_path == None:
         path = two_agent_astar(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1])
     else:
-        path = astar_avoid_path_forward_radius(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1], avoid_path, 1)
+        path = astar_avoid_path_forward_radius(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1], avoid_path, 1, a_2_end[2])
         #path = astar_avoid_path_with_lookahead(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1], avoid_path, 2)
+    
     z = zip(*path)
-    a_1_path = [l[1] for l in path]
-    a_2_path = [l[2] for l in path]
+    a_1_path = [l[0] for l in path]
+    a_2_path = [l[1] for l in path]
     print(f'Robot path computed is: {a_2_path}')
     return (a_1_path, a_2_path)
 
 if __name__ == "__main__":
     filepath = "kitchen_layouts_grid_text/empty.txt"
     grid = [list(line) for line in open(filepath, "r").read().strip().split("\n")]
-    start_state = (0, 0, "S", 2, 0, "S")
-    path = astar_avoid_path(grid, start_state, 2,0,0,0, [])
+    start_state = (0, 0, "S", 2, 5, "W")
+    astar_avoid_path_forward_radius(grid,start_state,4,0,4,0,['S','F','E','F','S','F','F','F','W'],1,ef2='S')
+    #path = astar_avoid_path(grid, start_state, 2,0,0,0, [])
 
     #path = two_agent_astar(layout, (), human_end[0], human_end[1], robot_end[0], robot_end[1]
     #print(5, 2, 6, 3)

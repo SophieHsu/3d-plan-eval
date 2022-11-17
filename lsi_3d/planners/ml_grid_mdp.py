@@ -1,176 +1,71 @@
 import itertools
 import time
-
 import numpy as np
-
+from lsi_3d.utils.grid_helpers import GridHelper
 
 class GridAvoidanceMDP():
     """
     2d-Grid MDP for path finding with a mobile agent that must be avoided
     """
-    def __init__(self, grid, terminal_state, start_state, gamma=0.9):
-        self.state_shape
+    def __init__(self, grid, directions, terminal_state, start_state, discount=0.9):
+        self.grid = grid
+        self.directions = directions
+        self.discount = discount
         self.states = []
-        self.reward_matrix = []
-        self.transition_matrix = []
+        self.actions = []
+        self.rewards = []
+        self.transitions = []
 
-    def init_mdp(grid, terminal_state, start_state):
+    def init_mdp(self, terminal_state, start_state):
         self.init_states()
         self.init_actions()
         self.init_transitions()
-        self.init_rewards()
+        self.init_rewards(terminal_state)
 
-    def init_states(self, map, directions):
+    def init_states(self):
         """
         Initializes the states of mdp. Agent may be in any square on map and facing in
         1 of 4 directions
         """
-        # for each dimension of map, add each possible direction
-        for (r,c),x in np.ndenumerate(map):
-            for d in directions:
-                self.states.append((r,c,d))
-
-        # get state shape as r x c x d so that we can index later with ravel
-        r,c = map.shape()
-        d = len(directions)
-        self.state_shape = r,c,d
-        return
+        for (row, col),_ in np.ndenumerate(self.grid):
+            for dire in self.directions:
+                self.states.append((row,col,dire))
 
     def get_state_index(self,row,col,dire):
         # get 1-d array index for r,c,d of state array
-        return np.ravel_multi_index((row,col,dire), self.state_shape)
+        return np.ravel_multi_index((row,col,dire), (len(self.grid),len(self.grid[0]),len(self.directions)))
     
-
     def init_actions(self):
         # Turn north, east, south, or west. iDle, or Interact
-        self.actions = ['N','E','S','W','D','I']
+        self.actions = ['F','N','E','S','W','D','I']
 
-    def init_transition_matrix(self):
-        self.transition_matrix = np.zeros((len(self.actions), len(self.states), len(self.states)))
+    def get_action_index(self, action):
+        return self.actions.index('I')
 
-        game_logic_transition = self.transition_matrix.copy()
-        # distance_transition = self.transition_matrix.copy()
+    def init_transitions(self):
+        self.transitions = np.zeros((len(self.actions), len(self.states), len(self.states)))
+
+        game_logic_transition = self.transitions.copy()
 
         # state transition calculation
-        for state_key, state_obj in self.state_dict.items():
-            for action_key, action_idx in self.action_idx_dict.items():
-                state_idx = self.state_idx_dict[state_key]
-                next_state_idx = state_idx
-                next_action_idx = action_idx
-        
-                # define state and action game transition logic
-                player_obj, soup_finish, orders = self.ml_state_to_objs(state_obj)
-                next_actions, next_state_keys = self.state_action_nxt_state(player_obj, soup_finish, orders)
+        for state_idx, state in enumerate(self.states):
+            for action_idx, action in self.actions:
+                next_state_prob, next_state_idx = self.get_trans_prob(state, action)
+                game_logic_transition[action_idx][state_idx][next_state_idx] += next_state_prob
 
-                if next_actions == action_key:
-                    next_state_idx = self.state_idx_dict[next_state_keys]
-
-                game_logic_transition[next_action_idx][state_idx][next_state_idx] += 1.0
-
-            # print(state_key)
-        # print(game_logic_transition[:, 25])
-        # tmp = input()
-
-        self.transition_matrix = game_logic_transition
+        self.transitions = game_logic_transition
         return
 
-    def ml_state_to_objs(self, state_obj):
-        # state: obj + action + bool(soup nearly finish) + orders
-        player_obj = state_obj[0]; soup_finish = state_obj[1];
-        orders = []
-        if len(state_obj) > 2:
-            orders = state_obj[2:]
+    def get_trans_prob(self, state, action):
+        next_state = GridHelper.transition(*state,action)
+        is_valid = GridHelper.valid_pos(self.grid, *next_state)
+        return is_valid, next_state
 
-        return player_obj, soup_finish, orders
-        
-    def state_action_nxt_state(self, player_obj, soup_finish, orders, other_obj=''):
-        # game logic
-        actions = ''; next_obj = player_obj; next_soup_finish = soup_finish
-        if player_obj == 'None':
-            if (soup_finish == self.mdp.num_items_for_soup) and (other_obj != 'dish'):
-                actions = 'pickup_dish'
-                next_obj = 'dish'
-            else:
-                next_order = None
-                if len(orders) > 1:
-                    next_order = orders[1]
+    def init_rewards(self, terminal_state):
+        self.rewards = np.zeros((len(self.actions), len(self.states)))
 
-                if next_order == 'onion':
-                    actions = 'pickup_onion'
-                    next_obj = 'onion'
-
-                elif next_order == 'tomato':
-                    actions = 'pickup_tomato' 
-                    next_obj = 'tomato'
-
-                else:
-                    actions = 'pickup_onion'
-                    next_obj = 'onion'
-
-        else:
-            if player_obj == 'onion':
-                actions = 'drop_onion'
-                next_obj = 'None'
-                next_soup_finish += 1
-
-            elif player_obj == 'tomato':
-                actions = 'drop_tomato'
-                next_obj = 'None'
-                next_soup_finish += 1
-
-            elif (player_obj == 'dish') and (soup_finish == self.mdp.num_items_for_soup):
-                actions = 'pickup_soup'
-                next_obj = 'soup'
-                next_soup_finish = 0
-
-            elif (player_obj == 'dish') and (soup_finish != self.mdp.num_items_for_soup):
-                actions = 'drop_dish'
-                next_obj = 'None'
-
-            elif player_obj == 'soup':
-                actions = 'deliver_soup'
-                next_obj = 'None'
-                if len(orders) >= 1:
-                    orders.pop(0)
-            else:
-                print(player_obj)
-                raise ValueError()
-
-        if next_soup_finish > self.mdp.num_items_for_soup:
-            next_soup_finish = self.mdp.num_items_for_soup
-
-        next_state_keys = next_obj + '_' + str(next_soup_finish)
-        for order in orders:
-            next_state_keys = next_state_keys + '_' + order
-
-        return actions, next_state_keys
-
-    def init_reward(self, reward_matrix=None):
-        # state: obj + action + bool(soup nearly finish) + orders
-
-        self.reward_matrix = reward_matrix if reward_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict)), dtype=float)
-
-        # when deliver order, pickup onion. probabily checking the change in states to give out rewards: if action is correct, curr_state acts and changes to rewardable next state. Then, we reward.
-
-        for state_key, state_obj in self.state_dict.items():
-            # state: obj + action + bool(soup nearly finish) + orders
-            player_obj = state_obj[0]; soup_finish = state_obj[1]
-            orders = []
-            if len(state_obj) > 2:
-                orders = state_obj[2:]
-
-            if player_obj == 'soup':
-                self.reward_matrix[self.action_idx_dict['deliver_soup']][self.state_idx_dict[state_key]] += self.mdp.delivery_reward
-        
-            if len(orders) == 0:
-                self.reward_matrix[:,self.state_idx_dict[state_key]] += self.mdp.delivery_reward
-
-
-    def init_mdp(self, order_list):
-        self.init_states(order_list)
-        self.init_actions()
-        self.init_transition_matrix()
-        self.init_reward()
+        # when deliver order, pickup onion. probabily checking the change in states
+        self.rewards[(self.get_action_index('I'), *terminal_state)] = 1
 
     def bellman_operator(self, V=None):
         if V is None:
@@ -178,7 +73,7 @@ class GridAvoidanceMDP():
 
         Q = np.zeros((self.num_actions, self.num_states))
         for a in range(self.num_actions):
-            Q[a] = self.reward_matrix[a] + self.discount * self.transition_matrix[a].dot(V)
+            Q[a] = self.rewards[a] + self.discount * self.transitions[a].dot(V)
 
         return Q.max(axis=0), Q.argmax(axis=0)
 

@@ -1,7 +1,7 @@
 import math
 from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.mdp.hl_state import AgentState, SoupState
+from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.enums import MLAction
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
@@ -16,30 +16,34 @@ class LsiEnv(object):
         nav_env: the simulation environment that the lsi_env wraps
     """
     def __init__(self, mdp:LsiMdp, nav_env:iGibsonEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent) -> None:
-        self.hl_state = mdp.hl_start_state
-        self.ml_state = mdp.start_locations
+        #self.joint_hl_state = mdp.hl_start_state
         self.nav_env = nav_env
         self.mdp = mdp
         self.ig_human = ig_human
         self.ig_robot = ig_robot
-        self.human_state = AgentState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
-        self.robot_state = AgentState(self.hl_state,self.ml_state,soup_locations=[mdp.get_pot_locations()])
+        self.human_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[0])
+        self.robot_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[1])
+        self.world_state = WorldState(mdp.hl_start_state)
 
-    def update_robot_world_state(self, next_hl_state):
+    def update_robot_hl_state(self, next_hl_state):
         '''
-        Looks at agents place in the world and updates current state
+        Update hl state by updated in_pot and orders for world
+        and holding for specific agent
         '''
-        self.hl_state = next_hl_state # eventually replace with game logice
-        self.ml_state = self.update_joint_ml_state()
-        self.robot_state = self.robot_state.update(self.hl_state, self.ml_state)
+        #self.joint_hl_state = next_hl_state # eventually replace with game logice
+        #self.ml_state = self.update_joint_ml_state()
+        self.world_state.update(next_hl_state)
+        self.robot_state.update_hl_state(next_hl_state)
 
-    def update_human_world_state(self, next_hl_state):
+    def update_human_hl_state(self, next_hl_state):
         '''
-        Looks at agents place in the world and updates current state
+        Update hl state by updated in_pot and orders for world
+        and holding for specific agent
         '''
-        self.hl_state = next_hl_state # eventually replace with game logice
-        self.ml_state = self.update_joint_ml_state()
-        self.human_state = self.human_state.update(self.hl_state, self.ml_state)
+        #self.joint_hl_state = next_hl_state # eventually replace with game logice
+        #self.ml_state = self.update_joint_ml_state()
+        self.world_state.update(next_hl_state)
+        self.human_state.update_hl_state(next_hl_state)
 
 
     def update_joint_ml_state(self):
@@ -53,9 +57,8 @@ class LsiEnv(object):
         
         human_ml_state = self.get_ml_state(self.ig_human)
         robot_ml_state = self.get_ml_state(self.ig_robot)
-        self.ml_state = (human_ml_state, robot_ml_state)
-        self.robot_state.ml_state = (human_ml_state, robot_ml_state)
-        self.human_state.ml_state = (human_ml_state, robot_ml_state)
+        self.robot_state.ml_state = robot_ml_state
+        self.human_state.ml_state = human_ml_state
         return (human_ml_state, robot_ml_state)
 
     def get_ml_state(self, agent:iGibsonAgent):
@@ -70,5 +73,31 @@ class LsiEnv(object):
         return (pos_r, pos_c, facing)
 
     def get_robot_ml_state(self):
-        x,y,f = self.robot_state.ml_state[1]
+        x,y,f = self.robot_state.ml_state
         return (x,y,MLAction.to_string(f))
+    
+    # def parse_hl_state(self, hl_state):
+    #     parsed = hl_state.split('_')
+    #     self.in_pot = parsed[1]
+    #     self.orders = parsed[2:]
+
+    def update(self, new_hl_state, new_ml_state):
+        prev_in_pot = self.in_pot
+
+        human_hl, robot_hl = new_hl_state
+        human_ml, robot_ml = new_ml_state
+
+        #self.joint_hl_state = new_hl_state
+        #self.ml_state = new_ml_state
+
+        self.human_state.update(human_hl, human_ml)
+        self.robot_state.update(robot_hl, robot_ml)
+
+        self.parse_hl_state(new_hl_state)
+
+        new_in_pot = self.in_pot
+
+        if new_in_pot == (prev_in_pot+1):
+            self.soup_states[0].onions_in_soup = self.in_pot
+
+        return self

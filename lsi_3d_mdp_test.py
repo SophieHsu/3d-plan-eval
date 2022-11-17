@@ -31,6 +31,13 @@ from agent import FixedMediumPlan
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
+from igibson.external.pybullet_tools.utils import (
+    get_max_limits,
+    get_min_limits,
+    get_sample_fn,
+    joints_from_names,
+    set_joint_positions,
+)
 
 # TARGET_ORNS = {
 #     "S": 0,
@@ -192,9 +199,16 @@ def grid2raw(grid_str):
                 return_str += "{} {} {}\n".format(name, x, y)
     return return_str
 
-def get_human_sub_path(path, current_index):
-    sub_path = path[current_index:(len(path))]
-
+def get_human_sub_path(path, current_index, human_ml_state):
+    sub_path = []
+    if current_index == 0 and human_ml_state != path[current_index][0]:
+        # in starting state
+        return path
+    if human_ml_state == path[current_index][0]:
+        sub_path = path[current_index:(len(path))]
+    elif human_ml_state == path[current_index+1][0]:
+        sub_path = path[current_index+1:(len(path))]
+    
     return sub_path
 
 def main_loop(
@@ -218,29 +232,11 @@ def main_loop(
         recalc_res (int): defines number of steps before the robot recalculates its path
     """
 
-    print('Press enter to start...')
-    input()
-    
-    # start = ig_human.start + ig_robot.start
-    # end = ((3,0),(5,3))
-    #plan = run_astar_two_agent(grid, start, end)
-    #human_plan = ['pickup_onion', 'drop_onion', 'pickup_onion', 'drop_onion', 'pickup_dish', 'deliver_soup']
+    # print('Press enter to start...')
+    # input()
     
     while True:
         init_action = np.zeros(env.nav_env.action_space.shape)
-        # init_action = [
-        #         0.0,
-        #         0.0,  # wheels
-        #         0.0,  # trunk
-        #         0.0,
-        #         0.0,  # head
-        #         1.1707963267948966,
-        #         1.4707963267948965,
-        #         -0.4,
-        #         1.6707963267948966,
-        #         0.0,
-        #         1.5707963267948966,
-        #     ]
         ig_robot.object.apply_action(init_action)
 
         if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
@@ -248,10 +244,11 @@ def main_loop(
             human gets high level action and plans path to it. when human finishes path
             it will re-enter this state
             '''
-            next_human_hl_state,human_plan, human_goal = hl_human_agent.action(env.human_state)
+            next_human_hl_state, human_plan, human_goal = hl_human_agent.action(env.world_state, env.human_state)
+            #human_plan.append('I')
             human = FixedMediumPlan(human_plan)
             env.human_state.executing_state = ExecutingState.EXEC_SUB_PATH
-            a_h = human.action()
+            pos_h, a_h = human.action()
             ig_human.prepare_for_next_action(a_h)
 
         if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
@@ -285,16 +282,16 @@ def main_loop(
             if env.get_robot_ml_state() == next_robot_goal:
                 next_robot_goal = robot.next_goal()
                 
-            human_sub_path = get_human_sub_path(human_plan, (human.i-1))
-            plan = hl_robot_agent.avoidance_motion_plan(env.robot_state, next_robot_goal, human_sub_path, human_goal)
+            human_sub_path = get_human_sub_path(human_plan, (human.i-1), env.human_state.ml_state)
+            plan = hl_robot_agent.avoidance_motion_plan((env.human_state.ml_state, env.robot_state.ml_state), next_robot_goal, human_sub_path, human_goal)
+
+            if optimal_plan_goal[0] == next_robot_goal:
+                # if this is final subpath on optimal plan, the append interact at the end
+                plan.append((next_robot_goal,'I'))
 
             if plan == []:
                 # could not find path to goal, so idle 1 step and then recalculate
-                plan.append('D')
-            elif optimal_plan_goal[0] == next_robot_goal:
-                # if this is final subpath on optimal plan, the append interact at the end
-                plan.append('I')
-            
+                plan.append((env.robot_state.ml_state,'D'))
 
             robot_plan = FixedMediumPlan(plan)
             env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
@@ -311,13 +308,15 @@ def main_loop(
                 # if :
                 #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
-                if robot_plan.i == len(robot_plan.plan) or robot_plan.i == recalc_res: #or a_r == MLAction.STAY:
+                if robot_plan.i == len(robot_plan.plan) or robot_plan.i == 1: #recalc_res: #or a_r == MLAction.STAY:
                     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
                 
                 else:
-                    a_r = robot_plan.action()
+                    pos_r, a_r = robot_plan.action()
                     env.update_joint_ml_state()
                     ig_robot.prepare_for_next_action(a_r)
+
+                    reset_arm_position(ig_robot)
 
                     if a_r == MLAction.IDLE and env.robot_state.executing_state != ExecutingState.IDLE:
                         env.robot_state.executing_state = ExecutingState.IDLE
@@ -333,29 +332,50 @@ def main_loop(
                 ig_human.agent_move_one_step(env.nav_env, a_h)
                 if ig_human.action_completed(a_h):
                     # human.action() gets next FNESW medium level action to take
-                    a_h = human.action()
+                    pos_h, a_h = human.action()
                     env.update_joint_ml_state()
                     ig_human.prepare_for_next_action(a_h)
 
                     if env.robot_state.executing_state == ExecutingState.IDLE:
                         env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
-                        #a_r = robot_plan.action()
-                        #ig_robot.prepare_for_next_action(a_r)
-
-        # if human.i % 3 == 0 and calced == False:
-        #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
-        #     calced = True
 
         for obj, pos in bowlpans:
                 obj.set_position(pos)
         env.nav_env.simulator.step()
 
         if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
-            env.update_robot_world_state(next_robot_hl_state)
+            env.update_robot_hl_state(next_robot_hl_state)
         if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
-            env.update_human_world_state(next_human_hl_state)
+            env.update_human_hl_state(next_human_hl_state)
 
-            
+def reset_arm_position(ig_robot):
+    arm_joints_names = [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "upperarm_roll_joint",
+        "elbow_flex_joint",
+        "forearm_roll_joint",
+        "wrist_flex_joint",
+        "wrist_roll_joint",
+    ]
+
+    arm_default_joint_positions = (
+        -1.414019864768982,
+        1.5178184935241699,
+        0.8189625336474915,
+        2.200358942909668,
+        2.9631312579803466,
+        -1.2862852996643066,
+        0.0008453550418615341,
+    )
+
+    body_ids = ig_robot.object.get_body_ids()
+    assert len(body_ids) == 1, "Fetch robot is expected to be single-body."
+    robot_id = body_ids[0]
+    arm_joint_ids = joints_from_names(robot_id, arm_joints_names)
+
+    set_joint_positions(robot_id, arm_joint_ids, arm_default_joint_positions)
+
 
 def robot_hand_up(env, bowlpans):
     # action = np.zeros(env.action_space.shape[0])
@@ -406,7 +426,7 @@ def load_objects(env, obj_x_y, orientation_map, robot_x, robot_y, human):
             x_shift, y_shift = get_counter_shift(orn)
             shift = (x_shift, y_shift, 0)
         pos = [x+shift[0]-4.5, y+shift[1]-4.5, 0+shift[2]]
-        env.set_pos_orn_with_z_offset(obj, tuple(pos), orn) 
+        env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
         if name not in ("bowl", "pan"):
             objs.append(obj)
