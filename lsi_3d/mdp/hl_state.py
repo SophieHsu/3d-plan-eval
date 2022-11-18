@@ -37,6 +37,7 @@ class AgentState(object):
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
         self.holding = parsed[0]
+        self.hl_state = hl_state
 
     def update_hl_state(self, new_hl_state):
 

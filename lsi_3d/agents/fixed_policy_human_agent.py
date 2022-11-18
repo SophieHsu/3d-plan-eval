@@ -31,7 +31,8 @@
 from agent import Agent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
-from lsi_3d.utils.enums import HLAction, MLAction
+from lsi_3d.utils.enums import HLAction, MLA
+from lsi_3d.utils.functions import convert_path_to_mla
 
 class FixedPolicyAgent(Agent):
     def __init__(self, hlp, mlp) -> None:
@@ -58,14 +59,14 @@ class FixedPolicyAgent(Agent):
             action,object = ('deliver','soup')
             next_hl_state = f'None_0_onion'
 
-        possible_motion_goals = self.hlp.map_action_to_location(agent_state, (action,object))
+        possible_motion_goals = self.hlp.map_action_to_location(world_state, agent_state, (action,object))
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
 
         # should this happen outside
         #paths = self.mlp.compute_motion_plan(state.ml_state, (goal,state.ml_state[0]))
         path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
-        path = [((pos[0],pos[1],MLAction.from_string(pos[2])),MLAction.from_string(a)) for (pos,a) in path]
+        path = convert_path_to_mla(path)
         return next_hl_state, path, goal
 
             

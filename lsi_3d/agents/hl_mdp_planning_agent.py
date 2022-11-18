@@ -2,7 +2,8 @@ from lsi_3d.agents.agent import Agent
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 import numpy as np
 
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import MLA
+from lsi_3d.utils.functions import convert_path_to_mla, convert_mla_state_to_string
 
 class HlMdpPlanningAgent(Agent):
 
@@ -36,9 +37,9 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
-    def action(self, state):
+    def action(self, world_state, agent_state):
 
-        state_str = state.hl_state
+        state_str = agent_state.hl_state
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # retrieve high level action from policy
@@ -54,7 +55,7 @@ class HlMdpPlanningAgent(Agent):
         # print(self.mdp_planner.state_idx_dict[state_str], action_idx, action_object_pair)
         
         # map back the medium level action to low level action
-        possible_motion_goals = self.mdp_planner.map_action_to_location(state, action_object_pair)
+        possible_motion_goals = self.mdp_planner.map_action_to_location(world_state, agent_state, action_object_pair)
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
 
@@ -64,15 +65,15 @@ class HlMdpPlanningAgent(Agent):
         path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
         self.optimal_path = path
 
-        path = [(pos,MLAction.from_string(a)) for (pos,a) in path]
+        path = convert_path_to_mla(path)
         return path
 
     def avoidance_motion_plan(self, joint_ml_state, goal, avoid_path, avoid_goal):
         # extract only actions for avoidance plan
         avoid_path = [s[1] for s in avoid_path]
-        avoid_path = [MLAction.to_string(a) for a in avoid_path]
+        avoid_path = [MLA.to_string(a) for a in avoid_path]
         paths = self.mlp.compute_motion_plan(joint_ml_state, (avoid_goal,goal), avoid_path)
         path = paths[1]
-        path = [(pos,MLAction.from_string(a)) for (pos,a) in path]
+        path = convert_path_to_mla(path)
         return path
 

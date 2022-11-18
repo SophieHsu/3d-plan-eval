@@ -1,4 +1,4 @@
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import MLA
 
 class Agent(object):
     def action(self, state):
@@ -13,8 +13,8 @@ class FixedMediumPlan(Agent):
     def __init__(self, plan):
         self.plan = plan #[(pos,MLAction.from_string(a)) for (pos,a) in plan]
         
-        if self.plan[len(self.plan)-1][1] != MLAction.INTERACT:
-            self.plan.append((self.plan[len(self.plan)-1][0], MLAction.INTERACT))
+        if self.plan[len(self.plan)-1][1] != MLA.INTERACT:
+            self.plan.append((self.plan[len(self.plan)-1][0], MLA.INTERACT))
         self.i = 0
     
     def action(self):
@@ -26,7 +26,7 @@ class FixedMediumPlan(Agent):
         return action
 
     def to_string(self):
-        return MLAction.to_string(self.plan)
+        return MLA.to_string(self.plan)
 
 class FixedMediumSubPlan(Agent):
     """

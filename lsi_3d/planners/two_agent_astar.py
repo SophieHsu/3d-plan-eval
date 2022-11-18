@@ -1,7 +1,7 @@
 from heapq import heappush, heappop
 from lsi_3d.utils.constants import DIRE2POSDIFF, FORWARD_RADIUS_POS
 
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import MLA
 # state: x1, y1, f1, x2, y2, f2 (x, y, facing_direction)
 
 def copy_grid(grid):
@@ -33,7 +33,7 @@ def manhattan(a, b):
 
 def get_states_in_forward_radius(state, radius):
     y,x,f = state
-    facing = MLAction.from_string(f)
+    facing = MLA.from_string(f)
     xmin_mul, xmax_mul, ymin_mul, ymax_mul = FORWARD_RADIUS_POS[facing]
     x_min = x + radius * xmin_mul
     x_max = x + radius * xmax_mul

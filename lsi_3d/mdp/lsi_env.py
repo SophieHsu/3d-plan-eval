@@ -3,7 +3,7 @@ from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import MLA
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
 
 class LsiEnv(object):
@@ -45,6 +45,20 @@ class LsiEnv(object):
         self.world_state.update(next_hl_state)
         self.human_state.update_hl_state(next_hl_state)
 
+    def get_human_hl_state(self):
+        hl_state = f'{self.human_state.holding}_{self.world_state.in_pot}'
+        for order in self.world_state.orders:
+            hl_state += f'_{order}'
+        
+        return hl_state
+
+    def get_robot_hl_state(self):
+        hl_state = f'{self.robot_state.holding}_{self.world_state.in_pot}'
+        for order in self.world_state.orders:
+            hl_state += f'_{order}'
+        
+        return hl_state
+
 
     def update_joint_ml_state(self):
         # r_x,r_y,z = self.ig_robot.object.get_position()
@@ -71,10 +85,6 @@ class LsiEnv(object):
         facing = orn_to_cardinal(y)
         
         return (pos_r, pos_c, facing)
-
-    def get_robot_ml_state(self):
-        x,y,f = self.robot_state.ml_state
-        return (x,y,MLAction.to_string(f))
     
     # def parse_hl_state(self, hl_state):
     #     parsed = hl_state.split('_')

@@ -3,7 +3,7 @@ from this import d
 import numpy as np
 from pygame import init
 
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import MLA
 
 
 class LsiMdp(object):
@@ -31,7 +31,7 @@ class LsiMdp(object):
 
 
         hl_start_state = exp_config['hl_start_state']
-        start_locations = [(agent_config['start_x'], agent_config['start_y'], MLAction.from_string(agent_config['start_direction'])) for agent_config in agent_configs]
+        start_locations = [(agent_config['start_x'], agent_config['start_y'], MLA.from_string(agent_config['start_direction'])) for agent_config in agent_configs]
 
         return LsiMdp(grid, start_locations, hl_start_state)
 

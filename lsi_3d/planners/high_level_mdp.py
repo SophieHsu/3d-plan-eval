@@ -238,11 +238,11 @@ class HighLevelMdpPlanner(object):
         print("It took {} seconds to create MediumLevelMdpPlanner".format(time.time() - start_time))
         return 
 
-    def map_action_to_location(self, state_obj, action_obj, p0_obj = None):
+    def map_action_to_location(self, world_state, agent_state, action_obj, p0_obj = None):
         """
         Get the next location the agent will be in based on current world state and medium level actions.
         """
-        p0_obj = p0_obj if p0_obj is not None else state_obj.holding
+        p0_obj = p0_obj if p0_obj is not None else agent_state.holding
         action, obj = action_obj
         #pots_states_dict = self.mdp.get_pot_states()
         location = []

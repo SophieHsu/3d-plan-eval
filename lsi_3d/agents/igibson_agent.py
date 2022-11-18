@@ -6,7 +6,7 @@ import numpy as np
 import math
 from igibson.utils.utils import quatToXYZW
 from transforms3d.euler import euler2quat
-from lsi_3d.utils.enums import MLAction
+from lsi_3d.utils.enums import MLA
 from lsi_3d.utils.constants import DIRE2POSDIFF, TARGET_ORNS
 from lsi_3d.utils.functions import quat2euler
 from scipy.spatial.transform import Rotation
@@ -47,10 +47,10 @@ class iGibsonAgent:
         #     x, y, z = self.object.get_position()
         #     self.target_x = x
         #     self.target_y = y
-        if current_action == MLAction.FORWARD and self.forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
+        if current_action == MLA.FORWARD and self.forward_distance(x, y, self.target_x, self.target_y, self.direction) < ONE_STEP*1.5:
             #self.action_index += 1
             ready_for_next_action = True
-        elif current_action in MLAction.directions() and self.turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
+        elif current_action in MLA.directions() and self.turn_distance(self.get_current_orn_z(), TARGET_ORNS[self.target_direction]) < ONE_STEP*1.5:
             #self.action_index += 1
             self.direction = current_action
             ready_for_next_action = True
@@ -77,16 +77,16 @@ class iGibsonAgent:
             self.target_x = x
             self.target_y = y
         
-        if next_action == MLAction.FORWARD:
+        if next_action == MLA.FORWARD:
             diff_x, diff_y = DIRE2POSDIFF[self.direction]
             self.target_x += diff_x
             self.target_y += diff_y
-        elif next_action in MLAction.directions():
+        elif next_action in MLA.directions():
             self.target_direction = next_action
             x, y, z = self.object.get_position()
             self.target_x = x
             self.target_y = y
-        elif next_action == MLAction.STAY or next_action == MLAction.IDLE:
+        elif next_action == MLA.STAY or next_action == MLA.IDLE:
             return
 
     def get_current_orn_z(self):
@@ -98,7 +98,7 @@ class iGibsonAgent:
         return abs(cur_orn_z - target_orn_z)
 
     def forward_distance(self, cur_x, cur_y, target_x, target_y, direction):
-        if direction in [MLAction.NORTH, MLAction.SOUTH]:
+        if direction in [MLA.NORTH, MLA.SOUTH]:
             return abs(cur_x-target_x)
         else:
             return abs(cur_y-target_y)
@@ -115,9 +115,9 @@ class iGibsonAgent:
                 #self.object.apply_action(action)
             #return
         
-        if action in MLAction.directions():
+        if action in MLA.directions():
             self.agent_turn_one_step(env, action)
-        elif action == MLAction.FORWARD:
+        elif action == MLA.FORWARD:
             cur_x, cur_y = self.object.get_position()[:2]
             goal_angle = math.atan2((self.target_y - cur_y), (self.target_x- cur_x))
             current_heading = self.get_current_orn_z()
@@ -134,13 +134,13 @@ class iGibsonAgent:
     def agent_forward_one_step(self, env):
         if self.name == "human":
             x,y,z = self.object.get_position()
-            if self.direction == MLAction.NORTH:
+            if self.direction == MLA.NORTH:
                 self.object.set_position_orientation([x-ONE_STEP,y,z], self.object.get_orientation())
-            elif self.direction == MLAction.SOUTH:
+            elif self.direction == MLA.SOUTH:
                 self.object.set_position_orientation([x+ONE_STEP,y,z], self.object.get_orientation())
-            elif self.direction == MLAction.EAST:
+            elif self.direction == MLA.EAST:
                 self.object.set_position_orientation([x,y+ONE_STEP,z], self.object.get_orientation())
-            elif self.direction == MLAction.WEST:
+            elif self.direction == MLA.WEST:
                 self.object.set_position_orientation([x,y-ONE_STEP,z], self.object.get_orientation())
         else:
             action = np.zeros(env.action_space.shape)

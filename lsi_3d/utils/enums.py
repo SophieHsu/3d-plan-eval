@@ -1,6 +1,7 @@
 from enum import Enum
 
-class MLAction(Enum):
+# Medium Level Action
+class MLA(Enum):
     STAY = 0
     INTERACT = 1
     NORTH = 2
