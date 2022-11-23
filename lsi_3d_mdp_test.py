@@ -19,7 +19,7 @@ from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
-from lsi_3d.utils.enums import ExecutingState, MLA
+from lsi_3d.utils.enums import ExecutingState
 from render_layouts import HEIGHT, WIDTH, name2abbr
 from igibson.robots.behavior_robot import BehaviorRobot
 import math
@@ -31,6 +31,7 @@ from agent import FixedMediumPlan
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
+from lsi_3d.utils.enums import ExecutingState
 from igibson.external.pybullet_tools.utils import (
     get_max_limits,
     get_min_limits,
@@ -241,24 +242,24 @@ def main_loop(
         init_action = np.zeros(env.nav_env.action_space.shape)
         ig_robot.object.apply_action(init_action)
 
-        if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
+        if env.human_state.executing_state == ExecutingState.CALC_HL_PATH:
             '''
             human gets high level action and plans path to it. when human finishes path
             it will re-enter this state
             '''
-            next_human_hl_state, human_plan, human_goal = hl_human_agent.action(env.world_state, env.human_state)
+            next_human_hl_state, human_plan, human_goal, human_action_object_pair = hl_human_agent.action(env.world_state, env.human_state)
             #human_plan.append('I')
             human = FixedMediumPlan(human_plan)
-            env.human_state.executing_state = ExecutingState.EXEC_SUB_PATH
+            env.human_state.executing_state = ExecutingState.EXEC_ML_PATH
             pos_h, a_h = human.action()
             ig_human.prepare_for_next_action(a_h)
 
-        if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
+        if env.robot_state.executing_state == ExecutingState.CALC_HL_PATH:
             '''
             robot gets high level action and translates into mid-level path
             when robot completes this path, it returns to this state
             '''
-            next_robot_hl_state, robot_goal = hl_robot_agent.action(env.world_state, env.human_state)
+            next_robot_hl_state, robot_goal, robot_action_object_pair = hl_robot_agent.action(env.world_state, env.robot_state)
             optimal_plan = hl_robot_agent.optimal_motion_plan(env.robot_state, robot_goal)
             optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
             env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
@@ -289,23 +290,23 @@ def main_loop(
 
             if plan == [] and optimal_plan_goal[0] == env.robot_state.ml_state:
                 # could not find path to goal, so idle 1 step and then recalculate
-                plan.append((next_robot_goal,MLA.INTERACT))
+                plan.append((next_robot_goal,'I'))
             elif plan == []:
                 # if this is final subpath on optimal plan, the append interact at the end
-                plan.append((env.robot_state.ml_state, MLA.IDLE))
+                plan.append((env.robot_state.ml_state, 'D'))
 
             robot_plan = FixedMediumPlan(plan)
-            env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
+            env.robot_state.executing_state = ExecutingState.EXEC_ML_PATH
             a_r = None
             # a_r = robot_plan.action()
             # ig_robot.prepare_for_next_action(a_r)
 
-        elif env.robot_state.executing_state == ExecutingState.EXEC_SUB_PATH:
+        elif env.robot_state.executing_state == ExecutingState.EXEC_ML_PATH:
 
             ig_robot.agent_move_one_step(env.nav_env, a_r)
             # env.update_joint_ml_state()
             
-            if ig_robot.action_completed(a_r) or a_r == MLA.IDLE:
+            if ig_robot.action_completed(a_r) or a_r == 'D':
                 # if :
                 #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
@@ -319,16 +320,16 @@ def main_loop(
 
                     reset_arm_position(ig_robot)
 
-                    if a_r == MLA.IDLE and env.robot_state.executing_state != ExecutingState.IDLE:
+                    if a_r == 'D' and env.robot_state.executing_state != ExecutingState.IDLE:
                         env.robot_state.executing_state = ExecutingState.IDLE
 
-                    if a_r == MLA.INTERACT: #and env.robot_state == robot_goal:
-                        env.robot_state.executing_state = ExecutingState.NO_ML_PATH
+                    if a_r == 'I': #and env.robot_state == robot_goal:
+                        env.robot_state.executing_state = ExecutingState.INTERACT
 
             
-        if env.human_state.executing_state == ExecutingState.EXEC_SUB_PATH:
-            if human.i == len(human.plan) or a_h == MLA.INTERACT: #or a_h == MLAction.STAY:
-                env.human_state.executing_state = ExecutingState.NO_ML_PATH
+        if env.human_state.executing_state == ExecutingState.EXEC_ML_PATH:
+            if human.i == len(human.plan) or a_h == 'I': #or a_h == MLAction.STAY:
+                env.human_state.executing_state = ExecutingState.INTERACT
             else:
                 ig_human.agent_move_one_step(env.nav_env, a_h)
                 if ig_human.action_completed(a_h):
@@ -338,16 +339,20 @@ def main_loop(
                     ig_human.prepare_for_next_action(a_h)
 
                     if env.robot_state.executing_state == ExecutingState.IDLE:
-                        env.robot_state.executing_state = ExecutingState.EXEC_SUB_PATH
+                        env.robot_state.executing_state = ExecutingState.EXEC_ML_PATH
 
         for obj, pos in bowlpans:
                 obj.set_position(pos)
         env.nav_env.simulator.step()
 
-        if env.robot_state.executing_state == ExecutingState.NO_ML_PATH:
-            env.update_robot_hl_state(next_robot_hl_state)
-        if env.human_state.executing_state == ExecutingState.NO_ML_PATH:
-            env.update_human_hl_state(next_human_hl_state)
+        if env.robot_state.executing_state == ExecutingState.INTERACT:
+            env.update_robot_hl_state(next_robot_hl_state, robot_action_object_pair)
+            env.robot_state.executing_state = ExecutingState.CALC_HL_PATH
+            #env.human_state.executing_state = ExecutingState.CALC_HL_PATH
+        if env.human_state.executing_state == ExecutingState.INTERACT:
+            env.update_human_hl_state(next_human_hl_state, human_action_object_pair)
+            #env.robot_state.executing_state = ExecutingState.CALC_HL_PATH
+            env.human_state.executing_state = ExecutingState.CALC_HL_PATH
 
 def reset_arm_position(ig_robot):
     arm_joints_names = [
@@ -475,8 +480,8 @@ def run_example(args):
     motion_planner = MotionPlanningWrapper(nav_env)
     print("**************loading done***************")
     
-    human = iGibsonAgent(human, human_start, MLA.SOUTH, "human")
-    robot = iGibsonAgent(nav_env.robots[0], robot_start, MLA.SOUTH, "robot")
+    human = iGibsonAgent(human, human_start, 'S', "human")
+    robot = iGibsonAgent(nav_env.robots[0], robot_start, 'S', "robot")
 
     lsi_env = LsiEnv(mdp, nav_env, human, robot)
     

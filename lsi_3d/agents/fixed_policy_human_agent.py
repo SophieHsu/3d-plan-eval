@@ -31,8 +31,6 @@
 from agent import Agent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
-from lsi_3d.utils.enums import HLAction, MLA
-from lsi_3d.utils.functions import convert_path_to_mla
 
 class FixedPolicyAgent(Agent):
     def __init__(self, hlp, mlp) -> None:
@@ -66,8 +64,8 @@ class FixedPolicyAgent(Agent):
         # should this happen outside
         #paths = self.mlp.compute_motion_plan(state.ml_state, (goal,state.ml_state[0]))
         path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
-        path = convert_path_to_mla(path)
-        return next_hl_state, path, goal
+        #path = convert_path_to_mla(path)
+        return next_hl_state, path, goal, (action, object)
 
             
 

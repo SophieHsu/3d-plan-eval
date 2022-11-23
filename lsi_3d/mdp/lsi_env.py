@@ -3,7 +3,6 @@ from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
-from lsi_3d.utils.enums import MLA
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
 
 class LsiEnv(object):
@@ -25,24 +24,24 @@ class LsiEnv(object):
         self.robot_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[1])
         self.world_state = WorldState(mdp.hl_start_state)
 
-    def update_robot_hl_state(self, next_hl_state):
+    def update_robot_hl_state(self, next_hl_state, action_object):
         '''
         Update hl state by updated in_pot and orders for world
         and holding for specific agent
         '''
         #self.joint_hl_state = next_hl_state # eventually replace with game logice
         #self.ml_state = self.update_joint_ml_state()
-        self.world_state.update(next_hl_state)
+        self.world_state.update(next_hl_state, action_object)
         self.robot_state.update_hl_state(next_hl_state)
 
-    def update_human_hl_state(self, next_hl_state):
+    def update_human_hl_state(self, next_hl_state, action_object):
         '''
         Update hl state by updated in_pot and orders for world
         and holding for specific agent
         '''
         #self.joint_hl_state = next_hl_state # eventually replace with game logice
         #self.ml_state = self.update_joint_ml_state()
-        self.world_state.update(next_hl_state)
+        self.world_state.update(next_hl_state, action_object)
         self.human_state.update_hl_state(next_hl_state)
 
     def get_human_hl_state(self):

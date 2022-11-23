@@ -6,15 +6,21 @@ from lsi_3d.utils.enums import ExecutingState
 
 class WorldState(object):
     def __init__(self, start_hl_state):
-        self.parse_hl_state(start_hl_state)
+        in_pot, orders = self.parse_hl_state(start_hl_state)
+        self.in_pot = in_pot
+        self.orders = orders
 
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
-        self.in_pot = int(parsed[1])
-        self.orders = parsed[2:]
+        return (int(parsed[1]), parsed[2:])
 
-    def update(self, new_hl_state):
-        self.parse_hl_state(new_hl_state)
+    def update(self, new_hl_state, action_object):
+        #in_pot, orders = self.parse_hl_state(new_hl_state)
+
+        if action_object == ('drop', 'onion'):
+            self.in_pot += 1
+        if action_object == ('deliver', 'soup'):
+            self.orders = self.orders.pop()
 
 class SoupState(object):
     def __init__(self, location, onions_in_soup) -> None:
@@ -29,7 +35,7 @@ class AgentState(object):
         self.hl_state = hl_state
         self.ml_state = ml_state
         self.ll_state = ll_state
-        self.executing_state = ExecutingState.NO_ML_PATH
+        self.executing_state = ExecutingState.CALC_HL_PATH
 
         self.holding = 'None'
         self.parse_hl_state(hl_state)

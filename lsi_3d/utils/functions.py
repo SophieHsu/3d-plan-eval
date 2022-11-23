@@ -2,20 +2,19 @@ import math
 import numpy as np
 from numpy import diff
 from lsi_3d.utils.constants import TARGET_ORNS
-from lsi_3d.utils.enums import MLA
 
 def orn_to_cardinal(angle):
 
     # converts an angle to whatever cardinal direction angle is closest to
     rad_45 = 0.785
     if angle >= rad_45 and angle < 3*rad_45:
-        return MLA.EAST
+        return 'E'
     if (angle >= 3*rad_45 and angle < math.pi) or (angle >= -math.pi and angle < -3*rad_45):
-        return MLA.NORTH
+        return 'N'
     if angle >= -3*rad_45 and angle < -rad_45:
-        return MLA.WEST
+        return 'W'
     if (angle >= -rad_45 and angle < 0) or (angle < rad_45 and angle >= 0):
-        return MLA.SOUTH
+        return 'S'
     # diff = np.inf
     # direction = None
 
@@ -54,16 +53,16 @@ def quat2euler(x, y, z, w):
   
     return roll_x, pitch_y, yaw_z # in radians
 
-def convert_path_to_mla(path):
-    return [((pos[0],pos[1],MLA.from_string(pos[2])),MLA.from_string(a)) for (pos,a) in path]
+# def convert_path_to_mla(path):
+#     return [((pos[0],pos[1],MLA.from_string(pos[2])),MLA.from_string(a)) for (pos,a) in path]
 
-def convert_mla_state_to_string(states):
-    converted_states = []
-    for state in states:
-        if len(state) > 2:
-            x,y,f = state
-            converted_states.append((x,y,MLA.to_string(f)))
-        else:
-            converted_states.append(state)
+# def convert_mla_state_to_string(states):
+#     converted_states = []
+#     for state in states:
+#         if len(state) > 2:
+#             x,y,f = state
+#             converted_states.append((x,y,MLA.to_string(f)))
+#         else:
+#             converted_states.append(state)
 
-    return converted_states
+#     return converted_states

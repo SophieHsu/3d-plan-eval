@@ -2,9 +2,6 @@ from lsi_3d.agents.agent import Agent
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 import numpy as np
 
-from lsi_3d.utils.enums import MLA
-from lsi_3d.utils.functions import convert_path_to_mla, convert_mla_state_to_string
-
 class HlMdpPlanningAgent(Agent):
 
     def __init__(self, hlp_planner, mlp:AStarMotionPlanner):
@@ -59,21 +56,17 @@ class HlMdpPlanningAgent(Agent):
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
 
-        return (next_state, goal)
+        return (next_state, goal, tuple(action_object_pair))
 
     def optimal_motion_plan(self, agent_state, goal):
         path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
         self.optimal_path = path
-
-        path = convert_path_to_mla(path)
         return path
 
     def avoidance_motion_plan(self, joint_ml_state, goal, avoid_path, avoid_goal):
         # extract only actions for avoidance plan
         avoid_path = [s[1] for s in avoid_path]
-        avoid_path = [MLA.to_string(a) for a in avoid_path]
         paths = self.mlp.compute_motion_plan(joint_ml_state, (avoid_goal,goal), avoid_path)
         path = paths[1]
-        path = convert_path_to_mla(path)
         return path
 
