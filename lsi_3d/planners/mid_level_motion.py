@@ -5,7 +5,7 @@ class AStarMotionPlanner(object):
     def __init__(self, map) -> None:
         self.map = map
 
-    def compute_motion_plan(self, starts, goals, avoid_path = None):
+    def compute_motion_plan(self, starts, goals, avoid_path = None, radius = None):
         print(f'Computing plan from {starts} to {goals}')
         r1,c1,d1 = starts[0]
         r2,c2,d2 = starts[1]
@@ -14,7 +14,7 @@ class AStarMotionPlanner(object):
 
         #goals = convert_mla_state_to_string(goals)
 
-        return run_astar_two_agent(self.map, starts, goals, avoid_path)
+        return run_astar_two_agent(self.map, starts, goals, avoid_path, radius)
 
     def compute_single_agent_astar_path(self, start, goal):
         r1,c1,d1 = start

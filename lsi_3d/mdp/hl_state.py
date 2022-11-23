@@ -1,10 +1,9 @@
+from lsi_3d.utils.enums import Mode
 
-import string
-from tokenize import String
-
-from lsi_3d.utils.enums import ExecutingState
-
-class WorldState(object):
+class WorldState():
+    """Keeps track of items in the world that are shared accross agents
+    i.e. items in pot, and orders left
+    """
     def __init__(self, start_hl_state):
         in_pot, orders = self.parse_hl_state(start_hl_state)
         self.in_pot = in_pot
@@ -22,7 +21,7 @@ class WorldState(object):
         if action_object == ('deliver', 'soup'):
             self.orders = self.orders.pop()
 
-class SoupState(object):
+class SoupState():
     def __init__(self, location, onions_in_soup) -> None:
         self.onions_in_soup = onions_in_soup
         self.location = location
@@ -30,12 +29,12 @@ class SoupState(object):
     def add_onion(self):
         self.onions_in_soup += 1
 
-class AgentState(object):
+class AgentState():
     def __init__(self, hl_state, ml_state, ll_state = None) -> None:
         self.hl_state = hl_state
         self.ml_state = ml_state
         self.ll_state = ll_state
-        self.executing_state = ExecutingState.CALC_HL_PATH
+        self.mode = Mode.CALC_HL_PATH
 
         self.holding = 'None'
         self.parse_hl_state(hl_state)

@@ -75,7 +75,7 @@ from enum import Enum
 #     ONION = 1
 #     SOUP = 2
 
-class ExecutingState(Enum):
+class Mode(Enum):
     EXEC_ML_PATH = 0
     CALC_HL_PATH = 1
     CALC_SUB_PATH = 2

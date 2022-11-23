@@ -63,10 +63,10 @@ class HlMdpPlanningAgent(Agent):
         self.optimal_path = path
         return path
 
-    def avoidance_motion_plan(self, joint_ml_state, goal, avoid_path, avoid_goal):
+    def avoidance_motion_plan(self, joint_ml_state, goal, avoid_path, avoid_goal, radius = None):
         # extract only actions for avoidance plan
         avoid_path = [s[1] for s in avoid_path]
-        paths = self.mlp.compute_motion_plan(joint_ml_state, (avoid_goal,goal), avoid_path)
+        paths = self.mlp.compute_motion_plan(joint_ml_state, (avoid_goal,goal), avoid_path, radius)
         path = paths[1]
         return path
 
