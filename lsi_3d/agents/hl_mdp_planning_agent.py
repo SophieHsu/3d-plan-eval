@@ -34,9 +34,15 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
+    def get_mdp_key_from_state(self, world_state, agent_state):
+        key = f"{agent_state.holding}_{world_state.in_pot}"
+        for order in world_state.orders:
+            key += f'_{order}'
+        return key
+
     def action(self, world_state, agent_state):
 
-        state_str = agent_state.hl_state
+        state_str = self.get_mdp_key_from_state(world_state, agent_state)
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # retrieve high level action from policy

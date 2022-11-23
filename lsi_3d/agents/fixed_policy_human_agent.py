@@ -43,19 +43,23 @@ class FixedPolicyAgent(Agent):
         action,object = 'stay',agent_state.holding
         if world_state.in_pot < 3 and agent_state.holding == 'None':
             action,object = ('pickup', 'onion')
-            next_hl_state = f'onion_{world_state.in_pot}_onion_onion'
+            next_hl_state = f'onion_{world_state.in_pot}'
         elif agent_state.holding == 'onion':
             action,object = ('drop','onion')
-            next_hl_state = f'None_{world_state.in_pot+1}_onion_onion'
+            next_hl_state = f'None_{world_state.in_pot+1}'
         elif world_state.in_pot == 3 and agent_state.holding == 'None':
             action,object = ('pickup','dish')
-            next_hl_state = f'dish_{world_state.in_pot}_onion_onion'
+            next_hl_state = f'dish_{world_state.in_pot}'
         elif agent_state.holding == 'dish' and world_state.in_pot == 3:
             action,object = ('pickup','soup')
-            next_hl_state = f'soup_{world_state.in_pot}_onion_onion'
+            world_state.in_pot = 0
+            next_hl_state = f'soup_{world_state.in_pot}'
         elif agent_state.holding == 'soup':
             action,object = ('deliver','soup')
-            next_hl_state = f'None_0_onion'
+            next_hl_state = f'None_{world_state.in_pot}'
+        
+        for order in world_state.orders:
+            next_hl_state += f'_{order}'
 
         possible_motion_goals = self.hlp.map_action_to_location(world_state, agent_state, (action,object))
         goal = possible_motion_goals[0]

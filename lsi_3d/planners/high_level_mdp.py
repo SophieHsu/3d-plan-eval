@@ -266,7 +266,7 @@ class HighLevelMdpPlanner(object):
                 location = self.mdp.get_dish_dispenser_locations()
                 print(f'Next Dish Location: {location}')
             else:
-                location = state_obj.get_ready_pots()[0] # + self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
+                location = self.mdp.get_pot_locations() # + self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
 
         elif action == 'drop':
             if obj == 'onion' or obj == 'tomato':

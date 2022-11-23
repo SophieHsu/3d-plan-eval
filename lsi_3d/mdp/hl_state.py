@@ -19,7 +19,7 @@ class WorldState():
         if action_object == ('drop', 'onion'):
             self.in_pot += 1
         if action_object == ('deliver', 'soup'):
-            self.orders = self.orders.pop()
+            self.orders = self.orders[:-1]
 
 class SoupState():
     def __init__(self, location, onions_in_soup) -> None:

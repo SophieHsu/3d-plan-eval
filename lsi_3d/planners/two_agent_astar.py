@@ -113,6 +113,33 @@ def cost_func(grid, ex, ey, x, y, f, action):
     else:
         return 1
 
+def cost_func_radius(grid, ex, ey, x, y, f, action, radius = None, avoid_state = None):
+    name2dire = {
+        "E": (0, 1),
+        "W": (0, -1),
+        "S": (1, 0),
+        "N": (-1, 0),
+    }
+    dx, dy = name2dire[f]
+    if end_achieved(grid, x, y, ex, ey, f) and action == "I" and (x+dx, y+dy) == (ex, ey):
+        return 0
+    elif action == 'D':
+        return 0.5
+    else:
+        if radius != None:
+            cost = 1
+            ax,ay,af = avoid_state
+            nx,ny,nf = transition(x,y,f,action)
+            for f_state in get_states_in_forward_radius(avoid_state, radius):
+                fx, fy = f_state
+                if (fx, fy) == (nx, ny):
+                    cost = 1.5
+            
+            return cost
+                
+        else:
+            return 1
+
 def end_achieved(grid, x, y, ex, ey, f, ef=None):
     if(grid[ex][ey] == "X"):
         if ef != None:
@@ -404,13 +431,13 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
             for action2 in actions:
                 nx2, ny2, nf2 = transition(cx2, cy2, cf2, action2)
                 new_state = (nx1, ny1, nf1, nx2, ny2, nf2)
-                cost2 = cost_func(grid, ex2, ey2, nx2, ny2, nf2, action2)
+                cost2 = cost_func_radius(grid, ex2, ey2, nx2, ny2, nf2, action2, f_radius, (nx1,nx1,nf1))
                 #print(action1, action2, new_state)
                 # if crossing_radius(cur_state, new_state, f_radius):
                 #     asdf = 4
                 if (ex2, ey2, ef2) == (nx2, ny2, nf2):
                     asdf = 2
-                if valid(grid, nx1, ny1, nx2, ny2) and (nx1, ny1) != (nx2, ny2) and not crossing_radius(cur_state, new_state, f_radius):
+                if valid(grid, nx1, ny1, nx2, ny2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
                     new_h = heuristic(ex1, ey1, ex2, ey2, new_state)
                     if new_state not in visited or cur_g+cost1+cost2+new_h < f_values[new_state]:
                         heappush(queue, (cur_g+cost1+cost2+new_h, cur_g+cost1+cost2, new_state, avoid_path_t_step+1))

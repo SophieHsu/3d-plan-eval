@@ -1,8 +1,8 @@
-class LsiState(object):
-    def __init__(self, hl_state, ml_state, ll_state = None) -> None:
-        self.hl_state = hl_state
-        self.ml_state = ml_state
-        self.ll_state = ll_state
+# class LsiState(object):
+#     def __init__(self, hl_state, ml_state, ll_state = None) -> None:
+#         self.hl_state = hl_state
+#         self.ml_state = ml_state
+#         self.ll_state = ll_state
 #     """A state in OvercookedGridworld."""
 #     def __init__(self, players, objects, order_list):
 #         """
