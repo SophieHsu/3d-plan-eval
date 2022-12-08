@@ -53,16 +53,19 @@ def quat2euler(x, y, z, w):
   
     return roll_x, pitch_y, yaw_z # in radians
 
-# def convert_path_to_mla(path):
-#     return [((pos[0],pos[1],MLA.from_string(pos[2])),MLA.from_string(a)) for (pos,a) in path]
-
-# def convert_mla_state_to_string(states):
-#     converted_states = []
-#     for state in states:
-#         if len(state) > 2:
-#             x,y,f = state
-#             converted_states.append((x,y,MLA.to_string(f)))
-#         else:
-#             converted_states.append(state)
-
-#     return converted_states
+def grid_transition(action, state):
+    # (s,a) -> (s')
+    x,y,f = state
+    a = action
+    name2dire = {
+        "E": (0, 1),
+        "W": (0, -1),
+        "S": (1, 0),
+        "N": (-1, 0),
+    }
+    if a in "EWSN":
+        f = a
+    elif a == "F":
+        dx, dy = name2dire[f]
+        x, y = x+dx, y+dy
+    return x, y, f

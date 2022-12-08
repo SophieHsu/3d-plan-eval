@@ -11,7 +11,7 @@ class FixedMediumPlan(Agent):
     def __init__(self, plan):
         self.plan = plan
         
-        if self.plan[len(self.plan)-1][1] != 'I':
+        if plan and self.plan[len(self.plan)-1][1] != 'I':
             self.plan.append((self.plan[len(self.plan)-1][0], 'I'))
         self.i = 0
     

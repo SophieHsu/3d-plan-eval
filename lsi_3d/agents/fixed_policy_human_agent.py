@@ -47,7 +47,7 @@ class FixedPolicyAgent(Agent):
         elif agent_state.holding == 'onion':
             action,object = ('drop','onion')
             next_hl_state = f'None_{world_state.in_pot+1}'
-        elif world_state.in_pot == 3 and agent_state.holding == 'None':
+        elif world_state.in_pot <= 3 and agent_state.holding == 'None':
             action,object = ('pickup','dish')
             next_hl_state = f'dish_{world_state.in_pot}'
         elif agent_state.holding == 'dish' and world_state.in_pot == 3:

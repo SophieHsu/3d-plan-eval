@@ -4,3 +4,4 @@ algorithm_config = 'a_star_two_agent.tml'
 order_list = ['onion','onion']
 hl_start_state = 'None_0_onion_onion'
 recalculation_resolution = 4
+avoid_radius = 1

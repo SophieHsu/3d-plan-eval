@@ -32,6 +32,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.enums import Mode
+from lsi_3d.utils.functions import grid_transition
 from igibson.external.pybullet_tools.utils import (
     get_max_limits,
     get_min_limits,
@@ -39,23 +40,6 @@ from igibson.external.pybullet_tools.utils import (
     joints_from_names,
     set_joint_positions,
 )
-
-# TARGET_ORNS = {
-#     "S": 0,
-#     "E": 1.5707,
-#     "N": 3.1415926,
-#     "W": -1.5707,
-#     None: -1
-# }
-
-# DIRE2POSDIFF = {
-#     "E": (0, 1),
-#     "W": (0, -1),
-#     "S": (1, 0),
-#     "N": (-1, 0)
-# }
-
-# ONE_STEP = 0.02
 
 def read_from_grid_text(grid_str):
     obj_x_y = []
@@ -86,7 +70,6 @@ def read_from_grid_text(grid_str):
     if count == 0:
         count = 1
     center_x, center_y = sum_x/count, sum_y/count
-
 
     for name, x, y in obj_x_y:
         if name == "table_h":
@@ -202,15 +185,19 @@ def grid2raw(grid_str):
 
 def get_human_sub_path(path, current_index, human_ml_state):
     sub_path = []
-    if current_index == 0 and human_ml_state != path[current_index][0]:
+    if current_index == 1 and human_ml_state != path[current_index][0]:
         # in starting state
         return path
-    if human_ml_state == path[current_index][0]:
-        sub_path = path[current_index:(len(path))]
-    elif human_ml_state == path[current_index-1][0] and current_index>=1:
-        sub_path = path[current_index-1:(len(path))]
-    elif human_ml_state == path[current_index+1][0]:
-        sub_path = path[current_index+1:(len(path))]
+    # if human_ml_state == path[current_index][0]:
+    #     sub_path = path[current_index:(len(path))]
+    # elif human_ml_state == path[current_index-1][0] and current_index>=1:
+    #     sub_path = path[current_index-1:(len(path))]
+    # elif human_ml_state == path[current_index+1][0]:
+    #     sub_path = path[current_index+1:(len(path))]
+
+    for idx, state in enumerate(path):
+        if state[0] == human_ml_state:
+            return path[idx+1:len(path)]
     
     return sub_path
 
@@ -221,7 +208,8 @@ def main_loop(
     hl_robot_agent:HlMdpPlanningAgent,
     hl_human_agent:FixedPolicyAgent,
     bowlpans,
-    recalc_res):
+    recalc_res,
+    avoid_radius):
     """_summary_
 
     Args:
@@ -285,7 +273,7 @@ def main_loop(
             if env.robot_state.ml_state == next_robot_goal:
                 next_robot_goal = robot.next_goal()
                 
-            human_sub_path = get_human_sub_path(human_plan, (human.i-1), env.human_state.ml_state)
+            human_sub_path = get_human_sub_path(human_plan, (human.i), env.human_state.ml_state)
             plan = hl_robot_agent.avoidance_motion_plan((env.human_state.ml_state, env.robot_state.ml_state), next_robot_goal, human_sub_path, human_goal, radius=1)
 
             if plan == [] and optimal_plan_goal[0] == env.robot_state.ml_state:
@@ -326,6 +314,9 @@ def main_loop(
                     if a_r == 'I': #and env.robot_state == robot_goal:
                         env.robot_state.mode = Mode.INTERACT
 
+                    if env.human_state.mode == Mode.IDLE:
+                        env.human_state.mode = Mode.EXEC_ML_PATH
+
             
         if env.human_state.mode == Mode.EXEC_ML_PATH:
             if human.i == len(human.plan) or a_h == 'I': #or a_h == MLAction.STAY:
@@ -340,6 +331,14 @@ def main_loop(
 
                     if env.robot_state.mode == Mode.IDLE:
                         env.robot_state.mode = Mode.EXEC_ML_PATH
+
+                    # if robot is in a goal state and humans next state is also this state,
+                    # then idle until robot moves
+                    # next_robot_goal == env.robot_state.ml_state and 
+                    if grid_transition(a_h, env.human_state.ml_state) == env.robot_state.ml_state:
+                        env.human_state.mode = Mode.IDLE
+
+                
 
         for obj, pos in bowlpans:
                 obj.set_position(pos)
@@ -485,7 +484,7 @@ def run_example(args):
 
     lsi_env = LsiEnv(mdp, nav_env, human, robot)
     
-    main_loop(mdp, lsi_env, human, robot, robot_agent, human_agent, bowlpans, recalc_res)
+    main_loop(mdp, lsi_env, human, robot, robot_agent, human_agent, bowlpans, recalc_res,1)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

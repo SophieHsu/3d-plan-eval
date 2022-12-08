@@ -133,7 +133,7 @@ def cost_func_radius(grid, ex, ey, x, y, f, action, radius = None, avoid_state =
             for f_state in get_states_in_forward_radius(avoid_state, radius):
                 fx, fy = f_state
                 if (fx, fy) == (nx, ny):
-                    cost = 1.5
+                    cost = 3.5
             
             return cost
                 
@@ -395,7 +395,7 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
     #visited.add(start_state)
     path_prev = dict()
     queue = []
-    heappush(queue, (0, 0, start_state, 0)) # f, g, state, f=h+g, avoid_path_t_step
+    heappush(queue, (0, 0, start_state, 0)) # f, g, state, f=h+g, avoid_path_t_stepp
     f_values = dict()
     f_values[start_state] = 0
     break_all = False
@@ -435,8 +435,8 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
                 #print(action1, action2, new_state)
                 # if crossing_radius(cur_state, new_state, f_radius):
                 #     asdf = 4
-                if (ex2, ey2, ef2) == (nx2, ny2, nf2):
-                    asdf = 2
+                # if (ex2, ey2, ef2) == (nx2, ny2, nf2):
+                #     asdf = 2
                 if valid(grid, nx1, ny1, nx2, ny2) and (nx1, ny1) != (nx2, ny2) and not crossing(cur_state, new_state):
                     new_h = heuristic(ex1, ey1, ex2, ey2, new_state)
                     if new_state not in visited or cur_g+cost1+cost2+new_h < f_values[new_state]:
