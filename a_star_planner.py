@@ -5,7 +5,7 @@ import numpy as np
 from igibson.objects.visual_marker import VisualMarker
 import pybullet as p
 
-class AStarAgent():
+class AStarPlanner():
 
     def __init__(self, robot, env, occupancy_grid):
         self.robot = robot
@@ -159,9 +159,6 @@ class AStarAgent():
         dy = abs(start[1] - end[1])
         heuristic = dx + dy + (math.sqrt(2) - 2) * min(dx, dy)
         node.f_cost = node.g_cost + heuristic
-
-    def update_occupancy_grid(self):
-        pass
 
 class AStarNode():
 

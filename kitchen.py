@@ -21,7 +21,6 @@ class Kitchen():
         orientation_map = dict()
 
         raw_str = self.grid2raw(filepath)
-        print(raw_str.strip().split("\n"))
         for line in raw_str.strip().split("\n"):
             if len(line) == 0:
                 break
@@ -108,7 +107,7 @@ class Kitchen():
             if name == "counter":
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
-            pos = [x+shift[0]-4.5, y+shift[1]-4.5, 0+shift[2]]
+            pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
             self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn) 
 
             if name not in ("bowl", "pan"):
