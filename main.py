@@ -6,12 +6,11 @@ from igibson.utils.utils import quatToXYZW, parse_config
 from transforms3d.euler import euler2quat
 import pybullet as p
 
-# from main_loop_wrapped_agent import MainLoopWrappedAgent
-from a_star_agent import AStarAgent
+from a_star_planner import AStarPlanner
+from motion_controller import MotionController
 
 # HDR files for PBR rendering
 from igibson.simulator_vr import SimulatorVR
-from igibson.utils.utils import parse_config
 
 from kitchen import Kitchen
 
@@ -35,7 +34,6 @@ def main():
     kitchen = Kitchen(env)
     kitchen.setup(kitchen_layout)
     _, _, occupancy_grid = kitchen.read_from_grid_text(kitchen_layout)
-    print(occupancy_grid)
 
     robot = env.robots[0]
     robot.tuck()
@@ -47,17 +45,13 @@ def main():
     env.set_pos_orn_with_z_offset(env.robots[0], [robot_x, robot_y, 0], [0, 0, 90])
 
     end = (5, 3)
-    aStarAgent = AStarAgent(robot, env, occupancy_grid)
-    yaw = 0
+    aStarPlanner = AStarPlanner(env, occupancy_grid)
+    motionController = MotionController(robot, aStarPlanner)
     while(True):
-        # cubePos, cubeOrn = p.getBasePositionAndOrientation(robot)
         follow_robot_view(robot)
-        # p.resetDebugVisualizerCamera(cameraTargetPosition=[0,0,0])
-        # agent_move_one_step(env, human, human.get_action())
-        # p.resetDebugVisualizerCamera(cameraDistance=1.2, cameraYaw=-90, cameraPitch=-90, cameraTargetPosition=pos)
         # actionStep = nav_env.simulator.gen_vr_robot_action()
         # human.apply_action(actionStep)
-        aStarAgent.step(end)
+        motionController.step(end)
         env.simulator.step()
 
 if __name__ == "__main__":
