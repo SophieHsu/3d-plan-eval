@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+ff9a87db1cc69870618753763534ea44 cryptopp/CMakeFiles/dynamic
+ff9a87db1cc69870618753763534ea44 cryptopp/CMakeFiles/shared
+ff9a87db1cc69870618753763534ea44 cryptopp/CMakeFiles/static

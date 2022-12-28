@@ -1,0 +1,1067 @@
+[
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG   -o CMakeFiles/test_device.dir/glad/egl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/glad/egl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/glad/egl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG   -o CMakeFiles/test_device.dir/glad/gl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/glad/gl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/glad/gl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG   -o CMakeFiles/test_device.dir/cpp/test_device.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/test_device.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/test_device.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG   -o CMakeFiles/query_devices.dir/glad/egl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/glad/egl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/glad/egl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG   -o CMakeFiles/query_devices.dir/glad/gl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/glad/gl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/glad/gl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG   -o CMakeFiles/query_devices.dir/cpp/query_devices.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/query_devices.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/query_devices.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -Dtinyobjloader_EXPORTS -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/tinyobjloader.dir/cpp/tinyobjloader/tiny_obj_loader.cc.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/tinyobjloader/tiny_obj_loader.cc",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/tinyobjloader/tiny_obj_loader.cc"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -Dtinyobjloader_EXPORTS -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/tinyobjloader.dir/cpp/tinyobjloader/tiny_obj_loader_decrypt.cc.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/tinyobjloader/tiny_obj_loader_decrypt.cc",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/tinyobjloader/tiny_obj_loader_decrypt.cc"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -Dtinyobjloader_EXPORTS -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/tinyobjloader.dir/cpp/tinyobjloader/bindings.cc.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/tinyobjloader/bindings.cc",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/tinyobjloader/bindings.cc"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DEGLRendererContext_EXPORTS -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/EGLRendererContext.dir/glad/egl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/glad/egl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/glad/egl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DEGLRendererContext_EXPORTS -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/EGLRendererContext.dir/glad/gl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/glad/gl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/glad/gl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DEGLRendererContext_EXPORTS -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/EGLRendererContext.dir/cpp/mesh_renderer.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/mesh_renderer.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/mesh_renderer.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38",
+  "command": "/usr/bin/c++  -DEGLRendererContext_EXPORTS -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp -I/home/mikedefranco/repos/iGibson/igibson/render/glm -I/usr/local/cuda-11.1/include -isystem /home/mikedefranco/miniconda3/envs/igibson/include/python3.8 -isystem /home/mikedefranco/repos/iGibson/igibson/render/pybind11/include  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/EGLRendererContext.dir/cpp/egl_mesh_renderer.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cpp/egl_mesh_renderer.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cpp/egl_mesh_renderer.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/cryptlib.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cryptlib.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cryptlib.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/cpu.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cpu.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cpu.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/integer.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/integer.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/integer.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/3way.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/3way.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/3way.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/adler32.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/adler32.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/adler32.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/algebra.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/algebra.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/algebra.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/algparam.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/algparam.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/algparam.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/allocate.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/allocate.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/allocate.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/arc4.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/arc4.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/arc4.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/aria.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/aria.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/aria.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/aria_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/aria_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/aria_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ariatab.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ariatab.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ariatab.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/asn.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/asn.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/asn.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/authenc.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/authenc.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/authenc.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/base32.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/base32.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/base32.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/base64.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/base64.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/base64.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/basecode.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/basecode.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/basecode.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/bfinit.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bfinit.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bfinit.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/blake2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blake2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blake2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse4.1 -o CMakeFiles/cryptopp-object.dir/blake2b_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blake2b_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blake2b_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse4.1 -o CMakeFiles/cryptopp-object.dir/blake2s_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blake2s_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blake2s_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/blowfish.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blowfish.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blowfish.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/blumshub.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blumshub.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/blumshub.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/camellia.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/camellia.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/camellia.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/cast.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cast.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cast.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/casts.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/casts.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/casts.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/cbcmac.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cbcmac.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cbcmac.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ccm.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ccm.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ccm.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/chacha.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chacha.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chacha.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mavx2 -o CMakeFiles/cryptopp-object.dir/chacha_avx.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chacha_avx.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chacha_avx.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse2 -o CMakeFiles/cryptopp-object.dir/chacha_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chacha_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chacha_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/chachapoly.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chachapoly.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/chachapoly.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/cham.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cham.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cham.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/cham_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cham_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cham_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/channels.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/channels.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/channels.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/cmac.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cmac.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/cmac.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/crc.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/crc.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/crc.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse4.2 -o CMakeFiles/cryptopp-object.dir/crc_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/crc_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/crc_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/darn.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/darn.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/darn.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/default.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/default.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/default.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/des.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/des.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/des.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/dessp.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dessp.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dessp.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/dh.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dh.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dh.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/dh2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dh2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dh2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/dll.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dll.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dll.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/donna_32.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/donna_32.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/donna_32.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/donna_64.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/donna_64.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/donna_64.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse2 -o CMakeFiles/cryptopp-object.dir/donna_sse.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/donna_sse.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/donna_sse.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/dsa.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dsa.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dsa.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/eax.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/eax.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/eax.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ec2n.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ec2n.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ec2n.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/eccrypto.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/eccrypto.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/eccrypto.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ecp.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ecp.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ecp.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/elgamal.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/elgamal.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/elgamal.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/emsa2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/emsa2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/emsa2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/eprecomp.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/eprecomp.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/eprecomp.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/esign.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/esign.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/esign.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/files.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/files.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/files.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/filters.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/filters.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/filters.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/fips140.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/fips140.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/fips140.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gcm.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gcm.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gcm.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -mpclmul -o CMakeFiles/cryptopp-object.dir/gcm_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gcm_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gcm_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gf256.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf256.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf256.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gf2_32.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf2_32.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf2_32.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gf2n.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf2n.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf2n.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mpclmul -o CMakeFiles/cryptopp-object.dir/gf2n_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf2n_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gf2n_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gfpcrypt.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gfpcrypt.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gfpcrypt.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gost.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gost.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gost.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/gzip.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gzip.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/gzip.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/hc128.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hc128.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hc128.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/hc256.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hc256.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hc256.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/hex.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hex.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hex.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/hight.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hight.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hight.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/hmac.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hmac.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hmac.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/hrtimer.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hrtimer.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/hrtimer.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ida.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ida.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ida.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/idea.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/idea.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/idea.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/iterhash.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/iterhash.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/iterhash.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/kalyna.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/kalyna.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/kalyna.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/kalynatab.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/kalynatab.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/kalynatab.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/keccak.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/keccak.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/keccak.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/keccak_core.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/keccak_core.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/keccak_core.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/keccak_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/keccak_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/keccak_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/lea.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lea.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lea.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/lea_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lea_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lea_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/lsh256.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh256.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh256.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mavx2 -o CMakeFiles/cryptopp-object.dir/lsh256_avx.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh256_avx.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh256_avx.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/lsh256_sse.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh256_sse.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh256_sse.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/lsh512.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh512.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh512.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mavx2 -o CMakeFiles/cryptopp-object.dir/lsh512_avx.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh512_avx.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh512_avx.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/lsh512_sse.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh512_sse.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/lsh512_sse.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/luc.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/luc.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/luc.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/mars.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/mars.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/mars.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/marss.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/marss.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/marss.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/md2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/md2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/md2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/md4.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/md4.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/md4.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/md5.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/md5.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/md5.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/misc.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/misc.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/misc.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/modes.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/modes.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/modes.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/mqueue.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/mqueue.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/mqueue.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/mqv.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/mqv.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/mqv.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/nbtheory.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/nbtheory.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/nbtheory.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/neon_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/neon_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/neon_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/oaep.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/oaep.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/oaep.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/osrng.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/osrng.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/osrng.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/padlkrng.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/padlkrng.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/padlkrng.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/panama.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/panama.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/panama.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/pkcspad.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/pkcspad.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/pkcspad.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/poly1305.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/poly1305.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/poly1305.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/polynomi.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/polynomi.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/polynomi.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ppc_power7.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_power7.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_power7.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ppc_power8.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_power8.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_power8.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ppc_power9.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_power9.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_power9.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ppc_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ppc_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/pssr.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/pssr.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/pssr.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/pubkey.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/pubkey.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/pubkey.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/queue.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/queue.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/queue.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rabbit.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rabbit.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rabbit.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rabin.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rabin.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rabin.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/randpool.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/randpool.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/randpool.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rc2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rc2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rc2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rc5.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rc5.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rc5.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rc6.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rc6.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rc6.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rdrand.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rdrand.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rdrand.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rdtables.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rdtables.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rdtables.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rijndael.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rijndael.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rijndael.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse4.1 -maes -o CMakeFiles/cryptopp-object.dir/rijndael_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rijndael_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rijndael_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ripemd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ripemd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ripemd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rng.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rng.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rng.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rsa.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rsa.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rsa.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/rw.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rw.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/rw.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/safer.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/safer.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/safer.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/salsa.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/salsa.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/salsa.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/scrypt.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/scrypt.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/scrypt.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/seal.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/seal.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/seal.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/seed.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/seed.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/seed.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/serpent.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/serpent.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/serpent.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/sha.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sha.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sha.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/sha3.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sha3.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sha3.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse4.2 -msha -o CMakeFiles/cryptopp-object.dir/sha_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sha_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sha_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/shacal2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shacal2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shacal2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse4.2 -msha -o CMakeFiles/cryptopp-object.dir/shacal2_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shacal2_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shacal2_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/shake.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shake.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shake.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/shark.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shark.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/shark.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/sharkbox.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sharkbox.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sharkbox.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/simeck.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/simeck.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/simeck.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/simon.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/simon.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/simon.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/simon128_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/simon128_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/simon128_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/skipjack.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/skipjack.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/skipjack.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/sm3.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sm3.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sm3.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/sm4.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sm4.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sm4.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -maes -o CMakeFiles/cryptopp-object.dir/sm4_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sm4_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sm4_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/sosemanuk.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sosemanuk.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sosemanuk.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/speck.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/speck.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/speck.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -mssse3 -o CMakeFiles/cryptopp-object.dir/speck128_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/speck128_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/speck128_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/square.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/square.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/square.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/squaretb.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/squaretb.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/squaretb.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -msse2 -o CMakeFiles/cryptopp-object.dir/sse_simd.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sse_simd.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/sse_simd.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/strciphr.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/strciphr.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/strciphr.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/tea.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tea.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tea.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/tftables.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tftables.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tftables.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/threefish.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/threefish.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/threefish.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/tiger.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tiger.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tiger.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/tigertab.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tigertab.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tigertab.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/ttmac.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ttmac.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/ttmac.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/tweetnacl.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tweetnacl.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/tweetnacl.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/twofish.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/twofish.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/twofish.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/vmac.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/vmac.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/vmac.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/wake.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/wake.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/wake.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/whrlpool.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/whrlpool.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/whrlpool.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/xed25519.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xed25519.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xed25519.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/xtr.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xtr.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xtr.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/xtrcrypt.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xtrcrypt.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xtrcrypt.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/xts.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xts.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/xts.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/zdeflate.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/zdeflate.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/zdeflate.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/zinflate.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/zinflate.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/zinflate.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIC   -o CMakeFiles/cryptopp-object.dir/zlib.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/zlib.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/zlib.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/test.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/test.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/test.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/bench1.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bench1.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bench1.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/bench2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bench2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bench2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/bench3.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bench3.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/bench3.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat0.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat0.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat0.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat1.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat1.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat1.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat3.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat3.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat3.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat4.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat4.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat4.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat5.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat5.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat5.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat6.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat6.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat6.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat7.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat7.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat7.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat8.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat8.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat8.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat9.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat9.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat9.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/validat10.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat10.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/validat10.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/regtest1.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest1.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest1.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/regtest2.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest2.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest2.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/regtest3.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest3.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest3.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/regtest4.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest4.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/regtest4.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/datatest.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/datatest.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/datatest.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/fipsalgt.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/fipsalgt.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/fipsalgt.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/fipstest.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/fipstest.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/fipstest.cpp"
+},
+{
+  "directory": "/home/mikedefranco/repos/iGibson/build/temp.linux-x86_64-cpython-38/cryptopp",
+  "command": "/usr/bin/c++  -DUSE_CUDA -DUSE_GLAD -I/home/mikedefranco/repos/iGibson/igibson/render/glad -I/home/mikedefranco/repos/iGibson/igibson/render/cryptopp  -DVERSION_INFO=\\\"2.2.0\\\" -O3 -DNDEBUG -fPIE   -o CMakeFiles/cryptest.dir/dlltest.cpp.o -c /home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dlltest.cpp",
+  "file": "/home/mikedefranco/repos/iGibson/igibson/render/cryptopp/dlltest.cpp"
+}
+]

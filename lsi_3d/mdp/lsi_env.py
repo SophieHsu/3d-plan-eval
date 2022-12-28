@@ -29,8 +29,6 @@ class LsiEnv(object):
         Update hl state by updated in_pot and orders for world
         and holding for specific agent
         '''
-        #self.joint_hl_state = next_hl_state # eventually replace with game logice
-        #self.ml_state = self.update_joint_ml_state()
         self.world_state.update(next_hl_state, action_object)
         self.robot_state.update_hl_state(next_hl_state)
 
@@ -39,8 +37,6 @@ class LsiEnv(object):
         Update hl state by updated in_pot and orders for world
         and holding for specific agent
         '''
-        #self.joint_hl_state = next_hl_state # eventually replace with game logice
-        #self.ml_state = self.update_joint_ml_state()
         self.world_state.update(next_hl_state, action_object)
         self.human_state.update_hl_state(next_hl_state)
 

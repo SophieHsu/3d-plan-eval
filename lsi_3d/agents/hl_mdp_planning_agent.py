@@ -64,6 +64,14 @@ class HlMdpPlanningAgent(Agent):
 
         return (next_state, goal, tuple(action_object_pair))
 
+    def action_given_parter_current_action(self, world_state, agent_state, partner_action):
+
+        state_str = self.get_mdp_key_from_state(world_state, agent_state)
+
+        self.mdp_planner.get
+
+        self.action(world_state, agent_state)
+
     def optimal_motion_plan(self, agent_state, goal):
         path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
         self.optimal_path = path
