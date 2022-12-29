@@ -8,11 +8,14 @@ import pybullet as p
 
 from a_star_planner import AStarPlanner
 from motion_controller import MotionController
+from motion_controller_human import MotionControllerHuman
 
 # HDR files for PBR rendering
 from igibson.simulator_vr import SimulatorVR
 
 from kitchen import Kitchen
+
+c_pos = [0, 0, 1.5]
 
 def top_camera_view():
     p.resetDebugVisualizerCamera(cameraDistance=1.0, cameraYaw=0, cameraPitch=-90, cameraTargetPosition=[4, 4, 10.0])
@@ -21,11 +24,37 @@ def follow_robot_view(robot):
     x, y, z = robot.get_position()
     p.resetDebugVisualizerCamera(cameraDistance=2.0, cameraYaw=-90, cameraPitch=-30, cameraTargetPosition=[x, y, 1.5])
 
+def follow_robot_view_top(robot):
+    x, y, z = robot.get_position()
+    p.resetDebugVisualizerCamera(cameraDistance=2.0, cameraYaw=0, cameraPitch=-30, cameraTargetPosition=[x, y, 2.0])
+
+# def control_camera():
+#     p.resetDebugVisualizerCamera(cameraDistance=1.0, cameraYaw=0, cameraPitch=0, cameraTargetPosition=c_pos)
+
+#     keys = p.getKeyboardEvents()
+#     #Keys to change camera
+#     if keys.get(102):  #F
+#         c_pos[1]+=1
+#     if keys.get(99):   #C
+#         c_pos[1]-=1
+#     if keys.get(122):  #Z
+#         c_pos[0]-=1
+#     if keys.get(120):  #X
+#         c_pos[0]+=1
+
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
     kitchen_layout = r"C:\Users\icaro\3d_lsi_2\kitchen_layouts_grid_text\kitchen1_alt.txt"
-    robot_x, robot_y = 0.5, 0.5
-    human_x, human_y = 3, 3
+    # Simple test:
+    # robot_x, robot_y = 3.5, 2.5
+    # human_x, human_y = 3.5, 2.5
+    # end = (5,3)
+
+    # Test case: not colliding into objects in adjacent squares
+    robot_x, robot_y = 4.5, 3.5
+    human_x, human_y = 2.5, 2.5
+    human_end = (0.5, 0.5)
+    robot_end = (7,3)
 
     env = iGibsonEnv(
         config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
@@ -36,22 +65,27 @@ def main():
     _, _, occupancy_grid = kitchen.read_from_grid_text(kitchen_layout)
 
     robot = env.robots[0]
-    robot.tuck()
-    # config = parse_config(config_file)
-    # human = BehaviorRobot(**config["human"])
-    # env.simulator.import_object(human)
+    # robot.tuck()
+    config = parse_config(config_file)
+    human = BehaviorRobot(**config["human"])
+    env.simulator.import_object(human)
     # # nav_env.simulator.switch_main_vr_robot(human)
-    # env.set_pos_orn_with_z_offset(human, [human_x-4.5, human_y-4.5, 0], [0, 0, 0])
-    env.set_pos_orn_with_z_offset(env.robots[0], [robot_x, robot_y, 0], [0, 0, 90])
-
-    end = (5, 3)
-    aStarPlanner = AStarPlanner(env, occupancy_grid)
-    motionController = MotionController(robot, aStarPlanner)
+    env.set_pos_orn_with_z_offset(human, [human_x, human_y, 0], [0, 0, 0])
+    env.set_pos_orn_with_z_offset(robot, [robot_x, robot_y, 0], [0, 0, 0])
+    
+    a_star_planner = AStarPlanner(env, occupancy_grid, robot)
+    motion_controller = MotionControllerHuman(human, a_star_planner)
+    motion_controller_robot = MotionController(robot, a_star_planner)
+    # top_camera_view()
     while(True):
-        follow_robot_view(robot)
+        follow_robot_view_top(human)
+        # follow_robot_view(robot)
         # actionStep = nav_env.simulator.gen_vr_robot_action()
         # human.apply_action(actionStep)
-        motionController.step(end)
+        # prop = human.get_proprioception()
+        # print(prop)
+        motion_controller.step(human_end, 1.57)
+        motion_controller_robot.step(robot_end, 1.57)
         env.simulator.step()
 
 if __name__ == "__main__":

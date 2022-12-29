@@ -650,6 +650,9 @@ class BaseRobot(StatefulObject):
         """
         :return dict: keyword-mapped proprioception observations available for this robot. Can be extended by subclasses
         """
+        # print(self.get_angular_velocity()[2])
+        # print(self.get_linear_velocity())
+        # print("----------")
         return {
             "joint_qpos": self.joint_positions,
             "joint_qpos_sin": np.sin(self.joint_positions),
