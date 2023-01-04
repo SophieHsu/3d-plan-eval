@@ -1,23 +1,31 @@
+import copy
+
+import numpy as np
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 
 class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
-    """docstring for HumanAwareMediumMDPPlanner"""
-    def __init__(self, mdp, mlp_params, hmlp, \
-        state_dict = {}, state_idx_dict = {}, action_dict = {}, action_idx_dict = {}, transition_matrix = None, reward_matrix = None, policy_matrix = None, value_matrix = None, \
-        num_states = 0, num_rounds = 0, epsilon = 0.01, discount = 0.8):
 
-        super().__init__(mdp, mlp_params, \
-        state_dict = {}, state_idx_dict = {}, action_dict = {}, action_idx_dict = {}, transition_matrix = None, reward_matrix = None, policy_matrix = None, value_matrix = None, \
-        num_states = 0, num_rounds = 0, epsilon = 0.01, discount = 0.8)
+    def __init__(self, mdp, hhlp): # hhlp = None, mlp_params = None, \
+        """Initializes HL Human Aware MDP Planner
 
-        self.hmlp = hmlp
+        Args:
+            mdp (Markov Decision Process): Defines MDP
+            hhlp (Human High Level Planner): Defines how human next states are anticipated
+        """
+        self.hhlp = hhlp
+        #state_dict = {}, state_idx_dict = {}, action_dict = {}, action_idx_dict = {}, transition_matrix = None, reward_matrix = None, policy_matrix = None, value_matrix = None, \
+        #num_states = 0, num_rounds = 0, epsilon = 0.01, discount = 0.8):
+
+        super().__init__(mdp) #, mlp_params, \
+        # state_dict = {}, state_idx_dict = {}, action_dict = {}, action_idx_dict = {}, transition_matrix = None, reward_matrix = None, policy_matrix = None, value_matrix = None, \
+        # num_states = 0, num_rounds = 0, epsilon = 0.01, discount = 0.8)
 
     def init_human_aware_states(self, state_idx_dict=None, order_list=None):
         # print('In init_human_aware_states()')
         self.init_states(order_list=order_list)
 
         # add p1_obj to [p0_obj, num_item_in_pot, order_list]
-        objects = ['onion', 'tomato', 'soup', 'dish', 'None']
+        objects = ['onion', 'soup', 'dish', 'None']
         original_state_dict = copy.deepcopy(self.state_dict)
         self.state_dict.clear()
         self.state_idx_dict.clear()
@@ -50,12 +58,12 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                 # get next step p1 object
                 p1_nxt_states = []
                 if len(p0_state) > 2:
-                    p1_nxt_states = self.hmlp.get_state_trans(p1_obj, p0_state[1], p0_state[2:])
+                    p1_nxt_states = self.hhlp.get_state_trans(p1_obj, p0_state[1], p0_state[2:])
                 else:
-                    p1_nxt_states = self.hmlp.get_state_trans(p1_obj, p0_state[1], [])
+                    p1_nxt_states = self.hhlp.get_state_trans(p1_obj, p0_state[1], [])
 
                 for [p1_nxt_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_trans_prob, p1_pref_prob] in p1_nxt_states:
-
+                    # p1 trans prob is 1/min_distance
                     # print([p1_nxt_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_trans_prob, p1_pref_prob])
 
                     p0_obj, soup_finish, orders = self.ml_state_to_objs(p0_state)
@@ -153,8 +161,9 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
     def extract_p0(self, state_obj):
         return state_obj[:-1], state_obj[-1]
 
-    def init_mdp(self):
-        self.init_human_aware_states(order_list=self.mdp.start_order_list)
+    def init_mdp(self, order_list):
+        #self.init_human_aware_states(order_list=self.mdp.start_order_list)
+        self.init_human_aware_states(order_list = order_list)
         self.init_actions()
         self.init_transition_matrix()
         self.init_reward()
@@ -175,3 +184,73 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
         state_str = str(player_obj)+'_'+str(soup_finish)+'_'+ order_str + '_' + str(other_player_obj)
 
         return state_str
+
+    def human_state_subtask_transition(self, human_state, world_info):
+        # From human state calculate manhattan / A* path and generate a probability distribution over this distance for each motion goal
+        player_obj = human_state[0]; subtask = human_state[1]
+        soup_finish = world_info[0]; orders = [] if len(world_info) < 2 else world_info[1:]
+        next_obj = player_obj; next_subtasks = []; 
+        next_soup_finish = soup_finish
+
+        if player_obj == 'None':
+            if subtask == 'pickup_dish':
+                next_obj = 'dish'
+                next_subtasks = ['pickup_soup']#, 'drop_dish']
+
+            elif subtask == 'pickup_onion':
+                next_obj = 'onion'
+                next_subtasks = ['drop_onion']
+            
+            elif subtask == 'pickup_tomato':
+                next_obj = 'tomato'
+                next_subtasks = ['drop_tomato']
+            
+            # elif subtask == 'pickup_soup':
+            #     next_obj = 'soup'
+            #     next_subtasks = ['deliver_soup']
+
+        else:
+            if player_obj == 'onion' and subtask == 'drop_onion' and soup_finish < self.mdp.num_items_for_soup:
+                next_obj = 'None'
+                next_soup_finish += 1
+                next_subtasks = ['pickup_onion', 'pickup_dish'] # 'pickup_tomato'
+            
+            elif player_obj == 'onion' and subtask == 'drop_onion' and soup_finish == self.mdp.num_items_for_soup:
+                next_obj = 'onion'
+                next_subtasks = ['drop_onion']
+
+            elif player_obj == 'tomato' and subtask == 'drop_tomato':
+                next_obj = 'None'
+                next_soup_finish += 1
+                next_subtasks = ['pickup_onion', 'pickup_dish'] # 'pickup_tomato'
+
+            elif (player_obj == 'dish') and subtask == 'pickup_soup':
+                next_obj = 'soup'
+                next_soup_finish = 0
+                next_subtasks = ['deliver_soup']
+
+            # elif (player_obj == 'dish') and subtask == 'drop_dish':
+            #     next_obj = 'None'
+            #     next_subtasks = ['pickup_onion', 'pickup_dish'] # 'pickup_tomato'
+
+            elif player_obj == 'soup' and subtask == 'deliver_soup':
+                next_obj = 'None'
+                next_subtasks = ['pickup_onion', 'pickup_dish'] # 'pickup_tomato'
+                if len(orders) >= 1:
+                    orders.pop(0)
+            else:
+                print(player_obj, subtask)
+                raise ValueError()
+
+        if next_soup_finish > self.mdp.num_items_for_soup:
+            next_soup_finish = self.mdp.num_items_for_soup
+
+        p1_nxt_states = []
+        for next_subtask in next_subtasks:
+            p1_nxt_states.append([next_obj, next_subtask])
+
+        nxt_world_info = [next_soup_finish]
+        for order in orders:
+            nxt_world_info.append(order)
+
+        return p1_nxt_states, nxt_world_info

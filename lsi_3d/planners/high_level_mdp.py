@@ -30,10 +30,10 @@ class HighLevelMdpPlanner(object):
 
         # objects agent is holding or not
         objects = ['onion', 'soup', 'dish', 'None']
-        max_in_soup = 4
+        max_in_soup = 3
 
         for order_num in range(len(order_list)+1): # +1 for case where nothing is held
-            for onion_count in range(max_in_soup):
+            for onion_count in range(max_in_soup+1):
                 for object in objects:
                     key = f'{object}_{onion_count}'
                     value = [object, onion_count]
@@ -230,6 +230,7 @@ class HighLevelMdpPlanner(object):
     def compute_mdp_policy(self, order_list):
         start_time = time.time()
         self.init_mdp(order_list)
+        #self.init_mdp()
         self.num_states = len(self.state_dict)
         self.num_actions = len(self.action_dict)
 

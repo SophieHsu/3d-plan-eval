@@ -17,7 +17,10 @@ from igibson.objects.articulated_object import URDFObject, URDFObject
 from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.planners.greedy_human_planner import HLGreedyHumanPlanner
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
+from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner
+from lsi_3d.planners.hl_human_planner import HLHumanPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.utils.enums import Mode
 from render_layouts import HEIGHT, WIDTH, name2abbr
@@ -461,8 +464,10 @@ def run_example(args):
 
     order_list = exp_config['order_list']
     recalc_res = exp_config['recalculation_resolution']
-    hlp = HighLevelMdpPlanner(mdp)
+    
     mlp = AStarMotionPlanner(grid)
+    hhlp = HLGreedyHumanPlanner(mdp, mlp)
+    hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
     hlp.compute_mdp_policy(order_list)
     robot_agent = HlMdpPlanningAgent(hlp, mlp)
     human_agent = FixedPolicyAgent(hlp,mlp)
