@@ -47,14 +47,20 @@ def main():
     kitchen_layout = r"C:\Users\icaro\3d_lsi_2\kitchen_layouts_grid_text\kitchen1_alt.txt"
     # Simple test:
     # robot_x, robot_y = 3.5, 2.5
+    # robot_end = (5,3)
     # human_x, human_y = 3.5, 2.5
-    # end = (5,3)
+    # human_end = (0,0)
+    
+    # Failing case:
+    # robot_x, robot_y = 5.5, 3.5
+    # robot_end = (7.5,3.5)
+    # human_x, human_y = 2.5, 2.5
+    # human_end = (6.5,3.5)
 
-    # Test case: not colliding into objects in adjacent squares
-    robot_x, robot_y = 4.5, 3.5
+    robot_x, robot_y = 5.5, 3.5
+    robot_end = (7.5,6.5)
     human_x, human_y = 2.5, 2.5
-    human_end = (0.5, 0.5)
-    robot_end = (7,3)
+    human_end = (0.0, 0.0)
 
     env = iGibsonEnv(
         config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
@@ -74,7 +80,7 @@ def main():
     env.set_pos_orn_with_z_offset(robot, [robot_x, robot_y, 0], [0, 0, 0])
     
     a_star_planner = AStarPlanner(env, occupancy_grid, robot)
-    motion_controller = MotionControllerHuman(human, a_star_planner)
+    motion_controller = MotionControllerHuman(human, a_star_planner, robot)
     motion_controller_robot = MotionController(robot, a_star_planner)
     # top_camera_view()
     while(True):

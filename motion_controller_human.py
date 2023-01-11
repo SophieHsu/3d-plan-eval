@@ -6,7 +6,8 @@ import pybullet as p
 
 class MotionControllerHuman():
 
-    def __init__(self, robot, planner):
+    def __init__(self, human, planner, robot):
+        self.human = human
         self.robot = robot
         self.planner = planner
         self.MAX_LIN_VEL = 13.3
@@ -15,8 +16,8 @@ class MotionControllerHuman():
         self.num_dt_to_predict = 100
 
     def step(self, end, final_ori):
-        x, y, z = self.robot.get_position()
-        qx, qy, qz, qw = self.robot.get_orientation()
+        x, y, z = self.human.get_position()
+        qx, qy, qz, qw = self.human.get_orientation()
         _, _, theta = quat2euler(qx, qy, qz, qw)
         theta = self.normalize_radians(theta)
         path = self.planner.find_path((x, y), end)
@@ -29,7 +30,10 @@ class MotionControllerHuman():
             action = np.zeros((28,))
             # If in grid square where the end location is
             if math.dist([x,y], end) < 0.05:
+                print(theta)
                 theta_difference = self.angle_difference(theta, final_ori)
+                # print(theta_difference)
+                # return
                 if theta_difference < -0.2:
                     vel = (0, self.MAX_ANG_VEL/15)
                 elif theta_difference > 0.2:
@@ -40,16 +44,13 @@ class MotionControllerHuman():
                 possible_vels = self.get_possible_velocities()
                 vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc)
 
-            # action_l, action_a = self.calculate_action_from_wheel_vel(vel[0], vel[1]) 
             action[0] = vel[0]/self.MAX_LIN_VEL
             action[5] = vel[1]/self.MAX_ANG_VEL
-            # 13.3
-            # 12.28
-            
-            self.robot.apply_action(action)
+            self.human.apply_action(action)
 
     def find_best_velocities(self, x, y, theta, possible_vels, destination):
-        selected_vel = None
+        robot_x, robot_y, robot_z = self.robot.get_position()
+        selected_vel = [0, 0]
 
         path = None
         min_dist = 100000
@@ -63,7 +64,9 @@ class MotionControllerHuman():
                 # p.addUserDebugLine([pos[0], pos[1], 1.0], [pos[0], pos[1] + 0.01, 1.0], lifeTime=20.0)
                 pos_no_theta = [pos[0], pos[1]]
                 dist = math.dist(pos_no_theta, destination)
-
+                robot_dist = math.dist(pos_no_theta, [robot_x, robot_y])
+                if robot_dist < 0.5:
+                    break
                 if dist < min_dist:
                     path = positions[0:idx]
                     min_dist = dist
@@ -102,8 +105,8 @@ class MotionControllerHuman():
     def get_possible_velocities(self):
         possible_vels = []
         # Velocities that are limited by acceleration and min/max velocities
-        vl_possible_vels = np.linspace(0, self.MAX_LIN_VEL/10, 7)
-        va_possible_vels = np.linspace(-self.MAX_ANG_VEL/10, self.MAX_ANG_VEL/10, 7)
+        vl_possible_vels = np.linspace(0, self.MAX_LIN_VEL/20, 7)
+        va_possible_vels = np.linspace(-self.MAX_ANG_VEL/20, self.MAX_ANG_VEL/20, 7)
 
         for vl in vl_possible_vels:
             for va in va_possible_vels:

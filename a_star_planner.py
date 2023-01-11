@@ -59,7 +59,7 @@ class AStarPlanner():
                 else:
                     open.append(neighbor)
 
-        path = [self.grid_to_real_coord(end_node.loc)]
+        path = [end]
         while end_node.parent is not None:
             end_node = end_node.parent
             path.insert(0, self.grid_to_real_coord(end_node.loc))
@@ -85,8 +85,8 @@ class AStarPlanner():
         self.occupancy_grid[loc[0]][loc[1]] = 'R'
 
     def get_neighbor_locs(self, loc):
-        # relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-        relative_neighbor_locs = [ (-1, 0), (0, -1), (0, 1), (1, 0)]
+        relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        # relative_neighbor_locs = [ (-1, 0), (0, -1), (0, 1), (1, 0)]
         neighbor_locs = []
         for n in relative_neighbor_locs:
             x_neighbor = loc[0] + n[0]
@@ -105,7 +105,8 @@ class AStarPlanner():
         for n in neighbor_locs:
             x_neighbor = n[0]
             y_neighbor = n[1]
-            if self.occupancy_grid[x_neighbor][y_neighbor] == 'X':
+            if self.is_valid_location(loc, (x_neighbor, y_neighbor)):
+            # if self.occupancy_grid[x_neighbor][y_neighbor] == 'X':
                 g_cost = None
                 if abs(x) == 1 and abs(y) == 1:
                     g_cost = node.g_cost + math.sqrt(2)
@@ -114,6 +115,15 @@ class AStarPlanner():
                 neighbor_node = AStarNode((x_neighbor, y_neighbor), node, g_cost)
                 neighbors.append(neighbor_node)
         return neighbors
+
+    def is_valid_location(self, loc, neighbor_loc):
+        x_diff = neighbor_loc[0] - loc[0]
+        y_diff = neighbor_loc[1] - loc[1]
+        neighbor_1 = (loc[0] + x_diff, loc[1])
+        neighbor_2 = (loc[0], loc[1] + y_diff)
+        if self.occupancy_grid[neighbor_loc[0]][neighbor_loc[1]] == 'X' and self.occupancy_grid[neighbor_1[0]][neighbor_1[1]] == 'X' and self.occupancy_grid[neighbor_2[0]][neighbor_2[1]] == 'X':
+            return True
+        return False
 
     def set_f_cost(self, node, end_node):
         start = node.loc
