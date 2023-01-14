@@ -6,7 +6,12 @@ class AStarMotionPlanner(object):
         self.map = map
 
     def compute_motion_plan(self, starts, goals, avoid_path = None, radius = None):
+        
         print(f'Computing plan from {starts} to {goals}')
+
+        if len(starts) == 1:
+            return self.compute_single_agent_astar_path(starts[0], goals[0])
+            
         r1,c1,d1 = starts[0]
         r2,c2,d2 = starts[1]
         #starts = (r1,c1,MLA.to_string(d1),r2,c2,MLA.to_string(d2))

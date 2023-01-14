@@ -1,4 +1,5 @@
 import copy
+import pprint
 
 import numpy as np
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
@@ -75,16 +76,21 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                     p1_ori_action, p0_nxt_p1_ori_p0_key = self.state_action_nxt_state(p0_obj, soup_finish, orders, p1_obj)
 
                     # print(p1_ori_action, p0_nxt_p1_ori_p0_key)
-
                     if action_key == p1_ori_action: # p0 nxt based on p1_ori
                         p0_nxt_p1_ori_nxt_idx = self.state_idx_dict[p0_nxt_p1_ori_p0_key + '_' + p1_obj]
                         game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] += (1.0 - p1_trans_prob) * p1_pref_prob
+
+                        if game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] > 1:
+                            game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] = 1
 
                         # print(state_key,'--', action_key, '-->', p0_nxt_p1_ori_p0_key + '_' + p1_obj)
 
                     else: # p0_ori + p1_ori
                         p0_ori_p1_ori_nxt_idx = self.state_idx_dict[p0_ori_key + '_' + p1_obj]
                         game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] += (1.0 - p1_trans_prob) * p1_pref_prob
+
+                        if game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] > 1:
+                            game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] = 1
 
                         # print(state_key,'--', action_key, '-->', p0_ori_key + '_' + p1_obj)
 
@@ -102,6 +108,10 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                         p0_nxt_p1_nxt_nxt_idx= self.state_idx_dict[p0_nxt_p1_nxt_p0_key + '_' + p1_nxt_obj]
                         game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] += p1_trans_prob * p1_pref_prob
 
+                        if game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] > 1:
+                            game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] = 1
+
+
                         # print(state_key,'--', action_key, '-->', p0_nxt_p1_nxt_p0_key + '_' + p1_nxt_obj)
 
                     else: # action not matched; thus, p0 ori based on p1 next
@@ -109,6 +119,11 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                         # game_logic_transition[action_idx][state_idx][p0_ori_p1_nxt_nxt_idx] += p1_trans_prob * p1_pref_prob
                         p0_ori_p1_ori_nxt_idx = self.state_idx_dict[p0_ori_key + '_' + p1_obj]
                         game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] += (p1_trans_prob) * p1_pref_prob
+
+                        if game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] > 1:
+                            game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] = 1
+
+                    
 
 
 
@@ -129,7 +144,6 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
         #     game_logic_transition[0, 42],\
         #     game_logic_transition[4, 42])
         # tmp = input()
-
         self.transition_matrix = game_logic_transition
 
     def init_reward(self, reward_matrix=None):
@@ -144,7 +158,7 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
             player_obj, soup_finish, orders = self.ml_state_to_objs(state_obj[:-1])
 
             if player_obj == 'soup':
-                self.reward_matrix[self.action_idx_dict['deliver_soup'], self.state_idx_dict[state_key]] += self.mdp.delivery_reward/10.0
+                self.reward_matrix[self.action_idx_dict['deliver_soup'], self.state_idx_dict[state_key]] += self.mdp.delivery_reward #/10.0
 
             # if player_obj == 'soup':
             #     self.reward_matrix[self.action_idx_dict['pickup_onion']][self.state_idx_dict[state_key]] -= self.mdp.delivery_reward/10.0

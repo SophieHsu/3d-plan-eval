@@ -42,17 +42,17 @@ class HLHumanPlanner(object):
         """
         ml_logic_goals = self.logic_ml_action(obj, num_item_in_pot, order_list)
 
-        # curr_p = ((1.0-self.adaptiveness)*self.prev_goal_dstb + self.adaptiveness*ml_logic_goals)   
+        #curr_p = ((1.0-self.adaptiveness)*self.prev_goal_dstb + self.adaptiveness*ml_logic_goals)   
         # print(self.adaptiveness, self.prev_goal_dstb, ml_logic_goals, curr_p)
-        task = np.random.choice(len(self.sub_goals), p=curr_p)
-        self.prev_goal_dstb = curr_p
+        # task = np.random.choice(len(self.sub_goals), p=curr_p)
+        #self.prev_goal_dstb = curr_p
 
         ml_goals = []
         ml_goals.append(self.onion_cooker_ml_goal(obj, num_item_in_pot, order_list))
         ml_goals.append(self.soup_server_ml_goal(obj, num_item_in_pot, order_list))
         ml_goals = np.array(ml_goals, dtype=object)
 
-        return ml_goals, curr_p
+        return ml_goals# , curr_p
 
     def onion_cooker_ml_goal(self, obj, num_item_in_pot, order_list):
         """

@@ -16,8 +16,11 @@ class WorldState():
     def update(self, new_hl_state, action_object):
         #in_pot, orders = self.parse_hl_state(new_hl_state)
 
-        if action_object == ('drop', 'onion'):
+        if action_object == ('drop', 'onion') and self.in_pot == 3:
+            print("Attempted to add onion to pot, but pot was full. Dropping on floor")
+        elif action_object == ('drop', 'onion'):
             self.in_pot += 1
+
         if action_object == ('deliver', 'soup'):
             self.orders = self.orders[:-1]
 
@@ -37,6 +40,7 @@ class AgentState():
         self.mode = Mode.CALC_HL_PATH
 
         self.holding = 'None'
+        self.next_holding = 'None'
         self.parse_hl_state(hl_state)
     
     def parse_hl_state(self, hl_state):

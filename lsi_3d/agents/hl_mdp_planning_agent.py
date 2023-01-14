@@ -34,22 +34,26 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
-    def get_mdp_key_from_state(self, world_state, agent_state):
+    def get_mdp_key_from_state(self, world_state, agent_state, obj = None):
         key = f"{agent_state.holding}_{world_state.in_pot}"
         for order in world_state.orders:
             key += f'_{order}'
+
+        if obj is not None:
+            key = key +'_'+ obj
         return key
 
-    def action(self, world_state, agent_state):
+    def action(self, world_state, agent_state, human_holding = None):
 
-        state_str = self.get_mdp_key_from_state(world_state, agent_state)
+        state_str = self.get_mdp_key_from_state(world_state, agent_state, human_holding)
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # retrieve high level action from policy
         action_idx = self.mdp_planner.policy_matrix[state_idx]
 
         # TODO: Eliminate need for this indexing
-        next_state_idx = np.where(self.mdp_planner.transition_matrix[action_idx][state_idx] == 1)[0][0]
+        #next_state_idx = np.where(self.mdp_planner.transition_matrix[action_idx][state_idx] == 1)[0][0]
+        next_state_idx = np.argmax(self.mdp_planner.transition_matrix[action_idx][state_idx])#[0][0]
         next_state = list(self.mdp_planner.state_idx_dict.keys())[list(self.mdp_planner.state_idx_dict.values()).index(next_state_idx)]
         print(f"Next HL Goal State: {next_state}")
         keys = list(self.mdp_planner.action_idx_dict.keys())

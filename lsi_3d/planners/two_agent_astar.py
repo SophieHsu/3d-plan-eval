@@ -98,7 +98,7 @@ def valid_one(grid, x, y):
 def valid(grid, nx1, ny1, nx2, ny2):
     return valid_one(grid, nx1, ny1) and valid_one(grid, nx2, ny2)
 
-def cost_func(grid, ex, ey, x, y, f, action):
+def cost_func(grid, ex, ey, x, y, f, action, delay_cost = None):
     name2dire = {
         "E": (0, 1),
         "W": (0, -1),
@@ -109,7 +109,10 @@ def cost_func(grid, ex, ey, x, y, f, action):
     if end_achieved(grid, x, y, ex, ey, f) and action == "I" and (x+dx, y+dy) == (ex, ey):
         return 0
     elif action == 'D':
-        return 0.5
+        if delay_cost is not None:
+            return delay_cost
+        else:
+            return 0.5
     else:
         return 1
 
@@ -414,6 +417,7 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
         
         # Add human actions at current time step for robot to avoid
         avoid_actions = []
+        avoid_actions.append('D')
         if len(avoid_path_queue) > avoid_path_t_step:
             avoid_actions.append(avoid_path[avoid_path_t_step])
         
@@ -426,7 +430,7 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
             nx1, ny1, nf1 = transition(cx1, cy1, cf1, action1)
 
             # can remove for fixed path
-            cost1 = cost_func(grid, ex1, ey1, nx1, ny1, nf1, action1)
+            cost1 = cost_func(grid, ex1, ey1, nx1, ny1, nf1, action1, 5)
 
             for action2 in actions:
                 nx2, ny2, nf2 = transition(cx2, cy2, cf2, action2)

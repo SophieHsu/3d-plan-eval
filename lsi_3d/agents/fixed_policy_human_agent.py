@@ -44,19 +44,24 @@ class FixedPolicyAgent(Agent):
         if world_state.in_pot < 3 and agent_state.holding == 'None':
             action,object = ('pickup', 'onion')
             next_hl_state = f'onion_{world_state.in_pot}'
+            agent_state.next_holding = 'onion'
         elif agent_state.holding == 'onion':
             action,object = ('drop','onion')
             next_hl_state = f'None_{world_state.in_pot+1}'
+            agent_state.next_holding = 'None'
         elif world_state.in_pot <= 3 and agent_state.holding == 'None':
             action,object = ('pickup','dish')
             next_hl_state = f'dish_{world_state.in_pot}'
+            agent_state.next_holding = 'dish'
         elif agent_state.holding == 'dish' and world_state.in_pot == 3:
             action,object = ('pickup','soup')
             world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
+            agent_state.next_holding = 'soup'
         elif agent_state.holding == 'soup':
             action,object = ('deliver','soup')
             next_hl_state = f'None_{world_state.in_pot}'
+            agent_state.next_holding = 'None'
         
         for order in world_state.orders:
             next_hl_state += f'_{order}'

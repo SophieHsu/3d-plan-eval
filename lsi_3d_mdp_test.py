@@ -250,7 +250,7 @@ def main_loop(
             robot gets high level action and translates into mid-level path
             when robot completes this path, it returns to this state
             '''
-            next_robot_hl_state, robot_goal, robot_action_object_pair = hl_robot_agent.action(env.world_state, env.robot_state)
+            next_robot_hl_state, robot_goal, robot_action_object_pair = hl_robot_agent.action(env.world_state, env.robot_state, env.human_state.holding)
             optimal_plan = hl_robot_agent.optimal_motion_plan(env.robot_state, robot_goal)
             optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
             env.robot_state.mode = Mode.CALC_SUB_PATH
@@ -325,7 +325,19 @@ def main_loop(
             if human.i == len(human.plan) or a_h == 'I': #or a_h == MLAction.STAY:
                 env.human_state.mode = Mode.INTERACT
             else:
-                ig_human.agent_move_one_step(env.nav_env, a_h)
+                # if robot is in a goal state and humans next state is also this state,
+                    # then idle until robot moves
+                    # next_robot_goal == env.robot_state.ml_state and 
+                if grid_transition(a_h, env.human_state.ml_state)[0:2] != env.robot_state.ml_state[0:2]:
+                    ig_human.agent_move_one_step(env.nav_env, a_h)
+                elif env.robot_state.mode == Mode.IDLE:
+                    env.robot_state.mode = Mode.CALC_SUB_PATH
+
+                    # if next step means human crashes into robot, add a delay to the plan
+                    #delay_step = human_sub_path[0]
+                    #delay_step = (delay_step[0], 'D')
+                    #human_sub_path.insert(0,delay_step)
+
                 if ig_human.action_completed(a_h):
                     # human.action() gets next FNESW medium level action to take
                     pos_h, a_h = human.action()
@@ -335,11 +347,7 @@ def main_loop(
                     if env.robot_state.mode == Mode.IDLE:
                         env.robot_state.mode = Mode.EXEC_ML_PATH
 
-                    # if robot is in a goal state and humans next state is also this state,
-                    # then idle until robot moves
-                    # next_robot_goal == env.robot_state.ml_state and 
-                    if grid_transition(a_h, env.human_state.ml_state) == env.robot_state.ml_state:
-                        env.human_state.mode = Mode.IDLE
+                    
 
                 
 
@@ -467,7 +475,9 @@ def run_example(args):
     
     mlp = AStarMotionPlanner(grid)
     hhlp = HLGreedyHumanPlanner(mdp, mlp)
+    #hhlp = HLHumanPlanner(mdp, mlp)
     hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
+    #hlp = HighLevelMdpPlanner(mdp)
     hlp.compute_mdp_policy(order_list)
     robot_agent = HlMdpPlanningAgent(hlp, mlp)
     human_agent = FixedPolicyAgent(hlp,mlp)

@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from numpy import diff
-from lsi_3d.utils.constants import TARGET_ORNS
+from lsi_3d.utils.constants import TARGET_ORNS, DIRE2POSDIFF
 
 def orn_to_cardinal(angle):
 
@@ -69,3 +69,15 @@ def grid_transition(action, state):
         dx, dy = name2dire[f]
         x, y = x+dx, y+dy
     return x, y, f
+
+def find_nearby_open_space(grid, loc):
+    locR, locC = loc
+    if grid[locR][locC] == 'X':
+        return (*loc, 'S')
+    for dir, diff in DIRE2POSDIFF.items():
+        diffR, diffC = diff
+        newLocR = locR + diffR
+        newLocC = locC + diffC
+        if 0 <= newLocR < len(grid) and 0 <= newLocC < len(grid[0]) and grid[newLocR][newLocC] == 'X':
+            return (newLocR, newLocC, dir)
+    return None

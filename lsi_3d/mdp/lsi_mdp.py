@@ -134,7 +134,7 @@ class LsiMdp(object):
         return self.where_map_is('P')
 
     def get_counter_locations(self):
-        return list(self.terrain_pos_dict['X'])
+        return self.where_map_is('X')
 
     def where_map_is(self, letter):
         indexes = []
