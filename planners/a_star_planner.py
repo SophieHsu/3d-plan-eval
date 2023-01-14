@@ -1,16 +1,14 @@
 import copy
 import math
-from utils import quat2euler
+from utils import quat2euler, real_to_grid_coord, grid_to_real_coord
 import numpy as np
 from igibson.objects.visual_marker import VisualMarker
 import pybullet as p
 
 class AStarPlanner():
 
-    def __init__(self, env, occupancy_grid, robot):
+    def __init__(self, env):
         self.env = env
-        self.occupancy_grid = copy.deepcopy(occupancy_grid)
-        self.robot = robot
         self.markers = []
         self.initialize_markers()
 
@@ -22,15 +20,14 @@ class AStarPlanner():
             self.markers.append(marker)
 
     # Run A Star algorithm
-    def find_path(self, start, end):
-        self.update_grid()
-        start = self.real_to_grid_coord(start)
-        end = self.real_to_grid_coord(end)
+    def find_path(self, start, end, occupancy_grid):
+        start = real_to_grid_coord(start)
+        end_grid = real_to_grid_coord(end)
 
         open = []
         closed = []
         start_node = AStarNode(loc=start, g_cost=0)
-        end_node = AStarNode(end)
+        end_node = AStarNode(end_grid)
         self.set_f_cost(start_node, end_node)
         open.append(start_node)
 
@@ -45,7 +42,7 @@ class AStarPlanner():
                 end_node = current
                 break
             
-            neighbors = self.get_neighbors(current)
+            neighbors = self.get_neighbors(current, occupancy_grid)
             for neighbor in neighbors:
                 if neighbor in closed:
                     continue
@@ -62,8 +59,13 @@ class AStarPlanner():
         path = [end]
         while end_node.parent is not None:
             end_node = end_node.parent
-            path.insert(0, self.grid_to_real_coord(end_node.loc))
+            path.insert(0, grid_to_real_coord(end_node.loc))
         
+        self.draw_path(path)
+
+        return path
+
+    def draw_path(self, path):
         for i in range(len(self.markers)):
             if i < len(path):
                 loc = path[i]
@@ -72,17 +74,6 @@ class AStarPlanner():
             else:
                 marker = self.markers[i]
                 marker.set_position([0, 0, 1])
-
-        return path
-
-    def update_grid(self):
-        x, y, z = self.robot.get_position()
-        loc = self.real_to_grid_coord((x,y))
-        neighbor_locs = self.get_neighbor_locs(loc)
-        for n in neighbor_locs:
-            if self.occupancy_grid[n[0]][n[1]] == 'R':
-                self.occupancy_grid[n[0]][n[1]] = 'X'
-        self.occupancy_grid[loc[0]][loc[1]] = 'R'
 
     def get_neighbor_locs(self, loc):
         relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
@@ -96,7 +87,7 @@ class AStarPlanner():
                 neighbor_locs.append((x_neighbor, y_neighbor))
         return neighbor_locs
 
-    def get_neighbors(self, node):
+    def get_neighbors(self, node, occupancy_grid):
         loc = node.loc
         x = loc[0]
         y = loc[1]
@@ -105,7 +96,7 @@ class AStarPlanner():
         for n in neighbor_locs:
             x_neighbor = n[0]
             y_neighbor = n[1]
-            if self.is_valid_location(loc, (x_neighbor, y_neighbor)):
+            if self.is_valid_location(loc, (x_neighbor, y_neighbor), occupancy_grid):
             # if self.occupancy_grid[x_neighbor][y_neighbor] == 'X':
                 g_cost = None
                 if abs(x) == 1 and abs(y) == 1:
@@ -116,12 +107,12 @@ class AStarPlanner():
                 neighbors.append(neighbor_node)
         return neighbors
 
-    def is_valid_location(self, loc, neighbor_loc):
+    def is_valid_location(self, loc, neighbor_loc, occupancy_grid):
         x_diff = neighbor_loc[0] - loc[0]
         y_diff = neighbor_loc[1] - loc[1]
         neighbor_1 = (loc[0] + x_diff, loc[1])
         neighbor_2 = (loc[0], loc[1] + y_diff)
-        if self.occupancy_grid[neighbor_loc[0]][neighbor_loc[1]] == 'X' and self.occupancy_grid[neighbor_1[0]][neighbor_1[1]] == 'X' and self.occupancy_grid[neighbor_2[0]][neighbor_2[1]] == 'X':
+        if occupancy_grid[neighbor_loc[0]][neighbor_loc[1]] == 'X' and occupancy_grid[neighbor_1[0]][neighbor_1[1]] == 'X' and occupancy_grid[neighbor_2[0]][neighbor_2[1]] == 'X':
             return True
         return False
 
@@ -133,12 +124,6 @@ class AStarPlanner():
         dy = abs(start[1] - end[1])
         heuristic = dx + dy + (math.sqrt(2) - 2) * min(dx, dy)
         node.f_cost = node.g_cost + heuristic
-
-    def real_to_grid_coord(self, coord):
-        return (math.floor(coord[0]), math.floor(coord[1]))
-
-    def grid_to_real_coord(self, coord):
-        return (coord[0] + 0.5, coord[1] + 0.5)
 
 class AStarNode():
 

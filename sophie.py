@@ -25,7 +25,7 @@ class RandHuman(object):
     def update_pos(self):
         self.pos[0] = random.randint(0, self.world.width)
         self.pos[1] = random.randint(0, self.world.height)
-        
+
 class ImmersiveHuman(object):
     """docstring for ImmersiveHuman
     pos (2d array): [x,y]
@@ -36,6 +36,7 @@ class ImmersiveHuman(object):
         self.pos = pos
         self.eye_sight = angle
         self.state = self.init_states(world, other_agent)
+
 
     def init_states(self, world_state, other_agent):
         ''' 
@@ -51,29 +52,14 @@ class ImmersiveHuman(object):
         '''
         return self.state
 
-    def get_vision_bound(self, world_state):
-        width = world_state.width
-        height = world_state.height
-
+    def get_vision_bound(self):
         # get the two points first by assuming facing north
         vision_width = np.radians(30)
         right_pt = self.pos + np.array([math.cos(vision_width), math.sin(vision_width)])
         left_pt = self.pos + np.array([-math.cos(vision_width), math.sin(vision_width)])
-
-        # angle based on the agent's facing
-        if self.ori == 0: # north
-            theta = np.radians(0)
-        elif self.ori == 1: # east
-            theta = np.radians(270)
-        elif self.ori == 2: # south
-            theta = np.radians(180)
-        elif self.ori == 3: # west
-            theta = np.radians(90)
         
-        c, s = np.cos(theta), np.sin(theta)
-        R = np.array(((c, -s), (s, c)))
-        right_pt = np.matmul(R,right_pt-self.pos)+self.pos
-        left_pt = np.matmul(R,left_pt-self.pos)+self.pos
+        # right_pt = np.matmul(R,right_pt-self.pos)+self.pos
+        # left_pt = np.matmul(R,left_pt-self.pos)+self.pos
 
         return right_pt, left_pt
 
@@ -86,8 +72,23 @@ class ImmersiveHuman(object):
         left_in_bound = False
         thresh = 1e-9
 
+        # angle based on the agent's facing
+        theta = None
+        if int(self.ori) == 0: # north
+            theta = np.radians(0)
+        elif int(self.ori) == 1: # east
+            theta = np.radians(-270)
+        elif int(self.ori) == 2: # south
+            theta = np.radians(180)
+        elif int(self.ori) == 3: # west
+            theta = np.radians(-90)
+        
+        c, s = np.cos(theta), np.sin(theta)
+        R = np.array(((c, -s), (s, c)))
+        rot_loc = np.matmul(R,np.array(loc)-self.pos)+self.pos
+
         # check right bound
-        right_val = ((right_pt[0] - self.pos[0])*(loc[1] - self.pos[1]) - (right_pt[1] - self.pos[1])*(loc[0] - self.pos[0]))
+        right_val = ((right_pt[0] - self.pos[0])*(rot_loc[1] - self.pos[1]) - (right_pt[1] - self.pos[1])*(rot_loc[0] - self.pos[0]))
         if right_val >= thresh: # left of line
             right_in_bound = True
         elif right_val <= -thresh: # right of line
@@ -96,7 +97,7 @@ class ImmersiveHuman(object):
             right_in_bound = True
 
         # check left bound
-        left_val = ((left_pt[0] - self.pos[0])*(loc[1] - self.pos[1]) - (left_pt[1] - self.pos[1])*(loc[0] - self.pos[0]))
+        left_val = ((left_pt[0] - self.pos[0])*(rot_loc[1] - self.pos[1]) - (left_pt[1] - self.pos[1])*(rot_loc[0] - self.pos[0]))
         if left_val >= thresh: # left of line
             left_in_bound = False
         elif left_val <= -thresh: # right of line
@@ -107,13 +108,12 @@ class ImmersiveHuman(object):
         return (left_in_bound and right_in_bound)
 
     def update(self, world_state, other_agent):
-        right_pt, left_pt = self.get_vision_bound(world_state)
+        right_pt, left_pt = self.get_vision_bound()
         self.state[0] = self.pos
         self.state[1] = int(self.ori)
 
         # check if objects are in vision
         print('left_pt:', left_pt, 'right_pt:', right_pt)
-
         if self.in_bound(world_state.timer_loc, right_pt, left_pt):
             print('Timer in bound')
             self.state[2] = world_state.timer

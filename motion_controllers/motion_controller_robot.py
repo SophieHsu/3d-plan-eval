@@ -4,53 +4,54 @@ import numpy as np
 from igibson.objects.visual_marker import VisualMarker
 import pybullet as p
 
-class MotionControllerHuman():
+class MotionControllerRobot():
 
-    def __init__(self, human, planner, robot):
-        self.human = human
+    def __init__(self, robot, planner, occupancy_grid):
         self.robot = robot
         self.planner = planner
-        self.MAX_LIN_VEL = 13.3
-        self.MAX_ANG_VEL = 12.28
+        self.occupancy_grid = occupancy_grid
+        self.WHEEL_RADIUS = 0.0613
+        self.WHEEL_AXLE_LENGTH = 0.372
+        self.MIN_WHEEL_VELOCITY = -10.4
+        self.MAX_WHEEL_VELOCITY = -1 * self.MIN_WHEEL_VELOCITY
+        self.MAX_LIN_VEL = 1.06662
+        self.MAX_ANG_VEL = 5.7345161
+        self.MAX_ACCELERATION = 400
         self.dt = 0.05
         self.num_dt_to_predict = 100
 
     def step(self, end, final_ori):
-        x, y, z = self.human.get_position()
-        qx, qy, qz, qw = self.human.get_orientation()
+        x, y, z = self.robot.get_position()
+        qx, qy, qz, qw = self.robot.get_orientation()
         _, _, theta = quat2euler(qx, qy, qz, qw)
         theta = self.normalize_radians(theta)
-        path = self.planner.find_path((x, y), end)
-        if len(path) > 0:
-            if len(path) > 1:
-                next_loc = path[1]
-            else:
-                next_loc = end
+        path = self.planner.find_path((x, y), end, self.occupancy_grid)
+        if len(path) > 1:
+            next_loc = path[1]
+        else:
+            next_loc = end
 
-            action = np.zeros((28,))
-            # If in grid square where the end location is
-            if math.dist([x,y], end) < 0.05:
-                print(theta)
-                theta_difference = self.angle_difference(theta, final_ori)
-                # print(theta_difference)
-                # return
-                if theta_difference < -0.2:
-                    vel = (0, self.MAX_ANG_VEL/15)
-                elif theta_difference > 0.2:
-                    vel = (0, -self.MAX_ANG_VEL/15)
-                else:
-                    vel = (0, 0)
+        action = np.zeros((11,))
+        # If in grid square where the end location is
+        if math.dist([x,y], end) < 0.05:
+            theta_difference = self.angle_difference(theta, final_ori)
+            if theta_difference < -0.2:
+                vel = (self.MIN_WHEEL_VELOCITY/5, self.MAX_WHEEL_VELOCITY/5)
+            elif theta_difference > 0.2:
+                vel = (self.MAX_WHEEL_VELOCITY/5, self.MIN_WHEEL_VELOCITY/5)
             else:
-                possible_vels = self.get_possible_velocities()
-                vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc)
+                vel = (0, 0)
+        else:
+            possible_vels = self.get_possible_velocities()
+            vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc)
 
-            action[0] = vel[0]/self.MAX_LIN_VEL
-            action[5] = vel[1]/self.MAX_ANG_VEL
-            self.human.apply_action(action)
+        action_l, action_a = self.calculate_action_from_wheel_vel(vel[0], vel[1]) 
+        action[0] = action_l
+        action[1] = action_a
+        self.robot.apply_action(action)
 
     def find_best_velocities(self, x, y, theta, possible_vels, destination):
-        robot_x, robot_y, robot_z = self.robot.get_position()
-        selected_vel = [0, 0]
+        selected_vel = None
 
         path = None
         min_dist = 100000
@@ -64,16 +65,14 @@ class MotionControllerHuman():
                 # p.addUserDebugLine([pos[0], pos[1], 1.0], [pos[0], pos[1] + 0.01, 1.0], lifeTime=20.0)
                 pos_no_theta = [pos[0], pos[1]]
                 dist = math.dist(pos_no_theta, destination)
-                robot_dist = math.dist(pos_no_theta, [robot_x, robot_y])
-                if robot_dist < 0.5:
-                    break
+
                 if dist < min_dist:
                     path = positions[0:idx]
                     min_dist = dist
                     selected_vel = vel
 
                 elif dist == min_dist:
-                    if vel[0] > selected_vel[0]:
+                    if abs(vel[0]) + abs(vel[1]) > abs(selected_vel[0]) + abs(selected_vel[1]):
                         path = positions[0:idx]
                         selected_vel = vel
             id += 1
@@ -83,34 +82,39 @@ class MotionControllerHuman():
 
         return selected_vel
 
-    def predict_path(self, x, y, theta, vl, va):
+    def predict_path(self, x, y, theta, vl, vr):
+        vl = vl * self.WHEEL_RADIUS
+        vr = vr * self.WHEEL_RADIUS
         positions = []
         for step in range(self.num_dt_to_predict):
             x_predict = None
             y_predict = None
             theta_predict = None
             t = self.dt * step
-            if (va == 0):
+            if (round(vl, 3) == round(vr, 3)):
                 x_predict = x + vl * t * math.cos(theta)
                 y_predict = y + vl * t * math.sin(theta)
                 theta_predict = theta
             else:
-                x_predict = vl/va * (math.sin(theta + va * t) - math.sin(theta)) + x
-                y_predict = vl/va * (-math.cos(theta + va * t) + math.cos(theta)) + y
-                theta_predict = theta + va * t
+                R = self.WHEEL_AXLE_LENGTH / 2.0 * (vr + vl) / (vr - vl)
+                delta_theta = (vr - vl) * t / self.WHEEL_AXLE_LENGTH
+                # Need to review this
+                x_predict = x + R * (math.sin(delta_theta + theta) - math.sin(theta))
+                y_predict = y - R * (math.cos(delta_theta + theta) - math.cos(theta))
+                theta_predict = theta + delta_theta
             positions.append((x_predict, y_predict, theta_predict))
-
         return positions
 
     def get_possible_velocities(self):
         possible_vels = []
         # Velocities that are limited by acceleration and min/max velocities
-        vl_possible_vels = np.linspace(0, self.MAX_LIN_VEL/20, 7)
-        va_possible_vels = np.linspace(-self.MAX_ANG_VEL/20, self.MAX_ANG_VEL/20, 7)
+        vl_possible_vels = np.linspace(self.MIN_WHEEL_VELOCITY, self.MAX_WHEEL_VELOCITY, 7)
+        vr_possible_vels = np.linspace(self.MIN_WHEEL_VELOCITY, self.MAX_WHEEL_VELOCITY, 7)
 
         for vl in vl_possible_vels:
-            for va in va_possible_vels:
-                possible_vels.append((vl, va))
+            for vr in vr_possible_vels:
+                if vl + vr > 0:
+                    possible_vels.append((vl, vr))
 
         return possible_vels
     
