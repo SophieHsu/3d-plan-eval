@@ -6,9 +6,9 @@ from igibson.utils.utils import quatToXYZW, parse_config
 from transforms3d.euler import euler2quat
 import pybullet as p
 
-from planners.a_star_planner import AStarPlanner
-from motion_controllers.motion_controller_robot import MotionControllerRobot
-from motion_controllers.motion_controller_human import MotionControllerHuman
+from lsi_3d.planners.a_star_planner import AStarPlanner
+from lsi_3d.motion_controllers.motion_controller_robot import MotionControllerRobot
+from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
 from human_wrapper import HumanWrapper
 from utils import real_to_grid_coord, grid_to_real_coord
 

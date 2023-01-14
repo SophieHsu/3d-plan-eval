@@ -1,0 +1,7 @@
+map_config = 'layout_2.tml'
+agent_config = ['human_agent.tml','robot_agent.tml']
+algorithm_config = 'a_star_two_agent.tml'
+order_list = ['onion','onion']
+hl_start_state = 'None_0_onion_onion'
+recalculation_resolution = 4
+avoid_radius = 1
