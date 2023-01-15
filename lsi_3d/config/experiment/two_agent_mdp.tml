@@ -5,3 +5,12 @@ order_list = ['onion','onion']
 hl_start_state = 'None_0_onion_onion'
 recalculation_resolution = 4
 avoid_radius = 1
+
+human_start_x=3
+human_start_y=0
+
+robot_start_x=2
+robot_start_y=5
+
+ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
+ig_mode = "gui_interactive"

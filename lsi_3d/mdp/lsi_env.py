@@ -4,6 +4,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
+from human_wrapper import HumanWrapper
 
 class LsiEnv(object):
     """
@@ -14,11 +15,11 @@ class LsiEnv(object):
 
         nav_env: the simulation environment that the lsi_env wraps
     """
-    def __init__(self, mdp:LsiMdp, nav_env:iGibsonEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent) -> None:
+    def __init__(self, mdp:LsiMdp, nav_env:iGibsonEnv, human_wrapper:HumanWrapper, ig_robot:iGibsonAgent) -> None:
         #self.joint_hl_state = mdp.hl_start_state
         self.nav_env = nav_env
         self.mdp = mdp
-        self.ig_human = ig_human
+        self.human_wrapper = human_wrapper
         self.ig_robot = ig_robot
         self.human_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[0])
         self.robot_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[1])
@@ -64,7 +65,7 @@ class LsiEnv(object):
         # r,p,y = quat2euler(x,y,z,w)
         # facing = orn_to_cardinal(y)
         
-        human_ml_state = self.get_ml_state(self.ig_human)
+        human_ml_state = self.get_ml_state(human_wrapper.get_position())
         robot_ml_state = self.get_ml_state(self.ig_robot)
         self.robot_state.ml_state = robot_ml_state
         self.human_state.ml_state = human_ml_state

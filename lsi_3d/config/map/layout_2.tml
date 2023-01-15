@@ -1,11 +1,3 @@
-layout="""
-CCCWCCCC
-CXXXXXXC
-CXXCCXXP
-XXXCCXXC
-XXXBBXXC
-XXXTTXXF
-XXXXXXXX
-XXXXXXXX"""
+layout="""kitchen_layouts_grid_text/kitchen0.txt"""
 rows=8
 columns=8

@@ -5,9 +5,9 @@ import numpy as np
 
 class HumanWrapper():
 
-    def __init__(self, human, robot, planner, motion_controller, occupancy_grid):
+    def __init__(self, human, planner, motion_controller, occupancy_grid):
         self.human = human
-        self.robot = robot
+        #self.robot = robot
         self.planner = planner
         self.motion_controller = motion_controller
         self.occupancy_grid = copy.deepcopy(occupancy_grid)
@@ -32,4 +32,7 @@ class HumanWrapper():
         if old_loc != loc:
             print(np.matrix(self.occupancy_grid))
             print("----------------------------")
+    
+    def get_position():
+        return self.human.get_position()
         

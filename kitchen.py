@@ -9,9 +9,12 @@ class Kitchen():
         self.env = env
         self.HEIGHT = 8 # x
         self.WIDTH = 8 # y
+        self.orientation_map = ""
+        self.grid = ""
 
     def setup(self, filepath):
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
+        self.map = orientation_map
         self.load_objects(obj_x_y, orientation_map)
 
     def read_from_grid_text(self, filepath):
@@ -51,6 +54,9 @@ class Kitchen():
                 ori += self.ori_filter(grid, x+1, y) + self.ori_filter(grid, x-1, y) # upper and lower neighbor
                 ori -= self.ori_filter(grid, x, y+1) + self.ori_filter(grid, x, y-1) # left and right neighbor
                 orientation_map[(name, x, y)] = self.get_orientation(center_x, center_y, x, y, ori)
+
+        self.orientation_map = orientation_map
+        self.grid = grid
         return obj_x_y, orientation_map, grid
 
     def load_objects(self, obj_x_y, orientation_map):
