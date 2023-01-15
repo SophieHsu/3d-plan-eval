@@ -268,3 +268,12 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
             nxt_world_info.append(order)
 
         return p1_nxt_states, nxt_world_info
+
+    def get_mdp_key_from_state(self, world_state, robot_state, human_state):
+        key = f"{robot_state.holding}_{world_state.in_pot}"
+        for order in world_state.orders:
+            key += f'_{order}'
+
+        if human_state.holding is not None:
+            key = key +'_'+ human_state.holding
+        return key

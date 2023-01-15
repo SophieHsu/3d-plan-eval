@@ -274,7 +274,7 @@ class HighLevelMdpPlanner(object):
                 #location = self.mdp.get_partially_full_pots(pots_states_dict) + self.mdp.get_empty_pots(pots_states_dict)
                 location = self.mdp.get_pot_locations()
             elif obj == 'dish':
-                location = self.drop_item(world_state)
+                location = self.drop_item(world_state, agent_state)
             else:
                 print(p0_obj, action, obj)
                 ValueError()
@@ -290,3 +290,15 @@ class HighLevelMdpPlanner(object):
             ValueError()
 
         return location
+
+    def get_mdp_key_from_state(self, world_state, robot_state, human_state):
+        key = f"{robot_state.holding}_{world_state.in_pot}"
+        for order in world_state.orders:
+            key += f'_{order}'
+
+        return key
+
+    def drop_item(world_state, agent_state):
+        agent_state.holding = None
+        return agent_state.ml_state[0:2]
+

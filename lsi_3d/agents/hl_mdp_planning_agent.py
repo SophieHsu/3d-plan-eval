@@ -34,18 +34,9 @@ class HlMdpPlanningAgent(Agent):
 
         return state_str
 
-    def get_mdp_key_from_state(self, world_state, agent_state, obj = None):
-        key = f"{agent_state.holding}_{world_state.in_pot}"
-        for order in world_state.orders:
-            key += f'_{order}'
+    def action(self, world_state, robot_state, human_state = None):
 
-        if obj is not None:
-            key = key +'_'+ obj
-        return key
-
-    def action(self, world_state, agent_state, human_holding = None):
-
-        state_str = self.get_mdp_key_from_state(world_state, agent_state, human_holding)
+        state_str = self.mdp_planner.get_mdp_key_from_state(world_state, robot_state, human_state)
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # retrieve high level action from policy
@@ -62,7 +53,7 @@ class HlMdpPlanningAgent(Agent):
         # print(self.mdp_planner.state_idx_dict[state_str], action_idx, action_object_pair)
         
         # map back the medium level action to low level action
-        possible_motion_goals = self.mdp_planner.map_action_to_location(world_state, agent_state, action_object_pair)
+        possible_motion_goals = self.mdp_planner.map_action_to_location(world_state, robot_state, action_object_pair)
         goal = possible_motion_goals[0]
         #start = ml_state[0] + ml_state[1]
 

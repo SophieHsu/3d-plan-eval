@@ -250,7 +250,7 @@ def main_loop(
             robot gets high level action and translates into mid-level path
             when robot completes this path, it returns to this state
             '''
-            next_robot_hl_state, robot_goal, robot_action_object_pair = hl_robot_agent.action(env.world_state, env.robot_state, env.human_state.holding)
+            next_robot_hl_state, robot_goal, robot_action_object_pair = hl_robot_agent.action(env.world_state, env.robot_state, env.human_state)
             optimal_plan = hl_robot_agent.optimal_motion_plan(env.robot_state, robot_goal)
             optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
             env.robot_state.mode = Mode.CALC_SUB_PATH
