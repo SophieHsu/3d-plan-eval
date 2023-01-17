@@ -18,7 +18,7 @@ class HlMdpPlanningAgent(Agent):
         self.sub_path_goal_i = 0
         self.hl_human_agent = hl_human_agent
         self.env = env
-        self.recalc_res = 1
+        self.recalc_res = 4
         self.ig_human = ig_human
         self.ig_robot = ig_robot
 
@@ -112,18 +112,18 @@ class HlMdpPlanningAgent(Agent):
         # hl_human_agent:FixedPolicyAgent,
         #recalc_res,
         #avoid_radius):
-        """_summary_
+        # """_summary_
 
-        Args:
-            mdp (_type_): _description_
-            env (LsiEnv): _description_
-            ig_human (iGibsonAgent): _description_
-            ig_robot (iGibsonAgent): _description_
-            hl_robot_agent (HlMdpPlanningAgent): _description_
-            hl_human_agent (FixedPolicyAgent): _description_
-            bowlpans (_type_): _description_
-            recalc_res (int): defines number of steps before the robot recalculates its path
-        """
+        # Args:
+        #     mdp (_type_): _description_
+        #     env (LsiEnv): _description_
+        #     ig_human (iGibsonAgent): _description_
+        #     ig_robot (iGibsonAgent): _description_
+        #     hl_robot_agent (HlMdpPlanningAgent): _description_
+        #     hl_human_agent (FixedPolicyAgent): _description_
+        #     bowlpans (_type_): _description_
+        #     recalc_res (int): defines number of steps before the robot recalculates its path
+        # """
 
         # print('Press enter to start...')
         # input()
