@@ -30,7 +30,7 @@ class LsiMdp(object):
 
         hl_start_state = exp_config['hl_start_state']
         # start_locations = [(agent_config['start_x'], agent_config['start_y'], agent_config['start_direction']) for agent_config in agent_configs]
-        start_locations = [(exp_config['human_start_x'], exp_config['human_start_y']), (exp_config['robot_start_x'], exp_config['robot_start_y'])]
+        start_locations = [(exp_config['human_start_x'], exp_config['human_start_y'], 'S'), (exp_config['robot_start_x'], exp_config['robot_start_y'], 'S')]
         return LsiMdp(grid, start_locations, hl_start_state)
 
     def get_state_transition(self, state, joint_action):

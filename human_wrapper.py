@@ -12,7 +12,11 @@ class HumanWrapper():
         self.motion_controller = motion_controller
         self.occupancy_grid = copy.deepcopy(occupancy_grid)
 
-    def step(self, end, final_ori):
+    def step():
+        highlevel
+        self._step()
+
+    def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         path = self.planner.find_path((x,y), end, self.occupancy_grid)

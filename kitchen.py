@@ -11,6 +11,7 @@ class Kitchen():
         self.WIDTH = 8 # y
         self.orientation_map = ""
         self.grid = ""
+        self.bowlpans = []
 
     def setup(self, filepath):
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
@@ -36,6 +37,8 @@ class Kitchen():
                 grid[x][y+1] = self.name2abbr(name)
             elif name == "table_v":
                 grid[x+1][y] = self.name2abbr(name)
+            elif name == 'pan':
+                grid[x][y] = self.name2abbr(name)
             else:
                 sum_x += x
                 sum_y += y
@@ -103,7 +106,6 @@ class Kitchen():
         }
 
         objs = []
-        bowlpans = []
         for name, x, y in obj_x_y:
             obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]))
             self.env.simulator.import_object(obj)
@@ -113,13 +115,14 @@ class Kitchen():
             if name == "counter":
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
-            pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
+            # pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
+            pos = [x+shift[0]-4.5, y+shift[1]-4.5, 0+shift[2]]
             self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn) 
 
             if name not in ("bowl", "pan"):
                 objs.append(obj)
             else:
-                bowlpans.append((obj, pos))
+                self.bowlpans.append((obj, pos))
         try:
             for obj in objs:
                 p.changeDynamics(obj.get_body_ids()[0],-1,mass=500)
@@ -172,6 +175,7 @@ class Kitchen():
             "sink": "W",
             "fridge": "F",
         }
+
         return name2abbr_map[name]
 
     def ori_filter(self, grid, x, y):

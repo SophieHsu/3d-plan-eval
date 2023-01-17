@@ -2,6 +2,9 @@ class Agent(object):
     def action(self, state):
         return NotImplementedError()
 
+    def step(self):
+        return NotImplementedError()
+
 class FixedMediumPlan(Agent):
     """
     An Agent with a fixed plan. Returns Stay actions once pre-defined plan has terminated.
