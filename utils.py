@@ -27,7 +27,9 @@ def quat2euler(x, y, z, w):
         return roll_x, pitch_y, yaw_z # in radians
 
 def real_to_grid_coord(coord):
-        return (math.floor(coord[0]), math.floor(coord[1]))
+        # return (math.floor(coord[0]), math.floor(coord[1]))
+        return (math.floor(coord[0] + 5), math.floor(coord[1] + 5))
 
 def grid_to_real_coord(coord):
-        return (coord[0] + 0.5, coord[1] + 0.5)
+        # return (coord[0] + 0.5, coord[1] + 0.5)
+        return (coord[0] - 4.5, coord[1] - 4.5)

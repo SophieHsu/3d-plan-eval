@@ -9,7 +9,7 @@ import pybullet as p
 from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.motion_controllers.motion_controller_robot import MotionControllerRobot
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
-from human_wrapper import HumanWrapper
+from lsi_3d.agents.human_agent import HumanAgent
 from utils import real_to_grid_coord, grid_to_real_coord
 
 # HDR files for PBR rendering
@@ -47,23 +47,13 @@ def follow_robot_view_top(robot):
 
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
-    kitchen_layout = r"C:\Users\icaro\3d_lsi_2\kitchen_layouts_grid_text\kitchen1_alt.txt"
+    kitchen_layout = r"C:\Users\icaro\3d-plan-eval\kitchen_layouts_grid_text\kitchen0.txt"
     # Simple test:
-    # robot_x, robot_y = 0, 0
-    # robot_end = (7,4)
-    # human_x, human_y = 3, 2
-    # human_end = (5, 2)
+    robot_x, robot_y = 0, 0
+    robot_end = (0, 0)
+    human_x, human_y = 2, 0
+    # human_end = (2, 1)
     
-    # Failing case:
-    robot_x, robot_y = 5.5, 3.5
-    robot_end = (7.5,3.5)
-    human_x, human_y = 2.5, 2.5
-    human_end = (6.5,3.5)
-
-    # robot_x, robot_y = 5.5, 3.5
-    # robot_end = (7.5, 6.5)
-    # human_x, human_y = 2.5, 2.5
-    # human_end = (0.0, 0.0)
 
     env = iGibsonEnv(
         config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
@@ -84,7 +74,8 @@ def main():
     
     a_star_planner = AStarPlanner(env)
     motion_controller = MotionControllerHuman()
-    human_wrapper = HumanWrapper(human, robot, a_star_planner, motion_controller, occupancy_grid)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid)
+    human_agent.set_robot(robot)
 
     motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
@@ -93,7 +84,7 @@ def main():
         # actionStep = nav_env.simulator.gen_vr_robot_action()
         # human.apply_action(actionStep)
         # prop = human.get_proprioception()
-        human_wrapper.step(human_end, 1.57)
+        human_agent.step()
         motion_controller_robot.step(robot_end, 1.57)
         env.simulator.step()
 

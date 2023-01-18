@@ -61,7 +61,7 @@ class AStarPlanner():
             end_node = end_node.parent
             path.insert(0, grid_to_real_coord(end_node.loc))
         
-        self.draw_path(path)
+        # self.draw_path(path)
 
         return path
 

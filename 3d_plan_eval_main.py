@@ -8,9 +8,8 @@ from transforms3d.euler import euler2quat
 import pybullet as p
 
 from lsi_3d.planners.a_star_planner import AStarPlanner
-from lsi_3d.motion_controllers.motion_controller_robot import MotionControllerRobot
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
-from human_wrapper import HumanWrapper
+from lsi_3d.agents.human_agent import HumanAgent
 from utils import real_to_grid_coord, grid_to_real_coord
 
 from kitchen import Kitchen
@@ -34,10 +33,6 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-def follow_robot_view_top(robot):
-    x, y, z = robot.get_position()
-    p.resetDebugVisualizerCamera(cameraDistance=2.0, cameraYaw=0, cameraPitch=-30, cameraTargetPosition=[x, y, 2.0])
-
 def human_setup(igibson_env, kitchen, configs):
     exp_configs, map_configs = configs
 
@@ -46,9 +41,9 @@ def human_setup(igibson_env, kitchen, configs):
     igibson_env.set_pos_orn_with_z_offset(human, [exp_configs["human_start_x"], exp_configs["human_start_y"], 0], [0, 0, 0])
     a_star_planner = AStarPlanner(igibson_env)
     motion_controller = MotionControllerHuman()
-    human_wrapper = HumanWrapper(human, a_star_planner, motion_controller, kitchen.grid)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, kitchen.grid)
 
-    return human_wrapper
+    return human_agent
 
 def robot_setup(igibson_env, kitchen, configs, human):
     exp_config, map_config = configs
@@ -87,7 +82,7 @@ def environment_setup():
     configs = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
-        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 12, physics_timestep=1.0 / 12, use_pb_gui=True
+        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 30, physics_timestep=1.0 / 120, use_pb_gui=True
     )
 
     kitchen = Kitchen(igibson_env)
@@ -99,14 +94,16 @@ def environment_setup():
 
 def main():
     igibson_env, kitchen, configs = environment_setup()
-    human = human_setup(igibson_env, kitchen, configs)
-    robot_agent = robot_setup(igibson_env, kitchen, configs, human)
-    main_loop(robot_agent)
+    human_agent = human_setup(igibson_env, kitchen, configs)
+    # robot_agent = robot_setup(igibson_env, kitchen, configs, human)
+    human_agent.set_robot(igibson_env.robots[0])
+    main_loop(igibson_env, None, human_agent)
 
-def main_loop(robot_agent):
+def main_loop(igibson_env, robot_agent, human_agent):
     while True:
-        # human.step(human_end, 1.57)
-        robot_agent.step()
+        human_agent.step()
+        # robot_agent.step()
+        igibson_env.simulator.step()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

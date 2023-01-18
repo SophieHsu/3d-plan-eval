@@ -6,8 +6,8 @@ hl_start_state = 'None_0_onion_onion'
 recalculation_resolution = 4
 avoid_radius = 1
 
-human_start_x=4
-human_start_y=1
+human_start_x=1
+human_start_y=-2
 
 robot_start_x=2
 robot_start_y=3
