@@ -45,10 +45,15 @@ def human_setup(igibson_env, kitchen, configs):
 
     return human_agent
 
-def robot_setup(igibson_env, kitchen, configs, human):
+def robot_setup(igibson_env, kitchen, configs):
+
     exp_config, map_config = configs
     robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
     human_start = (exp_config["human_start_x"], exp_config["human_start_y"]) 
+
+    human = BehaviorRobot()
+    igibson_env.simulator.import_object(human)
+    igibson_env.set_pos_orn_with_z_offset(human, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
 
     mdp = LsiMdp.from_config(map_config, exp_config, kitchen.grid)
 
@@ -56,10 +61,10 @@ def robot_setup(igibson_env, kitchen, configs, human):
     recalc_res = exp_config['recalculation_resolution']
     
     mlp = AStarMotionPlanner(kitchen.grid)
-    hhlp = HLGreedyHumanPlanner(mdp, mlp)
-    #hhlp = HLHumanPlanner(mdp, mlp)
-    #hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
-    hlp = HighLevelMdpPlanner(mdp)
+    # hhlp = HLGreedyHumanPlanner(mdp, mlp)
+    hhlp = HLHumanPlanner(mdp, mlp)
+    hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
+    #hlp = HighLevelMdpPlanner(mdp)
     hlp.compute_mdp_policy(order_list)
 
     # TODO: Get rid of 4.5 offset
@@ -68,7 +73,7 @@ def robot_setup(igibson_env, kitchen, configs, human):
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0], [r_x-4.5, r_y-4.5, 0], [0, 0, 0])
 
-    human = iGibsonAgent(human.human, human_start, 'S', "human")
+    human = iGibsonAgent(human, human_start, 'S', "human_sim")
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
     env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
@@ -82,7 +87,7 @@ def environment_setup():
     configs = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
-        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 30, physics_timestep=1.0 / 120, use_pb_gui=True
+        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 15, physics_timestep=1.0 / 30, use_pb_gui=False
     )
 
     kitchen = Kitchen(igibson_env)
@@ -94,15 +99,16 @@ def environment_setup():
 
 def main():
     igibson_env, kitchen, configs = environment_setup()
-    human_agent = human_setup(igibson_env, kitchen, configs)
-    # robot_agent = robot_setup(igibson_env, kitchen, configs, human)
-    human_agent.set_robot(igibson_env.robots[0])
-    main_loop(igibson_env, None, human_agent)
+    robot_agent = robot_setup(igibson_env, kitchen, configs)
+    # human_agent = human_setup(igibson_env, kitchen, configs)
+    #human_agent.set_robot(igibson_env.robots[0])
+    human_agent = None
+    main_loop(igibson_env, robot_agent, human_agent)
 
 def main_loop(igibson_env, robot_agent, human_agent):
     while True:
-        human_agent.step()
-        # robot_agent.step()
+        # human_agent.step()
+        robot_agent.step()
         igibson_env.simulator.step()
 
 if __name__ == "__main__":

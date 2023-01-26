@@ -67,6 +67,9 @@ class HLGreedyHumanPlanner(object):
 
     def get_trans_probabilities(self, next_hl_holding, in_pot, orders, ml_goals, holding, pref_prob):
         next_states = []
+
+        # ml_goals = self.human_ml_motion_goal(ml_goals)
+
         for i, ml_goal in enumerate(ml_goals):
             # WAIT = ml_goal[4]
             min_distance = np.Inf
@@ -86,9 +89,10 @@ class HLGreedyHumanPlanner(object):
                 plan = self.mlp.compute_motion_plan([(start_loc)], [ml_goal])
                 
                 if len(plan) > 0:
-                    trans_prob = 1/len(plan)
+                    # trans_prob = 1/len(plan)
+                    trans_prob = 1/2
                 else:
-                    trans_prob = 0.00001
+                    trans_prob = 1
 
             #else:
             #    min_distance = 1.0
@@ -98,6 +102,26 @@ class HLGreedyHumanPlanner(object):
         next_states = np.array(next_states, dtype=object)
 
         return next_states
+
+    def human_ml_motion_goal(self, goals):
+        """ 
+        Get the human's motion goal based on its held object. The return can be multiple location since there can be multiple same feature tiles.
+
+        Return: next object, list(motion goals)
+        """
+        # ml_logic_goals = self.logic_ml_action(obj, num_item_in_pot, order_list)
+
+        # curr_p = ((1.0-self.adaptiveness)*self.prev_goal_dstb + self.adaptiveness*ml_logic_goals)   
+        # print(self.adaptiveness, self.prev_goal_dstb, ml_logic_goals, curr_p)
+        #task = np.random.choice(len(self.sub_goals), p=curr_p)
+        # self.prev_goal_dstb = curr_p
+
+        ml_goals = []
+        ml_goals.append(self.onion_cooker_ml_goal(obj, num_item_in_pot, order_list))
+        ml_goals.append(self.soup_server_ml_goal(obj, num_item_in_pot, order_list))
+        ml_goals = np.array(ml_goals, dtype=object)
+
+        return ml_goals #, curr_p
 
     def start_location_from_object(self, obj):
         """ 

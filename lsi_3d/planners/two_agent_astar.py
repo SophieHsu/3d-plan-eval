@@ -390,8 +390,8 @@ def astar_avoid_path(grid, start_state, ex1, ey1, ex2, ey2, avoid_path):
 
 def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid_path, f_radius, ef2 = None):
     avoid_path_queue = avoid_path
-    if grid[ex1][ey1] == 'X' or grid[ex2][ey2] == 'X':
-        print('Warning: End goal is open space so agent may spin in place')
+    # if grid[ex1][ey1] == 'X' or grid[ex2][ey2] == 'X':
+    #    print('Warning: End goal is open space so agent may spin in place')
     
     actions = ["E", "W", "S", "N", "I", "F", "D"]
     visited = set()
@@ -417,7 +417,7 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
         
         # Add human actions at current time step for robot to avoid
         avoid_actions = []
-        avoid_actions.append('D')
+        # avoid_actions.append('D')
         if len(avoid_path_queue) > avoid_path_t_step:
             avoid_actions.append(avoid_path[avoid_path_t_step])
         

@@ -18,7 +18,7 @@ class HlMdpPlanningAgent(Agent):
         self.sub_path_goal_i = 0
         self.hl_human_agent = hl_human_agent
         self.env = env
-        self.recalc_res = 4
+        self.recalc_res = 1
         self.ig_human = ig_human
         self.ig_robot = ig_robot
 
@@ -137,6 +137,10 @@ class HlMdpPlanningAgent(Agent):
             it will re-enter this state
             '''
             self.next_human_hl_state, self.human_plan, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.env.human_state)
+            print(f'Executing Human High Level Action: {self.human_action_object_pair[0]} {self.human_action_object_pair[1]}')
+            print(f'Path is: {self.human_plan}')
+            print(f'Human Holding {self.env.human_state.holding}')
+            print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}', )
             #human_plan.append('I')
             self.human = FixedMediumPlan(self.human_plan)
             self.env.human_state.mode = Mode.EXEC_ML_PATH
@@ -150,9 +154,15 @@ class HlMdpPlanningAgent(Agent):
             '''
             self.next_robot_hl_state, self.robot_goal, self.robot_action_object_pair = hl_robot_agent.action(self.env.world_state, self.env.robot_state, self.env.human_state)
             optimal_plan = hl_robot_agent.optimal_motion_plan(self.env.robot_state, self.robot_goal)
+
+            print(f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}')
+            print(f'Optimal Path is: {self.optimal_path}')
+            print(f'Human Holding {self.env.robot_state.holding}')
+            print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}', )
+
             self.optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
             self.env.robot_state.mode = Mode.CALC_SUB_PATH
-            self.robot = FixedMediumSubPlan(optimal_plan, self.recalc_res)
+            self.robot = FixedMediumSubPlan(optimal_plan, 14)
             self.next_robot_goal = self.robot.next_goal()
 
         if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
@@ -175,7 +185,7 @@ class HlMdpPlanningAgent(Agent):
                 self.next_robot_goal = self.robot.next_goal()
                 
             human_sub_path = self._get_human_sub_path(self.human_plan, (self.human.i), self.env.human_state.ml_state)
-            plan = hl_robot_agent.avoidance_motion_plan((self.env.human_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=1)
+            plan = hl_robot_agent.avoidance_motion_plan((self.env.human_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=3)
 
             if plan == [] and self.optimal_plan_goal[0] == self.env.robot_state.ml_state:
                 # could not find path to goal, so idle 1 step and then recalculate
@@ -188,8 +198,8 @@ class HlMdpPlanningAgent(Agent):
             self.robot_plan = FixedMediumPlan(plan)
             self.env.robot_state.mode = Mode.EXEC_ML_PATH
             self.a_r = None
-            # a_r = robot_plan.action()
-            # ig_robot.prepare_for_next_action(a_r)
+            # self.a_r = self.robot_plan.action()
+            #self.ig_robot.prepare_for_next_action(self.a_r)
 
         elif self.env.robot_state.mode == Mode.EXEC_ML_PATH:
 
@@ -200,7 +210,7 @@ class HlMdpPlanningAgent(Agent):
                 # if :
                 #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
 
-                if self.robot_plan.i == len(self.robot_plan.plan) or self.robot_plan.i == 1: #recalc_res: #or a_r == MLAction.STAY:
+                if (self.robot_plan.i == len(self.robot_plan.plan) or self.robot_plan.i == 1 or (self.robot_plan.i % self.recalc_res) == 0) and self.a_r != None: #recalc_res: #or a_r == MLAction.STAY:
                     self.env.robot_state.mode = Mode.CALC_SUB_PATH
                 else:
                     pos_r, self.a_r = self.robot_plan.action()

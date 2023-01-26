@@ -135,7 +135,7 @@ class iGibsonAgent:
             pass
 
     def agent_forward_one_step(self, env):
-        if self.name == "human":
+        if self.name == "human_sim":
             x,y,z = self.object.get_position()
             if self.direction == 'N':
                 self.object.set_position_orientation([x-ONE_STEP,y,z], self.object.get_orientation())
@@ -199,7 +199,7 @@ class iGibsonAgent:
 
 
     def agent_turn_one_step(self, env, action):
-        if self.name == "human":
+        if self.name == "human_sim":
             x, y, z, w = self.object.get_orientation()
             x, y, z = quat2euler(x, y, z, w)
             #print("turn z:", z, action)
