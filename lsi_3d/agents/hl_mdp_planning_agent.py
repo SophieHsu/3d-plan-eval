@@ -257,6 +257,10 @@ class HlMdpPlanningAgent(Agent):
             #env.robot_state.executing_state = ExecutingState.CALC_HL_PATH
             self.env.human_state.mode = Mode.CALC_HL_PATH
 
+        if not self.env.world_state.orders:
+            print('orders complete')
+            exit()
+
     def _get_human_sub_path(self, path, current_index, human_ml_state):
         sub_path = []
         if current_index == 1 and human_ml_state != path[current_index][0]:

@@ -87,7 +87,7 @@ def environment_setup():
     configs = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
-        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 15, physics_timestep=1.0 / 30, use_pb_gui=False
+        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 10, physics_timestep=1.0 / 20, use_pb_gui=False
     )
 
     kitchen = Kitchen(igibson_env)
