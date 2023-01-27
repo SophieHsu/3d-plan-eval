@@ -21,6 +21,9 @@ class WorldState():
         elif action_object == ('drop', 'onion'):
             self.in_pot += 1
 
+        if action_object == ('pickup', 'soup') and self.in_pot == 3:
+            self.in_pot = 0
+
         if action_object == ('deliver', 'soup'):
             self.orders = self.orders[:-1]
 
@@ -41,17 +44,19 @@ class AgentState():
 
         self.holding = 'None'
         self.next_holding = 'None'
-        self.parse_hl_state(hl_state)
     
-    def parse_hl_state(self, hl_state):
+    def parse_hl_state(self, hl_state, world_state:WorldState):
         parsed = hl_state.split('_')
         self.holding = parsed[0]
-        self.hl_state = hl_state
+        self.hl_state = f'{self.holding}_{world_state.in_pot}'
 
-    def update_hl_state(self, new_hl_state):
+        for order in world_state.orders:
+            self.hl_state += f'_{order}'
+
+    def update_hl_state(self, new_hl_state, world_state):
 
         self.hl_state = new_hl_state
-        self.parse_hl_state(new_hl_state)
+        self.parse_hl_state(new_hl_state, world_state)
 
         return self
 

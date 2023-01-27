@@ -60,6 +60,7 @@ class HlMdpPlanningAgent(Agent):
         return state_str
 
     def action(self, world_state, robot_state, human_state = None):
+        # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
 
         state_str = self.mdp_planner.get_mdp_key_from_state(world_state, robot_state, human_state)
         state_idx = self.mdp_planner.state_idx_dict[state_str]
@@ -136,7 +137,7 @@ class HlMdpPlanningAgent(Agent):
             human gets high level action and plans path to it. when human finishes path
             it will re-enter this state
             '''
-            self.next_human_hl_state, self.human_plan, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.env.human_state)
+            self.next_human_hl_state, self.human_plan, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.env.human_state, self.env.robot_state)
             print(f'Executing Human High Level Action: {self.human_action_object_pair[0]} {self.human_action_object_pair[1]}')
             print(f'Path is: {self.human_plan}')
             print(f'Human Holding {self.env.human_state.holding}')
@@ -166,26 +167,12 @@ class HlMdpPlanningAgent(Agent):
             self.next_robot_goal = self.robot.next_goal()
 
         if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
-            '''
-            robot executes mid-level path in stages to avoid collision. collisions occur
-            in real-world scenarios because the agents are not operating in lock-step time.
-            (i.e. the human may move faster/slower than the robot and vice-versa)
-
-            the way this works is an optimal path to the mid-level goal is computed using a-star
-            without considering human path, next intermediate goals along mid-level path are
-            set and a path-avoidance a-star computes an optimal path which avoids the humans current
-            mid-level path. This path begins executing
-
-            Because the human's plan may change at any time, a parameter of the main loop is the 
-            recalculation resolution, which defines how many steps the robot takes in the world
-            before recalculating its sub path.
-            '''
             self.env.update_joint_ml_state()
             if self.env.robot_state.ml_state == self.next_robot_goal:
                 self.next_robot_goal = self.robot.next_goal()
                 
             human_sub_path = self._get_human_sub_path(self.human_plan, (self.human.i), self.env.human_state.ml_state)
-            plan = hl_robot_agent.avoidance_motion_plan((self.env.human_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=3)
+            plan = hl_robot_agent.avoidance_motion_plan((self.env.human_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=1)
 
             if plan == [] and self.optimal_plan_goal[0] == self.env.robot_state.ml_state:
                 # could not find path to goal, so idle 1 step and then recalculate
@@ -263,6 +250,7 @@ class HlMdpPlanningAgent(Agent):
         if self.env.robot_state.mode == Mode.INTERACT:
             self.env.update_robot_hl_state(self.next_robot_hl_state, self.robot_action_object_pair)
             self.env.robot_state.mode = Mode.CALC_HL_PATH
+
             #env.human_state.executing_state = ExecutingState.CALC_HL_PATH
         if self.env.human_state.mode == Mode.INTERACT:
             self.env.update_human_hl_state(self.next_human_hl_state, self.human_action_object_pair)

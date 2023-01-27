@@ -43,7 +43,7 @@ class LsiEnv(object):
         and holding for specific agent
         '''
         self.world_state.update(next_hl_state, action_object)
-        self.robot_state.update_hl_state(next_hl_state)
+        self.robot_state.update_hl_state(next_hl_state, self.world_state)
 
     def update_human_hl_state(self, next_hl_state, action_object):
         '''
@@ -51,7 +51,7 @@ class LsiEnv(object):
         and holding for specific agent
         '''
         self.world_state.update(next_hl_state, action_object)
-        self.human_state.update_hl_state(next_hl_state)
+        self.human_state.update_hl_state(next_hl_state, self.world_state)
 
     def get_human_hl_state(self):
         hl_state = f'{self.human_state.holding}_{self.world_state.in_pot}'
