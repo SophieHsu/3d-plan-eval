@@ -1,5 +1,5 @@
 import math
-from utils import quat2euler
+from utils import quat2euler, normalize_radians
 import numpy as np
 from igibson.objects.visual_marker import VisualMarker
 import pybullet as p
@@ -16,7 +16,7 @@ class MotionControllerHuman():
         x, y, z = human.get_position()
         qx, qy, qz, qw = human.get_orientation()
         _, _, theta = quat2euler(qx, qy, qz, qw)
-        theta = self.normalize_radians(theta)
+        theta = normalize_radians(theta)
         if len(path) > 0:
             end = path[-1]
             if len(path) > 1:
@@ -105,20 +105,13 @@ class MotionControllerHuman():
 
         return possible_vels
 
-    def normalize_radians(self, rad):
-        # Convert radians to value between 0 and 2 * pi
-        rad = rad % (2 * math.pi)
-        if rad < 0:
-            rad = rad + 2 * math.pi
-        return rad
-
     def angle_difference(self, theta, optimal_heading):
-        optimal_heading = self.normalize_radians(optimal_heading)
-        theta = self.normalize_radians(theta)
+        optimal_heading = normalize_radians(optimal_heading)
+        theta = normalize_radians(theta)
         theta_1 = abs(optimal_heading - theta)
         theta_2 = 2 * math.pi - theta_1
         min_theta = min(theta_1, theta_2)
-        temp = self.normalize_radians(theta + min_theta)
+        temp = normalize_radians(theta + min_theta)
         if temp > optimal_heading - 0.05 and temp < optimal_heading + 0.05:
             return min_theta
         else:

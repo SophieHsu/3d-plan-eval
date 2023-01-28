@@ -33,61 +33,78 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-def human_setup(igibson_env, kitchen, configs):
-    exp_configs, map_configs = configs
+# def human_setup(igibson_env, kitchen, configs):
+#     exp_configs, map_configs = configs
 
-    human = BehaviorRobot()
-    igibson_env.simulator.import_object(human)
-    igibson_env.set_pos_orn_with_z_offset(human, [exp_configs["human_start_x"], exp_configs["human_start_y"], 0], [0, 0, 0])
-    a_star_planner = AStarPlanner(igibson_env)
-    motion_controller = MotionControllerHuman()
-    human_agent = HumanAgent(human, a_star_planner, motion_controller, kitchen.grid)
+#     human = BehaviorRobot()
+#     igibson_env.simulator.import_object(human)
+#     igibson_env.set_pos_orn_with_z_offset(human, [exp_configs["human_start_x"], exp_configs["human_start_y"], 0], [0, 0, 0])
+#     a_star_planner = AStarPlanner(igibson_env)
+#     motion_controller = MotionControllerHuman()
+#     human_agent = HumanAgent(human, a_star_planner, motion_controller, kitchen.grid)
 
-    return human_agent
+#     return human_agent
 
-def robot_setup(igibson_env, kitchen, configs):
+# def robot_setup(igibson_env, kitchen, configs):
 
+def setup(igibson_env, kitchen, configs):
     exp_config, map_config = configs
+    order_list = exp_config['order_list']
+    human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
     robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
-    human_start = (exp_config["human_start_x"], exp_config["human_start_y"]) 
+    human_bot = BehaviorRobot()
 
-    human = BehaviorRobot()
-    igibson_env.simulator.import_object(human)
-    igibson_env.set_pos_orn_with_z_offset(human, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
+    human_sim = BehaviorRobot()
+    igibson_env.simulator.import_object(human_sim)
+    igibson_env.set_pos_orn_with_z_offset(human_sim, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
 
     mdp = LsiMdp.from_config(map_config, exp_config, kitchen.grid)
+    hlp = HighLevelMdpPlanner(mdp)
+    hlp.compute_mdp_policy(order_list)
 
-    order_list = exp_config['order_list']
-    recalc_res = exp_config['recalculation_resolution']
+    human = iGibsonAgent(human_bot, human_start, 'S', "human")
+    #robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
+    #env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
+
+    #######################################################################################
+    igibson_env.simulator.import_object(human_bot)
+    igibson_env.set_pos_orn_with_z_offset(human_bot, [human_start[0], human_start[1], 0], [0, 0, 0])
+    a_star_planner = AStarPlanner(igibson_env)
+    motion_controller = MotionControllerHuman()
+
+    #######################################################################################
     
     mlp = AStarMotionPlanner(kitchen.grid)
     # hhlp = HLGreedyHumanPlanner(mdp, mlp)
     hhlp = HLHumanPlanner(mdp, mlp)
-    hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
+    robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
     #hlp = HighLevelMdpPlanner(mdp)
-    hlp.compute_mdp_policy(order_list)
+    robot_hlp.compute_mdp_policy(order_list)
 
     # TODO: Get rid of 4.5 offset
     h_x,h_y = human_start
     r_x,r_y = robot_start
+    igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[2], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0], [r_x-4.5, r_y-4.5, 0], [0, 0, 0])
 
-    human = iGibsonAgent(human, human_start, 'S', "human_sim")
+    human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
-    env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
+    env = LsiEnv(mdp, igibson_env, human, robot, human_sim, kitchen)
 
-    human_agent = FixedPolicyAgent(hlp,mlp)
-    robot_agent = HlMdpPlanningAgent(hlp, mlp, human_agent, env, human, robot)
+    human_sim_agent = FixedPolicyAgent(robot_hlp,mlp)
+    robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env, human_sim, robot)
 
-    return robot_agent
+    human_agent = HumanAgent(human_bot, a_star_planner, motion_controller, kitchen.grid, hlp, env, igibson_env)
+
+    return robot_agent, human_agent
 
 def environment_setup():
     exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
     configs = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
-        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 10, physics_timestep=1.0 / 20, use_pb_gui=False
+        config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 15, physics_timestep=1.0 / 30, use_pb_gui=False
     )
 
     kitchen = Kitchen(igibson_env)
@@ -99,10 +116,11 @@ def environment_setup():
 
 def main():
     igibson_env, kitchen, configs = environment_setup()
-    robot_agent = robot_setup(igibson_env, kitchen, configs)
+    # robot_agent = robot_setup(igibson_env, kitchen, configs)
     # human_agent = human_setup(igibson_env, kitchen, configs)
     #human_agent.set_robot(igibson_env.robots[0])
-    human_agent = None
+    robot_agent, human_agent = setup(igibson_env, kitchen, configs)
+    human_agent.set_robot(igibson_env.robots[0])
     main_loop(igibson_env, robot_agent, human_agent)
 
 def main_loop(igibson_env, robot_agent, human_agent):

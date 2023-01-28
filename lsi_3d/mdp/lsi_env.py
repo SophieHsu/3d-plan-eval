@@ -21,6 +21,7 @@ class LsiEnv(object):
         nav_env:iGibsonEnv, 
         ig_human:iGibsonAgent, 
         ig_robot:iGibsonAgent, 
+        ig_human_sim:iGibsonAgent,
         kitchen:Kitchen, 
         recalc_res = None, 
         avoid_radius = None) -> None:
@@ -31,10 +32,12 @@ class LsiEnv(object):
         self.mdp = mdp
         self.ig_human = ig_human
         self.ig_robot = ig_robot
+        self.ig_human_sim = ig_human_sim
         self.recalc_res = recalc_res
         self.avoid_radius = avoid_radius
         self.human_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[0])
         self.robot_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[1])
+        self.human_sim_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[0])
         self.world_state = WorldState(mdp.hl_start_state)
 
     def update_robot_hl_state(self, next_hl_state, action_object):
@@ -52,6 +55,14 @@ class LsiEnv(object):
         '''
         self.world_state.update(next_hl_state, action_object)
         self.human_state.update_hl_state(next_hl_state, self.world_state)
+
+    def update_human_sim_hl_state(self, next_hl_state, action_object):
+        '''
+        Update hl state by updated in_pot and orders for world
+        and holding for specific agent
+        '''
+        self.world_state.update(next_hl_state, action_object)
+        self.human_sim_state.update_hl_state(next_hl_state, self.world_state)
 
     def get_human_hl_state(self):
         hl_state = f'{self.human_state.holding}_{self.world_state.in_pot}'
@@ -79,8 +90,10 @@ class LsiEnv(object):
         
         human_ml_state = self.get_ml_state(self.ig_human)
         robot_ml_state = self.get_ml_state(self.ig_robot)
+        human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
         self.robot_state.ml_state = robot_ml_state
         self.human_state.ml_state = human_ml_state
+        self.human_sim_state.ml_state = human_sim_ml_state
         return (human_ml_state, robot_ml_state)
 
     def get_ml_state(self, agent:iGibsonAgent):
