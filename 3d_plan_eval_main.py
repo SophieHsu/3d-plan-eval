@@ -54,9 +54,9 @@ def setup(igibson_env, kitchen, configs):
     robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
     human_bot = BehaviorRobot()
 
-    human_sim = BehaviorRobot()
-    igibson_env.simulator.import_object(human_sim)
-    igibson_env.set_pos_orn_with_z_offset(human_sim, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
+    # human_sim = BehaviorRobot()
+    # igibson_env.simulator.import_object(human_sim)
+    # igibson_env.set_pos_orn_with_z_offset(human_sim, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
 
     mdp = LsiMdp.from_config(map_config, exp_config, kitchen.grid)
     hlp = HighLevelMdpPlanner(mdp)
@@ -84,13 +84,12 @@ def setup(igibson_env, kitchen, configs):
     # TODO: Get rid of 4.5 offset
     h_x,h_y = human_start
     r_x,r_y = robot_start
-    igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[2], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0], [r_x-4.5, r_y-4.5, 0], [0, 0, 0])
 
-    human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
+    # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
-    env = LsiEnv(mdp, igibson_env, human, robot, human_sim, kitchen)
+    env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
     human_sim_agent = FixedPolicyAgent(robot_hlp,mlp)
     robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env, human_sim, robot)
