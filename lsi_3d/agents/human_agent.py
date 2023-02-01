@@ -5,10 +5,11 @@ from utils import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_
 from agent import Agent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
+import time
 
 class HumanAgent():
 
-    def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env, igibson_env):
+    def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env, igibson_env, vr=False):
         self.human = human
         self.robot = None
         self.planner = planner
@@ -18,20 +19,24 @@ class HumanAgent():
         self.lsi_env = lsi_env
         self.vision_range = math.pi
         self.igibson_env = igibson_env
+        self.vr = vr
 
     def set_robot(self, robot):
         self.robot = robot
 
     def step(self):
-        # High level planner determines where end point is. Right now this is hardcoded
-        # end = (2, -1)
-        # final_ori = 1.57
-        x, y, z = self.human.get_position()
-        end = self.get_next_goal()
-        end, ori = self.transform_end_location(end)
-        if self.is_at_location((x, y), end, 0.1):
-            print("hello")
-        self._step(end, ori)
+        if self.vr:
+            self.igibson_env.simulator.switch_main_vr_robot(self.human)
+            actionStep = self.igibson_env.simulator.gen_vr_robot_action()
+            self.human.apply_action(actionStep)
+        else:
+            x, y, z = self.human.get_position()
+            end, next_hl_state, action_object = self.get_next_goal()
+            end, ori = self.transform_end_location(end)
+            if self.is_at_location((x, y), end, 0.1):
+                self.lsi_env.update_human_hl_state(next_hl_state, action_object)
+                time.sleep(5)
+            self._step(end, ori)
 
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
@@ -71,7 +76,7 @@ class HumanAgent():
 
         possible_motion_goals = self.hlp.map_action_to_location(world_state, agent_state, (action,object))
         goal = possible_motion_goals[0]
-        return goal
+        return goal, next_hl_state, (action,object)
 
     def transform_end_location(self, loc):
         objects = self.igibson_env.simulator.scene.get_objects()

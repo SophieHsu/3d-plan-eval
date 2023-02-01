@@ -11,6 +11,9 @@ class MotionControllerHuman():
         self.MAX_ANG_VEL = 12.28
         self.dt = 0.05
         self.num_dt_to_predict = 100
+        self.rotate = False
+        self.rotate_angle = 0.0
+        self.arrived = False
 
     def step(self, human, robot, final_ori, path):
         x, y, z = human.get_position()
@@ -27,20 +30,41 @@ class MotionControllerHuman():
             action = np.zeros((28,))
             # If in grid square where the end location is
             if math.dist([x,y], end) < 0.05:
-                theta_difference = self.angle_difference(theta, final_ori)
-                if theta_difference < -0.2:
-                    vel = (0, -self.MAX_ANG_VEL/15)
-                elif theta_difference > 0.2:
-                    vel = (0, self.MAX_ANG_VEL/15)
-                else:
-                    vel = (0, 0)
+                vel = self.find_velocities_rotate(theta, final_ori)
+                if vel[0] == 0 and vel[1] == 0:
+                    self.arrived = True
             else:
                 possible_vels = self.get_possible_velocities()
                 vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc, robot)
+                self.arrived = False
+
+            # for negative velocities, just turn instead of going backwards
+            if vel[0] < 0 and self.rotate == False:
+                self.rotate = True
+                x_diff = next_loc[0] - x
+                y_diff = next_loc[1] - y
+                self.rotate_angle = math.atan2(y_diff, x_diff)
+
+            if self.rotate:
+                vel = self.find_velocities_rotate(theta, self.rotate_angle)
+                if vel[0] == 0 and vel[1] == 0:
+                    self.rotate = False
 
             action[0] = vel[0]/self.MAX_LIN_VEL
             action[5] = vel[1]/self.MAX_ANG_VEL
             human.apply_action(action)
+
+            # return self.rotate and 
+
+    def find_velocities_rotate(self, theta, final_ori):
+        theta_difference = self.angle_difference(theta, final_ori)
+        if theta_difference < -0.2:
+            vel = (0, -self.MAX_ANG_VEL/15)
+        elif theta_difference > 0.2:
+            vel = (0, self.MAX_ANG_VEL/15)
+        else:
+            vel = (0, 0)
+        return vel
 
     def find_best_velocities(self, x, y, theta, possible_vels, destination, robot):
         robot_x, robot_y, robot_z = robot.get_position()
@@ -96,7 +120,7 @@ class MotionControllerHuman():
     def get_possible_velocities(self):
         possible_vels = []
         # Velocities that are limited by acceleration and min/max velocities
-        vl_possible_vels = np.linspace(0, self.MAX_LIN_VEL/20, 7)
+        vl_possible_vels = np.linspace(-self.MAX_LIN_VEL/20, self.MAX_LIN_VEL/20, 12)
         va_possible_vels = np.linspace(-self.MAX_ANG_VEL/20, self.MAX_ANG_VEL/20, 7)
 
         for vl in vl_possible_vels:
