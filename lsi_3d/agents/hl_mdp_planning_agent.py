@@ -4,6 +4,7 @@ from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
+from lsi_3d.mdp.lsi_env import AgentState
 import numpy as np
 
 from lsi_3d.utils.enums import Mode
@@ -11,7 +12,7 @@ from lsi_3d.utils.functions import grid_transition
 
 class HlMdpPlanningAgent(Agent):
 
-    def __init__(self, hlp_planner, mlp:AStarMotionPlanner, hl_human_agent:Agent, env:LsiEnv, ig_human:iGibsonAgent, ig_robot:iGibsonAgent):
+    def __init__(self, hlp_planner, mlp:AStarMotionPlanner, hl_human_agent:Agent, env:LsiEnv, ig_robot:iGibsonAgent):
         self.mdp_planner = hlp_planner
         self.mlp = mlp
         self.optimal_path = []
@@ -19,7 +20,6 @@ class HlMdpPlanningAgent(Agent):
         self.hl_human_agent = hl_human_agent
         self.env = env
         self.recalc_res = 1
-        self.ig_human = ig_human
         self.ig_robot = ig_robot
 
         # Step function vars
@@ -34,6 +34,8 @@ class HlMdpPlanningAgent(Agent):
         self.robot_goal = None
         self.robot_action_object_pair = None
         self.robot = None
+
+        self.human_sim_state = AgentState(env.human_state.hl_state, env.human_state.ml_state)
 
     def get_pot_status(self, state):
         pot_states = self.mdp_planner.mdp.get_pot_states(state)
@@ -132,28 +134,28 @@ class HlMdpPlanningAgent(Agent):
         init_action = np.zeros(self.env.nav_env.action_space.shape)
         self.ig_robot.object.apply_action(init_action)
 
-        if self.env.human_sim_state.mode == Mode.CALC_HL_PATH:
+        if self.human_sim_state.mode == Mode.CALC_HL_PATH:
             '''
             human gets high level action and plans path to it. when human finishes path
             it will re-enter this state
             '''
-            self.next_human_hl_state, self.human_plan, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.env.human_sim_state, self.env.robot_state)
+            self.next_human_hl_state, self.human_plan, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.human_sim_state, self.env.robot_state)
             print(f'Executing Human High Level Action: {self.human_action_object_pair[0]} {self.human_action_object_pair[1]}')
             print(f'Path is: {self.human_plan}')
-            print(f'Human Holding {self.env.human_sim_state.holding}')
+            print(f'Human Holding {self.human_sim_state.holding}')
             print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}', )
             #human_plan.append('I')
             self.human = FixedMediumPlan(self.human_plan)
-            self.env.human_sim_state.mode = Mode.EXEC_ML_PATH
+            self.human_sim_state.mode = Mode.EXEC_ML_PATH
             pos_h, self.a_h = self.human.action()
-            self.ig_human.prepare_for_next_action(self.a_h)
+            # self.ig_human.prepare_for_next_action(self.a_h)
 
         if self.env.robot_state.mode == Mode.CALC_HL_PATH:
             '''
             robot gets high level action and translates into mid-level path
             when robot completes this path, it returns to this state
             '''
-            self.next_robot_hl_state, self.robot_goal, self.robot_action_object_pair = hl_robot_agent.action(self.env.world_state, self.env.robot_state, self.env.human_sim_state)
+            self.next_robot_hl_state, self.robot_goal, self.robot_action_object_pair = hl_robot_agent.action(self.env.world_state, self.env.robot_state, self.human_sim_state)
             optimal_plan = hl_robot_agent.optimal_motion_plan(self.env.robot_state, self.robot_goal)
 
             print(f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}')
@@ -168,11 +170,15 @@ class HlMdpPlanningAgent(Agent):
 
         if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
             self.env.update_joint_ml_state()
-            if self.env.robot_state.ml_state == self.next_robot_goal:
-                self.next_robot_goal = self.robot.next_goal()
+            plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_plan, self.human_goal, radius=1)
+
+        # if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
+        #     self.env.update_joint_ml_state()
+        #     if self.env.robot_state.ml_state == self.next_robot_goal:
+        #         self.next_robot_goal = self.robot.next_goal()
                 
-            human_sub_path = self._get_human_sub_path(self.human_plan, (self.human.i), self.env.human_sim_state.ml_state)
-            plan = hl_robot_agent.avoidance_motion_plan((self.env.human_sim_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=1)
+        #     human_sub_path = self._get_human_sub_path(self.human_plan, (self.human.i), self.human_sim_state.ml_state)
+        #     plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=1)
 
             if plan == [] and self.optimal_plan_goal[0] == self.env.robot_state.ml_state:
                 # could not find path to goal, so idle 1 step and then recalculate
@@ -180,13 +186,18 @@ class HlMdpPlanningAgent(Agent):
             elif plan == []:
                 # if this is final subpath on optimal plan, the append interact at the end
                 plan.append((self.env.robot_state.ml_state, 'D'))
-
-
+            
             self.robot_plan = FixedMediumPlan(plan)
             self.env.robot_state.mode = Mode.EXEC_ML_PATH
             self.a_r = None
-            # self.a_r = self.robot_plan.action()
-            #self.ig_robot.prepare_for_next_action(self.a_r)
+
+
+
+        #     self.robot_plan = FixedMediumPlan(plan)
+        #     self.env.robot_state.mode = Mode.EXEC_ML_PATH
+        #     self.a_r = None
+        #     # self.a_r = self.robot_plan.action()
+        #     #self.ig_robot.prepare_for_next_action(self.a_r)
 
         elif self.env.robot_state.mode == Mode.EXEC_ML_PATH:
 
@@ -212,35 +223,35 @@ class HlMdpPlanningAgent(Agent):
                     if self.a_r == 'I': #and env.robot_state == robot_goal:
                         self.env.robot_state.mode = Mode.INTERACT
 
-                    if self.env.human_sim_state.mode == Mode.IDLE:
+                    if self.human_sim_state.mode == Mode.IDLE:
                         self.env.human_sim_state.mode = Mode.EXEC_ML_PATH
 
             
-        if self.env.human_sim_state.mode == Mode.EXEC_ML_PATH:
-            if self.human.i == len(self.human.plan) or self.a_h == 'I': #or a_h == MLAction.STAY:
-                self.env.human_sim_state.mode = Mode.INTERACT
-            else:
-                # if robot is in a goal state and humans next state is also this state,
-                    # then idle until robot moves
-                    # next_robot_goal == env.robot_state.ml_state and 
-                if grid_transition(self.a_h, self.env.human_sim_state.ml_state)[0:2] != self.env.robot_state.ml_state[0:2]:
-                    self.ig_human.agent_move_one_step(self.env.nav_env, self.a_h)
-                elif self.env.robot_state.mode == Mode.IDLE:
-                    self.env.robot_state.mode = Mode.CALC_SUB_PATH
+        # if self.env.human_sim_state.mode == Mode.EXEC_ML_PATH:
+        #     if self.human.i == len(self.human.plan) or self.a_h == 'I': #or a_h == MLAction.STAY:
+        #         self.env.human_sim_state.mode = Mode.INTERACT
+        #     else:
+        #         # if robot is in a goal state and humans next state is also this state,
+        #             # then idle until robot moves
+        #             # next_robot_goal == env.robot_state.ml_state and 
+        #         if grid_transition(self.a_h, self.env.human_sim_state.ml_state)[0:2] != self.env.robot_state.ml_state[0:2]:
+        #             self.ig_human.agent_move_one_step(self.env.nav_env, self.a_h)
+        #         elif self.env.robot_state.mode == Mode.IDLE:
+        #             self.env.robot_state.mode = Mode.CALC_SUB_PATH
 
-                    # if next step means human crashes into robot, add a delay to the plan
-                    #delay_step = human_sub_path[0]
-                    #delay_step = (delay_step[0], 'D')
-                    #human_sub_path.insert(0,delay_step)
+        #             # if next step means human crashes into robot, add a delay to the plan
+        #             #delay_step = human_sub_path[0]
+        #             #delay_step = (delay_step[0], 'D')
+        #             #human_sub_path.insert(0,delay_step)
 
-                if self.ig_human.action_completed(self.a_h):
-                    # human.action() gets next FNESW medium level action to take
-                    pos_h, self.a_h = self.human.action()
-                    self.env.update_joint_ml_state()
-                    self.ig_human.prepare_for_next_action(self.a_h)
+        #         if self.ig_human.action_completed(self.a_h):
+        #             # human.action() gets next FNESW medium level action to take
+        #             pos_h, self.a_h = self.human.action()
+        #             self.env.update_joint_ml_state()
+        #             self.ig_human.prepare_for_next_action(self.a_h)
 
-                    if self.env.robot_state.mode == Mode.IDLE:
-                        self.env.robot_state.mode = Mode.EXEC_ML_PATH
+        #             if self.env.robot_state.mode == Mode.IDLE:
+        #                 self.env.robot_state.mode = Mode.EXEC_ML_PATH
 
                     
         for obj, pos in self.env.kitchen.bowlpans:
@@ -252,7 +263,7 @@ class HlMdpPlanningAgent(Agent):
             self.env.robot_state.mode = Mode.CALC_HL_PATH
 
             #env.human_sim_state.executing_state = ExecutingState.CALC_HL_PATH
-        if self.env.human_sim_state.mode == Mode.INTERACT:
+        if self.human_sim_state.mode == Mode.INTERACT:
             self.env.update_human_sim_hl_state(self.next_human_hl_state, self.human_action_object_pair)
             #env.robot_state.executing_state = ExecutingState.CALC_HL_PATH
             self.env.human_sim_state.mode = Mode.CALC_HL_PATH

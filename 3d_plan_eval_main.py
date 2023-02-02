@@ -92,7 +92,7 @@ def setup(igibson_env, kitchen, configs):
     env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
     human_sim_agent = FixedPolicyAgent(robot_hlp,mlp)
-    robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env, human_sim, robot)
+    robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env, robot)
 
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller, kitchen.grid, hlp, env, igibson_env)
 

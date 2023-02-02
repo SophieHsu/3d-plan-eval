@@ -87,10 +87,10 @@ class LsiEnv(object):
         
         human_ml_state = self.get_ml_state(self.ig_human)
         robot_ml_state = self.get_ml_state(self.ig_robot)
-        human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
+        # human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
         self.robot_state.ml_state = robot_ml_state
         self.human_state.ml_state = human_ml_state
-        self.human_sim_state.ml_state = human_sim_ml_state
+        # self.human_sim_state.ml_state = human_sim_ml_state
         return (human_ml_state, robot_ml_state)
 
     def get_ml_state(self, agent:iGibsonAgent):

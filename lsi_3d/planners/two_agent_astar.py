@@ -635,7 +635,7 @@ def run_astar_two_agent(layout, start, end, avoid_path = None, radius = None):
     if avoid_path == None:
         path = two_agent_astar(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1])
     else:
-        path = astar_avoid_path_forward_radius(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1], avoid_path, radius, a_2_end[2])
+        path = astar_avoid_path_forward_radius(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1], avoid_path, radius)# , a_2_end[2])
         #path = astar_avoid_path_with_lookahead(layout, start, a_1_end[0], a_1_end[1], a_2_end[0], a_2_end[1], avoid_path, 2)
     
     z = zip(*path)
