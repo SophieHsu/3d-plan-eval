@@ -15,7 +15,7 @@ class HlMdpPlanningAgent(Agent):
     def __init__(self, hlp_planner, mlp:AStarMotionPlanner, hl_human_agent:Agent, env:LsiEnv, ig_robot:iGibsonAgent):
         self.mdp_planner = hlp_planner
         self.mlp = mlp
-        self.optimal_path = []
+        self.ml_plan = []
         self.sub_path_goal_i = 0
         self.hl_human_agent = hl_human_agent
         self.env = env
@@ -107,6 +107,10 @@ class HlMdpPlanningAgent(Agent):
         path = paths[1]
         return path
 
+    def infront_of_goal(self, state, goal):
+        n_x, n_y, n_f = grid_transition('F', state)
+        return (n_x,n_y) == goal
+
     def step(self):
         # mdp, env:LsiEnv,
         #ig_human:iGibsonAgent,
@@ -155,22 +159,36 @@ class HlMdpPlanningAgent(Agent):
             robot gets high level action and translates into mid-level path
             when robot completes this path, it returns to this state
             '''
+
+
             self.next_robot_hl_state, self.robot_goal, self.robot_action_object_pair = hl_robot_agent.action(self.env.world_state, self.env.robot_state, self.human_sim_state)
-            optimal_plan = hl_robot_agent.optimal_motion_plan(self.env.robot_state, self.robot_goal)
+            # optimal_plan = hl_robot_agent.optimal_motion_plan(self.env.robot_state, self.robot_goal)
+            self.ml_plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_plan, self.human_goal, radius=1)
+
 
             print(f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}')
-            print(f'Optimal Path is: {self.optimal_path}')
             print(f'Human Holding {self.env.robot_state.holding}')
             print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}', )
 
-            self.optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
-            self.env.robot_state.mode = Mode.CALC_SUB_PATH
-            self.robot = FixedMediumSubPlan(optimal_plan, 14)
-            self.next_robot_goal = self.robot.next_goal()
+            # self.optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
+            
+            if self.infront_of_goal(self.env.robot_state.ml_state, self.robot_goal):
+                # could not find path to goal, so idle 1 step and then recalculate
+                self.ml_plan.append((self.robot_goal,'I'))
+            # if self.ml_plan == []:
+            #     # if this is final subpath on optimal plan, the append interact at the end
+            #     self.ml_plan.append((self.env.robot_state.ml_state, 'D'))
+            
+            self.robot_plan = FixedMediumPlan(self.ml_plan)
+            self.env.robot_state.mode = Mode.EXEC_ML_PATH
+            self.a_r = None
+            
+            self.env.robot_state.mode = Mode.EXEC_ML_PATH
+            # self.robot = FixedMediumSubPlan(optimal_plan, 14)
+        #     # self.next_robot_goal = self.robot.next_goal()
 
-        if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
-            self.env.update_joint_ml_state()
-            plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_plan, self.human_goal, radius=1)
+        # if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
+            
 
         # if self.env.robot_state.mode == Mode.CALC_SUB_PATH:
         #     self.env.update_joint_ml_state()
@@ -180,16 +198,16 @@ class HlMdpPlanningAgent(Agent):
         #     human_sub_path = self._get_human_sub_path(self.human_plan, (self.human.i), self.human_sim_state.ml_state)
         #     plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.next_robot_goal, human_sub_path, self.human_goal, radius=1)
 
-            if plan == [] and self.optimal_plan_goal[0] == self.env.robot_state.ml_state:
+            #if self.ml_plan == [] and self.optimal_plan_goal[0] == self.env.robot_state.ml_state:
                 # could not find path to goal, so idle 1 step and then recalculate
-                plan.append((self.next_robot_goal,'I'))
-            elif plan == []:
-                # if this is final subpath on optimal plan, the append interact at the end
-                plan.append((self.env.robot_state.ml_state, 'D'))
+            #    self.ml_plan.append((self.next_robot_goal,'I'))
+            # if self.ml_plan == []:
+            #     # if this is final subpath on optimal plan, the append interact at the end
+            #     self.ml_plan.append((self.env.robot_state.ml_state, 'D'))
             
-            self.robot_plan = FixedMediumPlan(plan)
-            self.env.robot_state.mode = Mode.EXEC_ML_PATH
-            self.a_r = None
+            # self.robot_plan = FixedMediumPlan(self.ml_plan)
+            # self.env.robot_state.mode = Mode.EXEC_ML_PATH
+            # self.a_r = None
 
 
 
@@ -199,7 +217,7 @@ class HlMdpPlanningAgent(Agent):
         #     # self.a_r = self.robot_plan.action()
         #     #self.ig_robot.prepare_for_next_action(self.a_r)
 
-        elif self.env.robot_state.mode == Mode.EXEC_ML_PATH:
+        if self.env.robot_state.mode == Mode.EXEC_ML_PATH:
 
             self.ig_robot.agent_move_one_step(self.env.nav_env, self.a_r)
             # env.update_joint_ml_state()
@@ -207,11 +225,14 @@ class HlMdpPlanningAgent(Agent):
             if self.ig_robot.action_completed(self.a_r) or self.a_r == 'D':
                 # if :
                 #     env.robot_state.executing_state = ExecutingState.CALC_SUB_PATH
-
+                self.env.update_joint_ml_state()
                 if (self.robot_plan.i == len(self.robot_plan.plan) or self.robot_plan.i == 1 or (self.robot_plan.i % self.recalc_res) == 0) and self.a_r != None: #recalc_res: #or a_r == MLAction.STAY:
-                    self.env.robot_state.mode = Mode.CALC_SUB_PATH
+                    self.env.robot_state.mode = Mode.CALC_HL_PATH
                 else:
                     pos_r, self.a_r = self.robot_plan.action()
+
+                    if self.a_r == 'D':
+                        pos_r,self.a_r = self.robot_plan.action()
                     self.env.update_joint_ml_state()
                     self.ig_robot.prepare_for_next_action(self.a_r)
 

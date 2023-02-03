@@ -127,7 +127,7 @@ def cost_func_radius(grid, ex, ey, x, y, f, action, radius = None, avoid_state =
     if end_achieved(grid, x, y, ex, ey, f) and action == "I" and (x+dx, y+dy) == (ex, ey):
         return 0
     elif action == 'D':
-        return 0.5
+        return 0.9
     else:
         if radius != None:
             cost = 1
@@ -136,7 +136,7 @@ def cost_func_radius(grid, ex, ey, x, y, f, action, radius = None, avoid_state =
             for f_state in get_states_in_forward_radius(avoid_state, radius):
                 fx, fy = f_state
                 if (fx, fy) == (nx, ny):
-                    cost = 3.5
+                    cost = 1.3
             
             return cost
                 
