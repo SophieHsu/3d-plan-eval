@@ -275,8 +275,8 @@ class HlMdpPlanningAgent(Agent):
         #                 self.env.robot_state.mode = Mode.EXEC_ML_PATH
 
                     
-        for obj, pos in self.env.kitchen.bowlpans:
-                obj.set_position(pos)
+        # for obj, pos in self.env.kitchen.bowlpans:
+        #         obj.set_position(pos)
         self.env.nav_env.simulator.step()
 
         if self.env.robot_state.mode == Mode.INTERACT:

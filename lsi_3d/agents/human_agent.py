@@ -48,10 +48,17 @@ class HumanAgent():
         agent_state = self.lsi_env.human_state
         world_state = self.lsi_env.world_state
         action,object = 'stay',agent_state.holding
-        if world_state.in_pot < 3 and agent_state.holding == 'None':
-            action,object = ('pickup', 'onion')
-            next_hl_state = f'onion_{world_state.in_pot}'
-            agent_state.next_holding = 'onion'
+        if agent_state.holding == 'None':
+            if world_state.in_pot == 2 and self.lsi_env.robot_state.holding == 'onion':
+                    action,object = ('pickup', 'dish')
+                    next_hl_state = f'dish_{world_state.in_pot}'
+            elif world_state.in_pot == 3 and self.lsi_env.robot_state.holding != 'dish':
+                action,object = ('pickup', 'dish')
+                next_hl_state = f'dish_{world_state.in_pot}'
+            else:
+                action,object = ('pickup', 'onion')
+                next_hl_state = f'onion_{world_state.in_pot}'
+                agent_state.next_holding = 'onion'
         elif agent_state.holding == 'onion':
             action,object = ('drop','onion')
             next_hl_state = f'None_{world_state.in_pot+1}'
