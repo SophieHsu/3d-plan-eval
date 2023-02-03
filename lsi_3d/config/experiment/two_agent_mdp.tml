@@ -6,11 +6,15 @@ hl_start_state = 'None_0_onion_onion'
 recalculation_resolution = 15
 avoid_radius = 1
 
+<<<<<<< HEAD
 human_start_x=4
 human_start_y=1
+=======
+human_start_x=1.5
+human_start_y=-1.5
+>>>>>>> main
 
 robot_start_x=2
-robot_start_y=3
+robot_start_y=1
 
 ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
-ig_mode = "gui_interactive"

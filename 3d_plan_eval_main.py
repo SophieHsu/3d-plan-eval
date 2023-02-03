@@ -1,4 +1,5 @@
 # Human
+import argparse
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.utils.motion_planning_wrapper import MotionPlanningWrapper
 from igibson.robots.behavior_robot import BehaviorRobot
@@ -33,6 +34,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
+<<<<<<< HEAD
 # def human_setup(igibson_env, kitchen, configs):
 #     exp_configs, map_configs = configs
 
@@ -48,11 +50,16 @@ from lsi_3d.mdp.lsi_mdp import LsiMdp
 # def robot_setup(igibson_env, kitchen, configs):
 
 def setup(igibson_env, kitchen, configs):
+=======
+def setup(igibson_env, kitchen, configs, args):
+>>>>>>> main
     exp_config, map_config = configs
     order_list = exp_config['order_list']
     human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
     robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
-    human_bot = BehaviorRobot()
+    config = parse_config(exp_config['ig_config_file'])
+    human_bot = BehaviorRobot(**config["human"])
+    human_vr = True if args.mode == 'vr' else False
 
     # human_sim = BehaviorRobot()
     # igibson_env.simulator.import_object(human_sim)
@@ -71,6 +78,10 @@ def setup(igibson_env, kitchen, configs):
     igibson_env.set_pos_orn_with_z_offset(human_bot, [human_start[0], human_start[1], 0], [0, 0, 0])
     a_star_planner = AStarPlanner(igibson_env)
     motion_controller = MotionControllerHuman()
+<<<<<<< HEAD
+=======
+    human_agent = HumanAgent(human_bot, a_star_planner, motion_controller, kitchen.grid, hlp, env, igibson_env, human_vr)
+>>>>>>> main
 
     #######################################################################################
     
@@ -98,12 +109,16 @@ def setup(igibson_env, kitchen, configs):
 
     return robot_agent, human_agent
 
-def environment_setup():
+def environment_setup(args):
     exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
     configs = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
+<<<<<<< HEAD
         config_file=exp_config['ig_config_file'], mode=exp_config['ig_mode'], action_timestep=1.0 / 15, physics_timestep=1.0 / 30, use_pb_gui=False
+=======
+        config_file=exp_config['ig_config_file'], mode=args.mode, action_timestep=1.0 / 30, physics_timestep=1.0 / 120, use_pb_gui=True
+>>>>>>> main
     )
 
     kitchen = Kitchen(igibson_env)
@@ -113,12 +128,18 @@ def environment_setup():
 
     return igibson_env, kitchen, configs
 
+<<<<<<< HEAD
 def main():
     igibson_env, kitchen, configs = environment_setup()
     # robot_agent = robot_setup(igibson_env, kitchen, configs)
     # human_agent = human_setup(igibson_env, kitchen, configs)
     #human_agent.set_robot(igibson_env.robots[0])
     robot_agent, human_agent = setup(igibson_env, kitchen, configs)
+=======
+def main(args):
+    igibson_env, kitchen, configs = environment_setup(args)
+    robot_agent, human_agent = setup(igibson_env, kitchen, configs, args)
+>>>>>>> main
     human_agent.set_robot(igibson_env.robots[0])
     main_loop(igibson_env, robot_agent, human_agent)
 
@@ -130,4 +151,14 @@ def main_loop(igibson_env, robot_agent, human_agent):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--mode",
+        "-m",
+        choices=["headless", "headless_tensor", "gui_non_interactive", "gui_interactive", "vr"],
+        default="gui_interactive",
+        help="which mode for simulation (default: gui_interactive)",
+    )
+
+    args = parser.parse_args()
+    main(args)
