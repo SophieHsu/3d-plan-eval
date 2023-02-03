@@ -124,7 +124,7 @@ def main():
 
 def main_loop(igibson_env, robot_agent, human_agent):
     while True:
-        # human_agent.step()
+        human_agent.step()
         robot_agent.step()
         igibson_env.simulator.step()
 
