@@ -237,7 +237,7 @@ def main_loop(
             human gets high level action and plans path to it. when human finishes path
             it will re-enter this state
             '''
-            next_human_hl_state, human_plan, human_goal, human_action_object_pair = hl_human_agent.action(env.world_state, env.human_state)
+            next_human_hl_state, human_plan, human_goal, human_action_object_pair = hl_human_agent.action(env.world_state, env.human_state, env.robot_state)
             #human_plan.append('I')
             human = FixedMediumPlan(human_plan)
             env.human_state.mode = Mode.EXEC_ML_PATH

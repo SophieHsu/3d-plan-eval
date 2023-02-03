@@ -43,13 +43,20 @@ def setup(igibson_env, kitchen, configs, args):
     human_bot = BehaviorRobot(**config["human"])
     human_vr = True if args.mode == 'vr' else False
 
+    # human_sim = BehaviorRobot()
+    # igibson_env.simulator.import_object(human_sim)
+    # igibson_env.set_pos_orn_with_z_offset(human_sim, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
+
     mdp = LsiMdp.from_config(map_config, exp_config, kitchen.grid)
     hlp = HighLevelMdpPlanner(mdp)
     hlp.compute_mdp_policy(order_list)
 
     human = iGibsonAgent(human_bot, human_start, 'S', "human")
+
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
     env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
+    #robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
+    #env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
     #######################################################################################
     igibson_env.simulator.import_object(human_bot)
@@ -59,21 +66,26 @@ def setup(igibson_env, kitchen, configs, args):
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller, kitchen.grid, hlp, env, igibson_env, human_vr)
 
     #######################################################################################
-    recalc_res = exp_config['recalculation_resolution']
     
     mlp = AStarMotionPlanner(kitchen.grid)
-    hhlp = HLGreedyHumanPlanner(mdp, mlp)
-    #hhlp = HLHumanPlanner(mdp, mlp)
-    #hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
-    
+    # hhlp = HLGreedyHumanPlanner(mdp, mlp)
+    hhlp = HLHumanPlanner(mdp, mlp)
+    robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
+    #hlp = HighLevelMdpPlanner(mdp)
+    robot_hlp.compute_mdp_policy(order_list)
+
     # TODO: Get rid of 4.5 offset
     h_x,h_y = human_start
     r_x,r_y = robot_start
-    # igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
+    igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1], [h_x-4.5, h_y-4.5, 0], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0], [r_x-4.5, r_y-4.5, 0], [0, 0, 0])
 
-    robot_human_agent = FixedPolicyAgent(hlp, mlp)
-    robot_agent = HlMdpPlanningAgent(hlp, mlp, robot_human_agent, env, human, robot)
+    # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
+
+    human_sim_agent = FixedPolicyAgent(robot_hlp,mlp)
+    robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env, robot)
+
+    human_agent = HumanAgent(human_bot, a_star_planner, motion_controller, kitchen.grid, hlp, env, igibson_env)
 
     return robot_agent, human_agent
 
@@ -101,7 +113,7 @@ def main(args):
 def main_loop(igibson_env, robot_agent, human_agent):
     while True:
         human_agent.step()
-        # robot_agent.step()
+        robot_agent.step()
         igibson_env.simulator.step()
 
 if __name__ == "__main__":

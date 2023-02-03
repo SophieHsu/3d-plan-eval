@@ -42,6 +42,110 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                 self.state_dict[new_key] = new_obj # update value
                 self.state_idx_dict[new_key] = len(self.state_idx_dict)
 
+    # def init_transition_matrix(self, transition_matrix=None):
+    #     self.transition_matrix = transition_matrix if transition_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
+
+    #     game_logic_transition = self.transition_matrix.copy()
+    #     distance_transition = self.transition_matrix.copy()
+
+    #     # state transition calculation
+    #     for state_key, state_obj in self.state_dict.items():
+    #         for action_key, action_idx in self.action_idx_dict.items():
+    #             state_idx = self.state_idx_dict[state_key]
+                
+    #             # define state and action game transition logic
+    #             p0_state, p1_obj = self.extract_p0(state_obj)
+                
+    #             # get next step p1 object
+    #             p1_nxt_states = []
+    #             if len(p0_state) > 2:
+    #                 p1_nxt_states = self.hhlp.get_state_trans(p1_obj, p0_state[1], p0_state[2:])
+    #             else:
+    #                 p1_nxt_states = self.hhlp.get_state_trans(p1_obj, p0_state[1], [])
+
+    #             for [p1_nxt_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_trans_prob, p1_pref_prob] in p1_nxt_states:
+    #                 # p1 trans prob is 1/min_distance
+    #                 # print([p1_nxt_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_trans_prob, p1_pref_prob])
+
+    #                 p0_obj, soup_finish, orders = self.ml_state_to_objs(p0_state)
+    #                 p0_ori_key = p0_state[0]
+    #                 for s in p0_state[1:]:
+    #                     p0_ori_key = p0_ori_key + '_' + str(s)
+
+    #                 # get next step p0 object based on p1 original
+    #                 p1_ori_action, p0_nxt_p1_ori_p0_key = self.state_action_nxt_state(p0_obj, soup_finish, orders, p1_obj)
+
+    #                 # print(p1_ori_action, p0_nxt_p1_ori_p0_key)
+    #                 if action_key == p1_ori_action: # p0 nxt based on p1_ori
+    #                     p0_nxt_p1_ori_nxt_idx = self.state_idx_dict[p0_nxt_p1_ori_p0_key + '_' + p1_obj]
+    #                     game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] += (1.0 - p1_trans_prob) * p1_pref_prob
+
+    #                     if game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] > 1:
+    #                         game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] = 1
+
+    #                     # print(state_key,'--', action_key, '-->', p0_nxt_p1_ori_p0_key + '_' + p1_obj)
+
+    #                 else: # p0_ori + p1_ori
+    #                     p0_ori_p1_ori_nxt_idx = self.state_idx_dict[p0_ori_key + '_' + p1_obj]
+    #                     game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] += (1.0 - p1_trans_prob) * p1_pref_prob
+
+    #                     if game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] > 1:
+    #                         game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] = 1
+
+    #                     # print(state_key,'--', action_key, '-->', p0_ori_key + '_' + p1_obj)
+
+    #                 # get next step p0 object based on p1 next state
+    #                 p1_nxt_action, p0_nxt_p1_nxt_p0_key = self.state_action_nxt_state(p0_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_nxt_obj)
+
+    #                 # print(p1_nxt_action, p0_nxt_p1_nxt_p0_key, aft_p1_num_item_in_pot, aft_p1_order_list)
+
+    #                 p1_nxt_key = str(aft_p1_num_item_in_pot)
+    #                 for obj in aft_p1_order_list:
+    #                     p1_nxt_key = p1_nxt_key + '_' + obj
+    #                 p1_nxt_key = p1_nxt_key + '_' + p1_nxt_obj
+
+    #                 if action_key == p1_nxt_action: # p0 nxt based on p1 next
+    #                     p0_nxt_p1_nxt_nxt_idx= self.state_idx_dict[p0_nxt_p1_nxt_p0_key + '_' + p1_nxt_obj]
+    #                     game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] += p1_trans_prob * p1_pref_prob
+
+    #                     if game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] > 1:
+    #                         game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] = 1
+
+
+    #                     # print(state_key,'--', action_key, '-->', p0_nxt_p1_nxt_p0_key + '_' + p1_nxt_obj)
+
+    #                 else: # action not matched; thus, p0 ori based on p1 next
+    #                     # p0_ori_p1_nxt_nxt_idx = self.state_idx_dict[p0_obj + '_' + p1_nxt_key]
+    #                     # game_logic_transition[action_idx][state_idx][p0_ori_p1_nxt_nxt_idx] += p1_trans_prob * p1_pref_prob
+    #                     p0_ori_p1_ori_nxt_idx = self.state_idx_dict[p0_ori_key + '_' + p1_obj]
+    #                     game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] += (p1_trans_prob) * p1_pref_prob
+
+    #                     if game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] > 1:
+    #                         game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] = 1
+
+                    
+
+
+
+    #                     # print(state_key,'--', action_key, '-->', p0_obj + '_' + p1_nxt_key)
+
+    #                 # print(game_logic_transition[action_idx][state_idx])
+    #                 # tmp = input()
+
+    #     # print(list(self.state_idx_dict.keys())[list(self.state_idx_dict.values()).index(58)],\
+    #     #     list(self.state_idx_dict.keys())[list(self.state_idx_dict.values()).index(42)],\
+    #     #     list(self.state_idx_dict.keys())[list(self.state_idx_dict.values()).index(267)],\
+    #     #     list(self.state_idx_dict.keys())[list(self.state_idx_dict.values()).index(269)],\
+    #     #     game_logic_transition[:, 42, 267],\
+    #     #     game_logic_transition[:, 42, 269],\
+    #     #     game_logic_transition[:, 42, 42],\
+    #     #     np.sum(game_logic_transition[:, 58], axis=1),\
+    #     #     np.sum(game_logic_transition[:, 42], axis=1),\
+    #     #     game_logic_transition[0, 42],\
+    #     #     game_logic_transition[4, 42])
+    #     # tmp = input()
+    #     self.transition_matrix = game_logic_transition
+
     def init_transition_matrix(self, transition_matrix=None):
         self.transition_matrix = transition_matrix if transition_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
 
@@ -64,7 +168,7 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                     p1_nxt_states = self.hhlp.get_state_trans(p1_obj, p0_state[1], [])
 
                 for [p1_nxt_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_trans_prob, p1_pref_prob] in p1_nxt_states:
-                    # p1 trans prob is 1/min_distance
+
                     # print([p1_nxt_obj, aft_p1_num_item_in_pot, aft_p1_order_list, p1_trans_prob, p1_pref_prob])
 
                     p0_obj, soup_finish, orders = self.ml_state_to_objs(p0_state)
@@ -73,15 +177,17 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                         p0_ori_key = p0_ori_key + '_' + str(s)
 
                     # get next step p0 object based on p1 original
+                    # p1 agent does not get to next state and p0 does
                     p1_ori_action, p0_nxt_p1_ori_p0_key = self.state_action_nxt_state(p0_obj, soup_finish, orders, p1_obj)
 
                     # print(p1_ori_action, p0_nxt_p1_ori_p0_key)
+
+                    # based on action what is probability of transition
                     if action_key == p1_ori_action: # p0 nxt based on p1_ori
                         p0_nxt_p1_ori_nxt_idx = self.state_idx_dict[p0_nxt_p1_ori_p0_key + '_' + p1_obj]
-                        game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] += (1.0 - p1_trans_prob) * p1_pref_prob
 
-                        if game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] > 1:
-                            game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] = 1
+                        # 1 - p1_trans_prob because based on p1 being in original state
+                        game_logic_transition[action_idx][state_idx][p0_nxt_p1_ori_nxt_idx] += (1.0 - p1_trans_prob) * p1_pref_prob
 
                         # print(state_key,'--', action_key, '-->', p0_nxt_p1_ori_p0_key + '_' + p1_obj)
 
@@ -108,10 +214,6 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                         p0_nxt_p1_nxt_nxt_idx= self.state_idx_dict[p0_nxt_p1_nxt_p0_key + '_' + p1_nxt_obj]
                         game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] += p1_trans_prob * p1_pref_prob
 
-                        if game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] > 1:
-                            game_logic_transition[action_idx][state_idx][p0_nxt_p1_nxt_nxt_idx] = 1
-
-
                         # print(state_key,'--', action_key, '-->', p0_nxt_p1_nxt_p0_key + '_' + p1_nxt_obj)
 
                     else: # action not matched; thus, p0 ori based on p1 next
@@ -119,11 +221,6 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
                         # game_logic_transition[action_idx][state_idx][p0_ori_p1_nxt_nxt_idx] += p1_trans_prob * p1_pref_prob
                         p0_ori_p1_ori_nxt_idx = self.state_idx_dict[p0_ori_key + '_' + p1_obj]
                         game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] += (p1_trans_prob) * p1_pref_prob
-
-                        if game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] > 1:
-                            game_logic_transition[action_idx][state_idx][p0_ori_p1_ori_nxt_idx] = 1
-
-                    
 
 
 
@@ -144,6 +241,7 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
         #     game_logic_transition[0, 42],\
         #     game_logic_transition[4, 42])
         # tmp = input()
+
         self.transition_matrix = game_logic_transition
 
     def init_reward(self, reward_matrix=None):
@@ -158,7 +256,7 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
             player_obj, soup_finish, orders = self.ml_state_to_objs(state_obj[:-1])
 
             if player_obj == 'soup':
-                self.reward_matrix[self.action_idx_dict['deliver_soup'], self.state_idx_dict[state_key]] += self.mdp.delivery_reward #/10.0
+                self.reward_matrix[self.action_idx_dict['deliver_soup'], self.state_idx_dict[state_key]] += self.mdp.delivery_reward/10.0
 
             # if player_obj == 'soup':
             #     self.reward_matrix[self.action_idx_dict['pickup_onion']][self.state_idx_dict[state_key]] -= self.mdp.delivery_reward/10.0
