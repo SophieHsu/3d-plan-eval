@@ -53,7 +53,7 @@ def setup(igibson_env, kitchen, configs, args):
 
     #######################################################################################
     igibson_env.simulator.import_object(human_bot)
-    igibson_env.set_pos_orn_with_z_offset(human_bot, [human_start[0], human_start[1], 0], [0, 0, 0])
+    igibson_env.set_pos_orn_with_z_offset(human_bot, [human_start[0], human_start[1], 0.35], [0, 0, 0])
     a_star_planner = AStarPlanner(igibson_env)
     motion_controller = MotionControllerHuman()
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller, kitchen.grid, hlp, env, igibson_env, human_vr)

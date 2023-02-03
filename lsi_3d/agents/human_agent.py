@@ -33,16 +33,25 @@ class HumanAgent():
             x, y, z = self.human.get_position()
             end, next_hl_state, action_object = self.get_next_goal()
             end, ori = self.transform_end_location(end)
-            if self.is_at_location((x, y), end, 0.1):
+            arrived = self._step(end, ori)
+            if arrived:
                 self.lsi_env.update_human_hl_state(next_hl_state, action_object)
                 time.sleep(5)
-            self._step(end, ori)
-
+            
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         path = self.planner.find_path((x,y), end, self.occupancy_grid)
-        self.motion_controller.step(self.human, self.robot, final_ori, path)
+        return self.motion_controller.step(self.human, self.robot, final_ori, path)
+
+    def pick(self, loc):
+        self.motion_controller.pick(self.human, loc)
+
+    def drop(self):
+        pass
+
+    def open(self):
+        pass
         
     def get_next_goal(self):
         agent_state = self.lsi_env.human_state

@@ -22,12 +22,12 @@ c_pos = [0, 0, 1.5]
 def top_camera_view():
     p.resetDebugVisualizerCamera(cameraDistance=1.0, cameraYaw=0, cameraPitch=-90, cameraTargetPosition=[4, 4, 10.0])
      
-def follow_robot_view(robot):
-    x, y, z = robot.get_position()
+def follow_entity_view(entity):
+    x, y, z = entity.get_position()
     p.resetDebugVisualizerCamera(cameraDistance=2.0, cameraYaw=-90, cameraPitch=-30, cameraTargetPosition=[x, y, 1.5])
 
-def follow_robot_view_top(robot):
-    x, y, z = robot.get_position()
+def follow_entity_view_top(entity):
+    x, y, z = entity.get_position()
     p.resetDebugVisualizerCamera(cameraDistance=2.0, cameraYaw=0, cameraPitch=-30, cameraTargetPosition=[x, y, 2.0])
 
 # def control_camera():
@@ -47,14 +47,13 @@ def follow_robot_view_top(robot):
 
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
-    kitchen_layout = r"C:\Users\icaro\3d-plan-eval\kitchen_layouts_grid_text\kitchen0.txt"
+    kitchen_layout = "./kitchen_layouts_grid_text\kitchen0.txt"
     # Simple test:
     robot_x, robot_y = 0, 0
-    robot_end = (0, 0)
-    human_x, human_y = 2, 0
+    # robot_end = (0, 0)
+    human_x, human_y = -1.5, 0.5
     # human_end = (2, 1)
     
-
     env = iGibsonEnv(
         config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
     )
@@ -69,23 +68,20 @@ def main():
     human = BehaviorRobot(**config["human"])
     env.simulator.import_object(human)
     # nav_env.simulator.switch_main_vr_robot(human)
-    env.set_pos_orn_with_z_offset(human, [human_x, human_y, 0], [0, 0, 0])
+    env.set_pos_orn_with_z_offset(human, [human_x, human_y, 0.6], [0, 0, 1.57])
     env.set_pos_orn_with_z_offset(robot, [robot_x, robot_y, 0], [0, 0, 0])
     
     a_star_planner = AStarPlanner(env)
     motion_controller = MotionControllerHuman()
-    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, env)
     human_agent.set_robot(robot)
 
-    motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
+    # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
     while(True):
-        follow_robot_view_top(human)
-        # actionStep = nav_env.simulator.gen_vr_robot_action()
-        # human.apply_action(actionStep)
-        # prop = human.get_proprioception()
-        human_agent.step()
-        motion_controller_robot.step(robot_end, 1.57)
+        follow_entity_view(human)
+        human_agent.pick([-1.5, 1.5, 1.2])
+        # motion_controller_robot.step(robot_end, 1.57)
         env.simulator.step()
 
 if __name__ == "__main__":
