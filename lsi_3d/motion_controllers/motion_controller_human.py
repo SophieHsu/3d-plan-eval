@@ -84,6 +84,7 @@ class MotionControllerHuman():
             self.arrived_hand_step = 2
         # Return to location
         elif self.arrived_hand_step == 2:
+            pass
             
 
     def action(self, forward, turn, right_hand_x, right_hand_y, right_hand_z, right_hand_grip):
