@@ -42,6 +42,8 @@ class AgentState():
         self.ll_state = ll_state
         self.mode = Mode.CALC_HL_PATH
 
+        self.start_state = hl_state
+
         self.holding = 'None'
         self.next_holding = 'None'
     
@@ -62,6 +64,12 @@ class AgentState():
 
     def update_ml_state(self, new_ml_state):
         self.ml_state = new_ml_state
+
+    def equal_hl(self, new_hl_state):
+        return self.hl_state == new_hl_state
+
+    def is_start_state(self):
+        return self.hl_state == self.start_state
 
     # def get_ready_pots(self):
     #     ready_pots = []

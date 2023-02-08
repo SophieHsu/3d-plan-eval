@@ -3,10 +3,11 @@ from lsi_3d.utils.functions import find_nearby_open_space
 
 
 class HLHumanPlanner(object):
-    def __init__(self, mdp, mlp): #, ml_action_manager, goal_preference, adaptiveness):
+    def __init__(self, mdp, mlp, use_distance_heuristic): #, ml_action_manager, goal_preference, adaptiveness):
         self.mdp = mdp
         self.mlp = mlp
         #self.ml_action_manager = ml_action_manager
+        self.use_distance_heuristic = use_distance_heuristic
         
         self.sub_goals = {'Onion cooker':0, 'Soup server':1}
         #self.adaptiveness = adaptiveness
@@ -44,14 +45,17 @@ class HLHumanPlanner(object):
             WAIT = ml_goal[4]
             min_distance = np.Inf
             if not WAIT:
-                start_locations = self.start_location_from_object(obj)
-                open_start_locations = [find_nearby_open_space(self.mlp.map, loc) for loc in start_locations]
-                
-                # use a* planner
-                plans = [self.mlp.compute_motion_plan([start], ml_goal[1]) for start in open_start_locations]
-                min_distances = [len(plan) for plan in plans]
-                min_distance = min(min_distances)
-                #min_distance = 2.0
+
+                if self.use_distance_heuristic:
+                    start_locations = self.start_location_from_object(obj)
+                    open_start_locations = [find_nearby_open_space(self.mlp.map, loc) for loc in start_locations]
+                    
+                    # use a* planner
+                    plans = [self.mlp.compute_motion_plan([start], ml_goal[1]) for start in open_start_locations]
+                    min_distances = [len(plan) for plan in plans]
+                    min_distance = min(min_distances)
+                else:
+                    min_distance = 2.0
             else:
                 min_distance = 1.0
             next_states.append([ml_goal[0], ml_goal[2], ml_goal[3], 1.0/min_distance, curr_p[i]])

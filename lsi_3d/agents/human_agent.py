@@ -36,7 +36,7 @@ class HumanAgent():
             arrived = self._step(end, ori)
             if arrived:
                 self.lsi_env.update_human_hl_state(next_hl_state, action_object)
-                time.sleep(5)
+                # time.sleep(5)
             
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
