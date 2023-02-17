@@ -34,6 +34,7 @@ class HumanAgent():
             end, next_hl_state, action_object = self.get_next_goal()
             end, ori = self.transform_end_location(end)
             arrived = self._step(end, ori)
+            self.lsi_env.update_joint_ml_state()
             if arrived:
                 self.lsi_env.update_human_hl_state(next_hl_state, action_object)
                 # time.sleep(5)
@@ -78,7 +79,7 @@ class HumanAgent():
             agent_state.next_holding = 'dish'
         elif agent_state.holding == 'dish' and world_state.in_pot == 3:
             action,object = ('pickup','soup')
-            world_state.in_pot = 0
+            # world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
             agent_state.next_holding = 'soup'
         elif agent_state.holding == 'soup':

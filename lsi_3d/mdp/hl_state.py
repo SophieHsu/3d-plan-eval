@@ -68,6 +68,9 @@ class AgentState():
     def equal_hl(self, new_hl_state):
         return self.hl_state == new_hl_state
 
+    def equal_ml(self, new_state):
+        return (self.ml_state[0], self.ml_state[1]) == (new_state.ml_state[0],new_state.ml_state[1])
+
     def is_start_state(self):
         return self.hl_state == self.start_state
 

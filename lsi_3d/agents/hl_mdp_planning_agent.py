@@ -144,17 +144,28 @@ class HlMdpPlanningAgent(Agent):
             human gets high level action and plans path to it. when human finishes path
             it will re-enter this state
             '''
-            self.next_human_hl_state, self.human_plan, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.env.human_state, self.env.robot_state)
+            self.next_human_hl_state, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(self.env.world_state, self.env.human_state, self.env.robot_state)
+            self.human_plan = self.mlp.compute_single_agent_astar_path(self.env.human_state.ml_state, self.human_goal)
             print(f'Executing Human High Level Action: {self.human_action_object_pair[0]} {self.human_action_object_pair[1]}')
             print(f'Path is: {self.human_plan}')
             print(f'Human Holding {self.human_sim_state.holding}')
             print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}', )
             #human_plan.append('I')
-            self.human = FixedMediumPlan(self.human_plan)
-            self.human_sim_state.mode = Mode.EXEC_ML_PATH
-            self.human_sim_state.hl_state = self.env.human_state.hl_state
-            pos_h, self.a_h = self.human.action()
+            if len(self.human_plan) > 0:
+                self.human = FixedMediumPlan(self.human_plan)
+                self.human_sim_state.mode = Mode.EXEC_ML_PATH
+                self.human_sim_state.hl_state = self.env.human_state.hl_state
+                pos_h, self.a_h = self.human.action()
             # self.ig_human.prepare_for_next_action(self.a_h)
+
+        if not self.env.human_state.equal_ml(self.human_sim_state):
+            self.human_sim_state.ml_state = self.env.human_state.ml_state
+            self.human_plan = self.mlp.compute_single_agent_astar_path(self.env.human_state.ml_state, self.human_goal)
+            self.human = FixedMediumPlan(self.human_plan)
+            pos_h, self.a_h = self.human.action()
+
+            if self.env.robot_state.mode == Mode.IDLE:
+                self.env.robot_state.mode == Mode.CALC_HL_PATH
 
         if self.env.robot_state.mode == Mode.CALC_HL_PATH:
             '''
@@ -165,7 +176,7 @@ class HlMdpPlanningAgent(Agent):
 
             self.next_robot_hl_state, self.robot_goal, self.robot_action_object_pair = hl_robot_agent.action(self.env.world_state, self.env.robot_state, self.human_sim_state)
             # optimal_plan = hl_robot_agent.optimal_motion_plan(self.env.robot_state, self.robot_goal)
-            self.ml_plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_plan, self.human_goal, radius=1)
+            self.ml_plan = hl_robot_agent.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_plan, self.human_goal, radius=2)
 
 
             print(f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}')

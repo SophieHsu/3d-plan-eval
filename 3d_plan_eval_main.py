@@ -11,6 +11,7 @@ import pybullet as p
 from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
 from lsi_3d.agents.human_agent import HumanAgent
+from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from utils import real_to_grid_coord, grid_to_real_coord
 
 from kitchen import Kitchen
@@ -23,7 +24,6 @@ import pybullet as p
 from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
-from lsi_3d.planners.greedy_human_planner import HLGreedyHumanPlanner
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner
 from lsi_3d.planners.hl_human_planner import HLHumanPlanner
@@ -69,10 +69,22 @@ def setup(igibson_env, kitchen, configs, args):
     
     mlp = AStarMotionPlanner(kitchen.grid)
     # hhlp = HLGreedyHumanPlanner(mdp, mlp)
-    hhlp = HLHumanPlanner(mdp, mlp, False)
-    robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
+
+    planner_config = 2
+    if planner_config == 1:
+        hhlp = HLHumanPlanner(mdp, mlp, False)
+        robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
+        robot_hlp.compute_mdp_policy(order_list)
+    elif planner_config == 2:
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp)
+    # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
+    # mdp_planner = planners.HumanAwareMediumMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, hmlp, force_compute_all=True)
+
+    # greedy = True is same as Human Aware MDP
+    # ai_agent = agent.MediumQMdpPlanningAgent(mdp_planner, greedy=False, auto_unstuck=True)
+
     #hlp = HighLevelMdpPlanner(mdp)
-    robot_hlp.compute_mdp_policy(order_list)
+        robot_hlp.compute_mdp(order_list)
 
     # TODO: Get rid of 4.5 offset
     h_x,h_y = human_start

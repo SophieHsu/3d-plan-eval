@@ -100,9 +100,9 @@ class FixedPolicyAgent(Agent):
 
         # should this happen outside
         #paths = self.mlp.compute_motion_plan(state.ml_state, (goal,state.ml_state[0]))
-        path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
+        # path = self.mlp.compute_single_agent_astar_path(agent_state.ml_state, goal)
         #path = convert_path_to_mla(path)
-        return next_hl_state, path, goal, (action, object)
+        return next_hl_state, goal, (action, object)
 
             
 
