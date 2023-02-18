@@ -298,7 +298,7 @@ class HighLevelMdpPlanner(object):
 
         return key
 
-    def drop_item(world_state, agent_state):
+    def drop_item(self, world_state, agent_state):
         agent_state.holding = None
         return agent_state.ml_state[0:2]
 

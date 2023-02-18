@@ -43,7 +43,7 @@ class LsiEnv(object):
         and holding for specific agent
         '''
         self.world_state.update(next_hl_state, action_object)
-        self.robot_state.update_hl_state(next_hl_state)
+        self.robot_state.update_hl_state(next_hl_state, self.world_state)
 
     def update_human_hl_state(self, next_hl_state, action_object):
         '''
@@ -51,7 +51,15 @@ class LsiEnv(object):
         and holding for specific agent
         '''
         self.world_state.update(next_hl_state, action_object)
-        self.human_state.update_hl_state(next_hl_state)
+        self.human_state.update_hl_state(next_hl_state, self.world_state)
+
+    def update_human_sim_hl_state(self, next_hl_state, action_object):
+        '''
+        Update hl state by updated in_pot and orders for world
+        and holding for specific agent
+        '''
+        self.world_state.update(next_hl_state, action_object)
+        self.human_sim_state.update_hl_state(next_hl_state, self.world_state)
 
     def get_human_hl_state(self):
         hl_state = f'{self.human_state.holding}_{self.world_state.in_pot}'
@@ -79,8 +87,10 @@ class LsiEnv(object):
         
         human_ml_state = self.get_ml_state(self.ig_human)
         robot_ml_state = self.get_ml_state(self.ig_robot)
+        # human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
         self.robot_state.ml_state = robot_ml_state
         self.human_state.ml_state = human_ml_state
+        # self.human_sim_state.ml_state = human_sim_ml_state
         return (human_ml_state, robot_ml_state)
 
     def get_ml_state(self, agent:iGibsonAgent):

@@ -1,21 +1,43 @@
 import numpy as np
+from lsi_3d.utils.functions import find_nearby_open_space
 
 
 class HLHumanPlanner(object):
-    def __init__(self, mdp, mlp): #, ml_action_manager, goal_preference, adaptiveness):
+    def __init__(self, mdp, mlp, use_distance_heuristic): #, ml_action_manager, goal_preference, adaptiveness):
         self.mdp = mdp
         self.mlp = mlp
         #self.ml_action_manager = ml_action_manager
+        self.use_distance_heuristic = use_distance_heuristic
         
         self.sub_goals = {'Onion cooker':0, 'Soup server':1}
         #self.adaptiveness = adaptiveness
         #self.goal_preference = np.array(goal_preference)
         #self.prev_goal_dstb = self.goal_preference
 
-    def get_state_trans(self, obj, num_item_in_pot, order_list):
-        # return probability distribution based on A* distance
-        # Should Human HL Planner be subclass
+    # def get_state_trans(self, obj, num_item_in_pot, order_list):
+    #     # return probability distribution based on A* distance
+    #     # Should Human HL Planner be subclass
 
+    #     ml_goals, curr_p = self.human_ml_motion_goal(obj, num_item_in_pot, order_list)
+        
+    #     next_states = []
+    #     for i, ml_goal in enumerate(ml_goals):
+    #         WAIT = ml_goal[4]
+    #         min_distance = np.Inf
+    #         if not WAIT:
+    #             start_locations = self.start_location_from_object(obj)
+    #             # min_distance = self.ml_action_manager.motion_planner.min_cost_between_features(start_locations, ml_goal[1])
+    #             # min_distance = self.mlp.compute_motion_plan(start_locations, ml_goal[1])
+    #             min_distance = 2.0
+    #         else:
+    #             min_distance = 1.0
+    #         next_states.append([ml_goal[0], ml_goal[2], ml_goal[3], 1.0/min_distance, curr_p[i]])
+        
+    #     next_states = np.array(next_states, dtype=object)
+
+    #     return next_states
+
+    def get_state_trans(self, obj, num_item_in_pot, order_list):
         ml_goals, curr_p = self.human_ml_motion_goal(obj, num_item_in_pot, order_list)
         
         next_states = []
@@ -23,9 +45,17 @@ class HLHumanPlanner(object):
             WAIT = ml_goal[4]
             min_distance = np.Inf
             if not WAIT:
-                start_locations = self.start_location_from_object(obj)
-                # min_distance = self.ml_action_manager.motion_planner.min_cost_between_features(start_locations, ml_goal[1])
-                min_distance = self.mlp.compute_motion_plan(start_locations, ml_goal[1])
+
+                if self.use_distance_heuristic:
+                    start_locations = self.start_location_from_object(obj)
+                    open_start_locations = [find_nearby_open_space(self.mlp.map, loc) for loc in start_locations]
+                    
+                    # use a* planner
+                    plans = [self.mlp.compute_motion_plan([start], ml_goal[1]) for start in open_start_locations]
+                    min_distances = [len(plan) for plan in plans]
+                    min_distance = min(min_distances)
+                else:
+                    min_distance = 2.0
             else:
                 min_distance = 1.0
             next_states.append([ml_goal[0], ml_goal[2], ml_goal[3], 1.0/min_distance, curr_p[i]])
@@ -40,19 +70,24 @@ class HLHumanPlanner(object):
 
         Return: next object, list(motion goals)
         """
+        self.sub_goals = {'Onion cooker': 0, 'Soup server': 1}
+
         ml_logic_goals = self.logic_ml_action(obj, num_item_in_pot, order_list)
 
-        #curr_p = ((1.0-self.adaptiveness)*self.prev_goal_dstb + self.adaptiveness*ml_logic_goals)   
+        self.adaptiveness = 0.5
+        self.prev_goal_dstb = np.array([0.5,0.5])
+
+        curr_p = ((1.0-self.adaptiveness)*self.prev_goal_dstb + self.adaptiveness*ml_logic_goals)   
         # print(self.adaptiveness, self.prev_goal_dstb, ml_logic_goals, curr_p)
-        # task = np.random.choice(len(self.sub_goals), p=curr_p)
-        #self.prev_goal_dstb = curr_p
+        task = np.random.choice(len(self.sub_goals), p=curr_p)
+        self.prev_goal_dstb = curr_p
 
         ml_goals = []
         ml_goals.append(self.onion_cooker_ml_goal(obj, num_item_in_pot, order_list))
         ml_goals.append(self.soup_server_ml_goal(obj, num_item_in_pot, order_list))
         ml_goals = np.array(ml_goals, dtype=object)
 
-        return ml_goals# , curr_p
+        return ml_goals, curr_p
 
     def onion_cooker_ml_goal(self, obj, num_item_in_pot, order_list):
         """

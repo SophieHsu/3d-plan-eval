@@ -7,6 +7,7 @@ from pygame import init
 class LsiMdp(object):
     def __init__(self, map, start_locations, hl_start_state):
         self.map = map
+        self.start_order_list = ['onion', 'onion']
         self.start_locations = start_locations
         self.num_items_for_soup = 3
         self.delivery_reward = 20

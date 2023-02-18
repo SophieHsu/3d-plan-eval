@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import igibson
+from igibson import object_states
 from igibson.objects.articulated_object import URDFObject
 import pybullet as p
 
@@ -14,6 +15,7 @@ class Kitchen():
         self.orientation_map = ""
         self.grid = ""
         self.bowlpans = []
+        self.food_obj = []
 
     def setup(self, filepath):
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
@@ -108,7 +110,10 @@ class Kitchen():
                          "objects/steak/steak_000/steak_000.urdf"),
             "tray":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/tray/tray_000/tray_000.urdf")
+                         "objects/tray/tray_000/tray_000.urdf"),
+            "apple":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/apple/00_0/00_0.urdf")
         }
 
         name2scale_map = {
@@ -124,6 +129,7 @@ class Kitchen():
             "tray": np.array([0.1, 0.1, 0.1]),
             "sink": np.array([1.2, 1.25, 1.25]),
             "fridge": np.array([1.5, 1.2, 1.2]),
+            "apple": np.array([0.1, 0.1, 0.1]),
         }
 
         name2shift_map = {
@@ -132,13 +138,35 @@ class Kitchen():
             "table_h": (0, 0.5, 0),
             "stove": (0, 0, 0),
             "bowl": (0, 0, 1.2),
-            "pan": (0, 0, 1.24),  # shift height
+            "pan": (0.23, -0.1, 1.24),  # shift height
             "sink": (0, 0, 0.1),
             "fridge": (0, 0, 0.2),
-            "steak": (0, 0, 1.0),
+            "steak": (0.23, -0.1, 1.25),
             "tray": (0, 0, 0.9),
+            "apple": (0, 0.2, 1.0),
             "broccoli": (0, 0.2, 0.6),
             "green_onion": (0, -0.2, 0.6),
+        }
+
+        name2abl = {
+            "counter": None,
+            "table_v": None,
+            "table_h": None,
+            "stove": None,
+            "bowl": None,
+            "pan": None,
+            "sink": None,
+            "fridge": {
+                "coldSource": {
+                    "temperature": 7.0,
+                    "requires_inside": True,
+                }
+            },
+            "steak": None,
+            "tray": None,
+            "apple": None,
+            "broccoli": None,
+            "green_onion": None,
         }
 
         shift_l = 0.1
@@ -149,12 +177,15 @@ class Kitchen():
             (0, 0, -1.5707): (shift_l, 0),
         }
 
-        objs = []
+        static_objs = []
         for name, x, y in obj_x_y:
             obj = URDFObject(name2path[name],
+                             name=name,
+                             category=name,
                              scale=name2scale_map[name] / 1.15,
                              model_path="/".join(
-                                 name2path[name].split("/")[:-1]))
+                                 name2path[name].split("/")[:-1]),
+                             abilities=name2abl[name])
             self.env.simulator.import_object(obj)
 
             orn = orientation_map[(name, x, y)]
@@ -168,12 +199,20 @@ class Kitchen():
 
             if name not in ("bowl", "pan", "green_onion", "broccoli", "steak",
                             "tray"):
-                objs.append(obj)
+                static_objs.append(obj)
             else:
                 self.bowlpans.append((obj, pos))
+
+            if name in ("apple", "green_onion", "broccoli", "steak"):
+                self.food_obj.append(obj)
+                obj.states[object_states.Temperature].set_value(7)
+            if name == "stove":
+                obj.states[object_states.ToggledOn].set_value(True)
+
         try:
-            for obj in objs:
-                p.changeDynamics(obj.get_body_ids()[0], -1, mass=500)
+            for obj in static_objs:
+                p.changeDynamics(obj.get_body_ids()[0], -1,
+                                 mass=800)  # mass=500
         except:
             pass
 
@@ -208,10 +247,11 @@ class Kitchen():
                         #pass
                         return_str += "{} {} {}\n".format("counter", x, y)
                     if name == "pan":
+                        return_str += "{} {} {}\n".format("steak", x, y)
                         return_str += "{} {} {}\n".format("stove", x, y)
                     if name == "fridge":
+                        return_str += "{} {} {}\n".format("apple", x, y)
                         return_str += "{} {} {}\n".format("tray", x, y)
-                        return_str += "{} {} {}\n".format("steak", x, y)
                         return_str += "{} {} {}\n".format("green_onion", x, y)
                         return_str += "{} {} {}\n".format("broccoli", x, y)
                     return_str += "{} {} {}\n".format(name, x, y)
@@ -228,9 +268,10 @@ class Kitchen():
             "sink": "W",
             "fridge": "F",
             "broccoli": "F",
-            "steak": "F",
+            "steak": "P",
             "green_onion": "F",
             "tray": "F",
+            "apple": "F",
         }
 
         return name2abbr_map[name]

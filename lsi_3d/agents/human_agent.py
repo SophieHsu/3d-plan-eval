@@ -44,26 +44,44 @@ class HumanAgent():
             x, y, z = self.human.get_position()
             end, next_hl_state, action_object = self.get_next_goal()
             end, ori = self.transform_end_location(end)
-            if self.is_at_location((x, y), end, 0.1):
+            arrived = self._step(end, ori)
+            self.lsi_env.update_joint_ml_state()
+            if arrived:
                 self.lsi_env.update_human_hl_state(next_hl_state,
                                                    action_object)
-                time.sleep(5)
-            self._step(end, ori)
+                # time.sleep(5)
 
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         path = self.planner.find_path((x, y), end, self.occupancy_grid)
-        self.motion_controller.step(self.human, self.robot, final_ori, path)
+        return self.motion_controller.step(self.human, self.robot, final_ori,
+                                           path)
+
+    def pick(self, loc):
+        self.motion_controller.pick(self.human, loc)
+
+    def drop(self):
+        pass
+
+    def open(self):
+        pass
 
     def get_next_goal(self):
         agent_state = self.lsi_env.human_state
         world_state = self.lsi_env.world_state
         action, object = 'stay', agent_state.holding
-        if world_state.in_pot < 3 and agent_state.holding == 'None':
-            action, object = ('pickup', 'onion')
-            next_hl_state = f'onion_{world_state.in_pot}'
-            agent_state.next_holding = 'onion'
+        if agent_state.holding == 'None':
+            if world_state.in_pot == 2 and self.lsi_env.robot_state.holding == 'onion':
+                action, object = ('pickup', 'dish')
+                next_hl_state = f'dish_{world_state.in_pot}'
+            elif world_state.in_pot == 3 and self.lsi_env.robot_state.holding != 'dish':
+                action, object = ('pickup', 'dish')
+                next_hl_state = f'dish_{world_state.in_pot}'
+            else:
+                action, object = ('pickup', 'onion')
+                next_hl_state = f'onion_{world_state.in_pot}'
+                agent_state.next_holding = 'onion'
         elif agent_state.holding == 'onion':
             action, object = ('drop', 'onion')
             next_hl_state = f'None_{world_state.in_pot+1}'
@@ -74,7 +92,7 @@ class HumanAgent():
             agent_state.next_holding = 'dish'
         elif agent_state.holding == 'dish' and world_state.in_pot == 3:
             action, object = ('pickup', 'soup')
-            world_state.in_pot = 0
+            # world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
             agent_state.next_holding = 'soup'
         elif agent_state.holding == 'soup':

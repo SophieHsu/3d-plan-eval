@@ -14,6 +14,8 @@ class MotionControllerHuman():
         self.rotate = False
         self.rotate_angle = 0.0
         self.arrived = False
+        self.arrived_hand_step = 0
+        self.original_hand_position = None
 
     def step(self, human, robot, final_ori, path):
         x, y, z = human.get_position()
@@ -50,11 +52,55 @@ class MotionControllerHuman():
                 if vel[0] == 0 and vel[1] == 0:
                     self.rotate = False
 
-            action[0] = vel[0]/self.MAX_LIN_VEL
-            action[5] = vel[1]/self.MAX_ANG_VEL
+            action = self.action(vel[0]/self.MAX_LIN_VEL, vel[1]/self.MAX_ANG_VEL, 0, 0, 0, 0)
             human.apply_action(action)
 
-            # return self.rotate and 
+        return self.arrived
+
+    def pick(self, human, loc):
+        right_hand = human._parts["right_hand"]
+        position = right_hand.get_position()
+
+        x_diff = loc[0] - position[0]
+        y_diff = loc[1] - position[1]
+        z_diff = loc[2] - position[2]
+        max_val = max(x_diff, y_diff, z_diff)
+
+        x_diff = x_diff / (max_val * 100)
+        y_diff = y_diff / (max_val * 100)
+        z_diff = z_diff / (max_val * 100)
+
+        # Go to location
+        if self.arrived_hand_step == 0:
+            if math.dist(loc, position) > 0.1:
+                action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
+                human.apply_action(action)
+            else:
+                self.arrived_hand_step = 1
+        # Grab
+        elif self.arrived_hand_step == 1:
+            action = self.action(0, 0, 0, 0, 0, 1.0)
+            human.apply_action(action)
+            self.arrived_hand_step = 2
+        # Return to location
+        elif self.arrived_hand_step == 2:
+            pass
+            
+
+    def action(self, forward, turn, right_hand_x, right_hand_y, right_hand_z, right_hand_grip):
+        # 0 - Linear velocity
+        # 5 - Angular velocity
+        # 20 - Right hand y velocity
+        # 21 - Right hand x velocity, so reversed in this function (left - positive, right - negative)
+        # 22 - Right hand z velocity
+        action = np.zeros((28,))
+        action[0] = forward
+        action[5] = turn
+        action[20] = right_hand_y
+        action[21] = -right_hand_x
+        action[22] = right_hand_z
+        action[19] = right_hand_grip
+        return action
 
     def find_velocities_rotate(self, theta, final_ori):
         theta_difference = self.angle_difference(theta, final_ori)
