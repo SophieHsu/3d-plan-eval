@@ -3,6 +3,8 @@ import os
 import igibson
 from igibson import object_states
 from igibson.objects.articulated_object import URDFObject
+from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
+from igibson.utils.assets_utils import get_ig_model_path
 import pybullet as p
 
 
@@ -69,6 +71,30 @@ class Kitchen():
         self.grid = grid
         return obj_x_y, orientation_map, grid
 
+    def name2abbr(self, name):
+        name2abbr_map = {
+            "counter": "C",
+            "table_v": "T",
+            "table_h": "T",
+            "stove": "H",
+            "bowl": "B",
+            "pan": "P",
+            "sink": "W",
+            "fridge": "F",
+            "broccoli": "F",
+            "steak": "P",
+            "green_onion": "K",
+            "tray": "F",
+            "apple": "F",
+            "plate1": "W",
+            "plate2": "W",
+            "scrub_brush": "W",
+            "chopping_board": "K",
+            "knife": "K"
+        }
+
+        return name2abbr_map[name]
+
     def load_objects(self, obj_x_y, orientation_map):
         name2path = {
             "counter":
@@ -113,7 +139,23 @@ class Kitchen():
                          "objects/tray/tray_000/tray_000.urdf"),
             "apple":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/apple/00_0/00_0.urdf")
+                         "objects/apple/00_0/00_0.urdf"),
+            "plate1":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/plate/plate_000/plate_000.urdf"),
+            "plate2":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/plate/plate_000/plate_000.urdf"),
+            "scrub_brush":
+            os.path.join(
+                igibson.ig_dataset_path,
+                "objects/scrub_brush/scrub_brush_000/scrub_brush_000.urdf"),
+            "chopping_board":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/chopping_board/10_0/10_0.urdf"),
+            "knife":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/carving_knife/14_1/14_1.urdf")
         }
 
         name2scale_map = {
@@ -130,6 +172,11 @@ class Kitchen():
             "sink": np.array([1.2, 1.25, 1.25]),
             "fridge": np.array([1.5, 1.2, 1.2]),
             "apple": np.array([0.1, 0.1, 0.1]),
+            "plate1": np.array([0.01, 0.01, 0.01]),
+            "plate2": np.array([0.01, 0.01, 0.01]),
+            "scrub_brush": np.array([0.01, 0.01, 0.01]),
+            "chopping_board": np.array([1.2, 1.2, 1.2]),
+            "knife": np.array([1, 1, 1])
         }
 
         name2shift_map = {
@@ -145,7 +192,13 @@ class Kitchen():
             "tray": (0, 0, 0.9),
             "apple": (0, 0.2, 1.0),
             "broccoli": (0, 0.2, 0.6),
-            "green_onion": (0, -0.2, 0.6),
+            # "green_onion": (0, -0.2, 0.6),
+            "green_onion": (0, 0, 1.25),
+            "plate1": (0, 0, 1.2),
+            "plate2": (0, 0, 1.0),
+            "scrub_brush": (0, 0, 1.3),
+            "chopping_board": (0, 0, 1.2),
+            "knife": (0.4, 0, 1.2),
         }
 
         name2abl = {
@@ -153,7 +206,10 @@ class Kitchen():
             "table_v": None,
             "table_h": None,
             "stove": None,
-            "bowl": None,
+            "bowl": {
+                "dustyable": {},
+                "stainable": {}
+            },
             "pan": None,
             "sink": None,
             "fridge": {
@@ -166,7 +222,30 @@ class Kitchen():
             "tray": None,
             "apple": None,
             "broccoli": None,
-            "green_onion": None,
+            "green_onion": {
+                "burnable": {},
+                "freezable": {},
+                "cookable": {},
+                "sliceable": {
+                    "slice_force": 0.0
+                }
+            },
+            "plate1": {
+                "dustyable": {},
+                "stainable": {}
+            },
+            "plate2": {
+                "dustyable": {},
+                "stainable": {}
+            },
+            "scrub_brush": {
+                "soakable": {},
+                "cleaningTool": {}
+            },
+            "chopping_board": None,
+            "knife": {
+                "slicer": {}
+            }
         }
 
         shift_l = 0.1
@@ -186,7 +265,46 @@ class Kitchen():
                              model_path="/".join(
                                  name2path[name].split("/")[:-1]),
                              abilities=name2abl[name])
-            self.env.simulator.import_object(obj)
+
+            if name == "green_onion":
+                object_parts = []
+                # Check the parts that compose the apple and create URDF objects of them
+                for i, part in enumerate(obj.metadata["object_parts"]):
+                    part_category = part["category"]
+                    part_model = part["model"]
+                    # Scale the offset accordingly
+                    part_pos = part["pos"] * obj.scale
+                    part_orn = part["orn"]
+                    part_model_path = get_ig_model_path(
+                        part_category, part_model)
+                    part_filename = os.path.join(part_model_path,
+                                                 part_model + ".urdf")
+                    part_obj_name = obj.name + "_part_{}".format(i)
+                    part_obj = URDFObject(
+                        part_filename,
+                        name=part_obj_name,
+                        category=part_category,
+                        model_path=part_model_path,
+                        scale=obj.scale,
+                    )
+                    object_parts.append((part_obj, (part_pos, part_orn)))
+
+                # Group the apple parts into a single grouped object
+                grouped_parts_obj = ObjectGrouper(object_parts)
+
+                # Create a multiplexed object: either the full apple, or the parts
+                multiplexed_obj = ObjectMultiplexer(obj.name + "_multiplexer",
+                                                    [obj, grouped_parts_obj],
+                                                    0)
+                self.env.simulator.import_object(multiplexed_obj)
+                obj.set_position([100, 100, -100])
+                for i, (part_obj, _) in enumerate(object_parts):
+                    part_obj.set_position([101 + i, 100, -100])
+
+                obj = multiplexed_obj
+
+            else:
+                self.env.simulator.import_object(obj)
 
             orn = orientation_map[(name, x, y)]
             shift = name2shift_map[name]
@@ -198,16 +316,29 @@ class Kitchen():
             self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
             if name not in ("bowl", "pan", "green_onion", "broccoli", "steak",
-                            "tray"):
+                            "tray", "plate", "chopping_board", "knife"):
                 static_objs.append(obj)
-            else:
-                self.bowlpans.append((obj, pos))
+            # else:
+            #     self.bowlpans.append((obj, pos))
 
             if name in ("apple", "green_onion", "broccoli", "steak"):
                 self.food_obj.append(obj)
+                obj.states[object_states.Temperature].get_value(),
                 obj.states[object_states.Temperature].set_value(7)
             if name == "stove":
                 obj.states[object_states.ToggledOn].set_value(True)
+            if "plate" in name:
+                if object_states.Dusty in obj.states:
+                    obj.states[object_states.Dusty].set_value(True)
+
+                if object_states.Stained in obj.states:
+                    obj.states[object_states.Stained].set_value(True)
+
+            if name == "sink":
+                obj.states[object_states.ToggledOn].set_value(False)
+
+            # if name == "chopping_board":
+            #     obj.states[object_states.OnTop].set_value(obj, static_objs[-1])
 
         try:
             for obj in static_objs:
@@ -228,6 +359,7 @@ class Kitchen():
             "F": "fridge",
             "T": "table",
             "W": "sink",
+            "K": "chopping_board",
         }
         return_str = ""
         for x in range(self.HEIGHT):
@@ -247,34 +379,26 @@ class Kitchen():
                         #pass
                         return_str += "{} {} {}\n".format("counter", x, y)
                     if name == "pan":
-                        return_str += "{} {} {}\n".format("steak", x, y)
                         return_str += "{} {} {}\n".format("stove", x, y)
+                        return_str += "{} {} {}\n".format("steak", x, y)
                     if name == "fridge":
                         return_str += "{} {} {}\n".format("apple", x, y)
                         return_str += "{} {} {}\n".format("tray", x, y)
-                        return_str += "{} {} {}\n".format("green_onion", x, y)
+                        # return_str += "{} {} {}\n".format("green_onion", x, y)
                         return_str += "{} {} {}\n".format("broccoli", x, y)
+
+                    if name == "sink":
+                        return_str += "{} {} {}\n".format("plate1", x, y)
+                        return_str += "{} {} {}\n".format("plate2", x, y)
+                        return_str += "{} {} {}\n".format("scrub_brush", x, y)
+
+                    if name == "chopping_board":
+                        return_str += "{} {} {}\n".format("counter", x, y)
+                        return_str += "{} {} {}\n".format("green_onion", x, y)
+                        return_str += "{} {} {}\n".format("knife", x, y)
+
                     return_str += "{} {} {}\n".format(name, x, y)
         return return_str
-
-    def name2abbr(self, name):
-        name2abbr_map = {
-            "counter": "C",
-            "table_v": "T",
-            "table_h": "T",
-            "stove": "H",
-            "bowl": "B",
-            "pan": "P",
-            "sink": "W",
-            "fridge": "F",
-            "broccoli": "F",
-            "steak": "P",
-            "green_onion": "F",
-            "tray": "F",
-            "apple": "F",
-        }
-
-        return name2abbr_map[name]
 
     def ori_filter(self, grid, x, y):
         if not (x >= 0 and x < self.HEIGHT and y >= 0 and y < self.WIDTH):
@@ -301,3 +425,37 @@ class Kitchen():
             else:
                 orientation = (0, 0, -1.5707)
         return orientation
+
+    def step(self, count=0):
+        for obj in self.food_obj:
+            try:
+                print(
+                    "%s. Temperature: %.2f. Frozen: %r. Cooked: %r. Burnt: %r."
+                    % (
+                        obj.name,
+                        obj.states[object_states.Temperature].get_value(),
+                        obj.states[object_states.Frozen].get_value(),
+                        obj.states[object_states.Cooked].get_value(),
+                        obj.states[object_states.Burnt].get_value(),
+                    ))
+            except:
+                pass
+
+            if obj.name == "green_onion_multiplexer" and count > 80:
+                print("Slicing the green onion and moving the parts")
+                # Slice the apple and set the object parts away
+                part_pos = obj.get_position()
+                obj.states[object_states.Sliced].set_value(True)
+
+                # Check that the multiplexed changed to the group of parts
+                assert isinstance(obj.current_selection(), ObjectGrouper)
+                self.food_obj.remove(obj)
+
+                # Move the parts
+                for i, part_obj in enumerate(obj.objects):
+                    new_pos = part_pos.copy()
+                    new_pos[1] += 0.05 * ((-1)**i)
+                    part_obj.set_position(new_pos)
+                    self.food_obj.append(part_obj)
+
+        print()

@@ -44,18 +44,18 @@ class Simulator:
     """
 
     def __init__(
-        self,
-        gravity=9.8,
-        physics_timestep=1 / 120.0,
-        render_timestep=1 / 30.0,
-        solver_iterations=100,
-        mode="gui_interactive",
-        image_width=128,
-        image_height=128,
-        vertical_fov=90,
-        device_idx=0,
-        rendering_settings=MeshRendererSettings(),
-        use_pb_gui=False,
+            self,
+            gravity=9.8,
+            physics_timestep=1 / 120.0,
+            render_timestep=1 / 30.0,
+            solver_iterations=100,
+            mode="gui_interactive",
+            image_width=128,
+            image_height=128,
+            vertical_fov=90,
+            device_idx=0,
+            rendering_settings=MeshRendererSettings(),
+            use_pb_gui=False,
     ):
         """
         :param gravity: gravity on z direction.
@@ -78,7 +78,8 @@ class Simulator:
         self.render_timestep = render_timestep
         self.solver_iterations = solver_iterations
         self.physics_timestep_num = self.render_timestep / self.physics_timestep
-        assert self.physics_timestep_num.is_integer(), "render_timestep must be a multiple of physics_timestep"
+        assert self.physics_timestep_num.is_integer(
+        ), "render_timestep must be a multiple of physics_timestep"
 
         self.physics_timestep_num = int(self.physics_timestep_num)
         self.mode = SimulatorMode[mode.upper()]
@@ -98,7 +99,9 @@ class Simulator:
             )
         if plt != "Linux" and self.mode == SimulatorMode.HEADLESS_TENSOR:
             self.mode = SimulatorMode.HEADLESS
-            log.warning("Simulator mode headless_tensor is only supported on Linux. Default to headless mode.")
+            log.warning(
+                "Simulator mode headless_tensor is only supported on Linux. Default to headless mode."
+            )
 
         self.viewer = None
         self.renderer = None
@@ -111,7 +114,8 @@ class Simulator:
         # Set of categories that can be grasped by assisted grasping
         self.object_state_types = get_states_by_dependency_order()
 
-        self.assist_grasp_category_allow_list = self.gen_assisted_grasping_categories()
+        self.assist_grasp_category_allow_list = self.gen_assisted_grasping_categories(
+        )
         self.assist_grasp_mass_thresh = 10.0
 
     def set_timestep(self, physics_timestep, render_timestep):
@@ -175,7 +179,10 @@ class Simulator:
                 rendering_settings=self.rendering_settings,
                 simulator=self,
             )
-        elif self.mode in [SimulatorMode.GUI_INTERACTIVE, SimulatorMode.GUI_NON_INTERACTIVE, SimulatorMode.HEADLESS]:
+        elif self.mode in [
+                SimulatorMode.GUI_INTERACTIVE,
+                SimulatorMode.GUI_NON_INTERACTIVE, SimulatorMode.HEADLESS
+        ]:
             self.renderer = MeshRenderer(
                 width=self.image_width,
                 height=self.image_height,
@@ -224,7 +231,8 @@ class Simulator:
 
         :param scene: a scene object to load
         """
-        assert isinstance(scene, Scene), "import_scene can only be called with Scene"
+        assert isinstance(scene,
+                          Scene), "import_scene can only be called with Scene"
         scene.load(self)
         self.scene = scene
 
@@ -250,7 +258,9 @@ class Simulator:
 
         :param obj: a non-robot object to load
         """
-        assert isinstance(obj, BaseObject), "import_object can only be called with BaseObject"
+        assert isinstance(
+            obj,
+            BaseObject), "import_object can only be called with BaseObject"
 
         if isinstance(obj, VisualMarker) or isinstance(obj, Particle):
             # Marker objects can be imported without a scene.
@@ -305,17 +315,21 @@ class Simulator:
                 if link_id == PYBULLET_BASE_LINK_INDEX:
                     link_name = p.getBodyInfo(body_id)[0].decode("utf-8")
                 else:
-                    link_name = p.getJointInfo(body_id, link_id)[12].decode("utf-8")
+                    link_name = p.getJointInfo(body_id,
+                                               link_id)[12].decode("utf-8")
 
                 collision_shapes = p.getCollisionShapeData(body_id, link_id)
-                collision_shapes = [item for item in collision_shapes if item[2] == p.GEOM_MESH]
+                collision_shapes = [
+                    item for item in collision_shapes if item[2] == p.GEOM_MESH
+                ]
                 # a link can have multiple collision meshes due to boxification,
                 # and we want to query the original collision mesh for information
 
                 if len(collision_shapes) == 0:
                     continue
                 else:
-                    _, _, _, dimensions, filename, rel_pos, rel_orn = collision_shapes[0]
+                    _, _, _, dimensions, filename, rel_pos, rel_orn = collision_shapes[
+                        0]
 
                 filenames = link_name_to_vm[link_name]
                 for filename in filenames:
@@ -323,14 +337,15 @@ class Simulator:
                     if visual_mesh_to_material is not None and filename in visual_mesh_to_material:
                         overwrite_material = visual_mesh_to_material[filename]
 
-                    shapes.append(
-                        (link_id, p.GEOM_MESH, dimensions, filename, rel_pos, rel_orn, [0, 0, 0], overwrite_material)
-                    )
+                    shapes.append((link_id, p.GEOM_MESH, dimensions, filename,
+                                   rel_pos, rel_orn, [0, 0,
+                                                      0], overwrite_material))
         else:
             # Pull the visual shapes from pybullet
             shapes = []
             for shape in p.getVisualShapeData(body_id):
-                link_id, type, dimensions, filename, rel_pos, rel_orn, color = shape[1:8]
+                link_id, type, dimensions, filename, rel_pos, rel_orn, color = shape[
+                    1:8]
 
                 if filename:
                     filename = filename.decode("utf-8")
@@ -339,9 +354,10 @@ class Simulator:
                 dynamics_info = p.getDynamicsInfo(body_id, link_id)
                 inertial_pos, inertial_orn = dynamics_info[3], dynamics_info[4]
                 rel_pos, rel_orn = p.multiplyTransforms(
-                    *p.invertTransform(inertial_pos, inertial_orn), rel_pos, rel_orn
-                )
-                shapes.append((link_id, type, dimensions, filename, rel_pos, rel_orn, color, None))
+                    *p.invertTransform(inertial_pos, inertial_orn), rel_pos,
+                    rel_orn)
+                shapes.append((link_id, type, dimensions, filename, rel_pos,
+                               rel_orn, color, None))
 
         # Now that we have the visual shapes, let's add them to the renderer.
         visual_objects = []
@@ -353,35 +369,55 @@ class Simulator:
 
             # Specify a filename if our object is not a mesh
             if type == p.GEOM_SPHERE:
-                filename = os.path.join(igibson.assets_path, "models/mjcf_primitives/sphere8.obj")
-                dimensions = [dimensions[0] / 0.5, dimensions[0] / 0.5, dimensions[0] / 0.5]
+                filename = os.path.join(igibson.assets_path,
+                                        "models/mjcf_primitives/sphere8.obj")
+                dimensions = [
+                    dimensions[0] / 0.5, dimensions[0] / 0.5,
+                    dimensions[0] / 0.5
+                ]
             elif type == p.GEOM_CAPSULE or type == p.GEOM_CYLINDER:
-                filename = os.path.join(igibson.assets_path, "models/mjcf_primitives/cylinder16.obj")
-                dimensions = [dimensions[1] / 0.5, dimensions[1] / 0.5, dimensions[0]]
+                filename = os.path.join(
+                    igibson.assets_path,
+                    "models/mjcf_primitives/cylinder16.obj")
+                dimensions = [
+                    dimensions[1] / 0.5, dimensions[1] / 0.5, dimensions[0]
+                ]
                 if not os.path.exists(filename):
                     log.info(
                         "Cylinder mesh file cannot be found in the assets. Consider removing the assets folder and downloading the newest version using download_assets(). Using a cube for backcompatibility"
                     )
-                    filename = os.path.join(igibson.assets_path, "models/mjcf_primitives/cube.obj")
-                    dimensions = [dimensions[0] / 0.5, dimensions[0] / 0.5, dimensions[0] / 0.5]
+                    filename = os.path.join(igibson.assets_path,
+                                            "models/mjcf_primitives/cube.obj")
+                    dimensions = [
+                        dimensions[0] / 0.5, dimensions[0] / 0.5,
+                        dimensions[0] / 0.5
+                    ]
             elif type == p.GEOM_BOX:
-                filename = os.path.join(igibson.assets_path, "models/mjcf_primitives/cube.obj")
+                filename = os.path.join(igibson.assets_path,
+                                        "models/mjcf_primitives/cube.obj")
             elif type == p.GEOM_PLANE:
-                filename = os.path.join(igibson.assets_path, "models/mjcf_primitives/cube.obj")
+                filename = os.path.join(igibson.assets_path,
+                                        "models/mjcf_primitives/cube.obj")
                 dimensions = [100, 100, 0.01]
 
             # Always load overwrite material
             if overwrite_material is not None:
                 if isinstance(overwrite_material, RandomizedMaterial):
-                    self.renderer.load_randomized_material(overwrite_material, texture_scale)
+                    self.renderer.load_randomized_material(
+                        overwrite_material, texture_scale)
                 elif isinstance(overwrite_material, ProceduralMaterial):
-                    self.renderer.load_procedural_material(overwrite_material, texture_scale)
+                    self.renderer.load_procedural_material(
+                        overwrite_material, texture_scale)
 
             # Load the visual object if it doesn't already exist.
             caching_allowed = type == p.GEOM_MESH and overwrite_material is None
-            cache_key = (filename, tuple(dimensions), tuple(rel_pos), tuple(rel_orn))
+            cache_key = (filename, tuple(dimensions), tuple(rel_pos),
+                         tuple(rel_orn))
             if caching_allowed and cache_key in self.visual_object_cache:
-                visual_object = self.visual_object_cache[(filename, tuple(dimensions), tuple(rel_pos), tuple(rel_orn))]
+                visual_object = self.visual_object_cache[(filename,
+                                                          tuple(dimensions),
+                                                          tuple(rel_pos),
+                                                          tuple(rel_orn))]
             else:
                 self.renderer.load_object(
                     filename,
@@ -444,7 +480,8 @@ class Simulator:
 
         # Step the object procedural materials based on the updated object states.
         for obj in self.scene.get_objects():
-            if hasattr(obj, "procedural_material") and obj.procedural_material is not None:
+            if hasattr(obj, "procedural_material"
+                       ) and obj.procedural_material is not None:
                 obj.procedural_material.update()
 
     def step(self):
@@ -467,7 +504,8 @@ class Simulator:
         self.body_links_awake = 0
         for instance in self.renderer.instances:
             if instance.dynamic:
-                self.body_links_awake += self.update_position(instance, force_sync=force_sync or self.first_sync)
+                self.body_links_awake += self.update_position(
+                    instance, force_sync=force_sync or self.first_sync)
         if self.viewer is not None:
             self.viewer.update()
         if self.first_sync:
@@ -493,16 +531,15 @@ class Simulator:
         :param body_id: pybullet body id
         :param c_link: link index or -1 for the base
         """
-        if (
-            not hasattr(self.scene, "objects_by_id")
-            or body_id not in self.scene.objects_by_id
-            or not hasattr(self.scene.objects_by_id[body_id], "category")
-            or self.scene.objects_by_id[body_id].category == "object"
-        ):
+        if (not hasattr(self.scene, "objects_by_id")
+                or body_id not in self.scene.objects_by_id
+                or not hasattr(self.scene.objects_by_id[body_id], "category")
+                or self.scene.objects_by_id[body_id].category == "object"):
             mass = p.getDynamicsInfo(body_id, c_link)[0]
             return mass <= self.assist_grasp_mass_thresh
         else:
-            return self.scene.objects_by_id[body_id].category in self.assist_grasp_category_allow_list
+            return self.scene.objects_by_id[
+                body_id].category in self.assist_grasp_category_allow_list
 
     def set_hidden_state(self, obj, hide=True):
         """
@@ -539,11 +576,14 @@ class Simulator:
             else:
                 activation_state = PyBulletSleepState.AWAKE
 
-            if activation_state not in [PyBulletSleepState.AWAKE, PyBulletSleepState.ISLAND_AWAKE]:
+            if activation_state not in [
+                    PyBulletSleepState.AWAKE, PyBulletSleepState.ISLAND_AWAKE
+            ]:
                 continue
 
             if link_id == PYBULLET_BASE_LINK_INDEX:
-                pos, orn = p.getBasePositionAndOrientation(instance.pybullet_uuid)
+                pos, orn = p.getBasePositionAndOrientation(
+                    instance.pybullet_uuid)
             else:
                 pos, orn = p.getLinkState(instance.pybullet_uuid, link_id)[:2]
 

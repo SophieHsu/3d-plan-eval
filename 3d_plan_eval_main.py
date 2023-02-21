@@ -3,6 +3,7 @@ import argparse
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.utils.motion_planning_wrapper import MotionPlanningWrapper
 from igibson.robots.behavior_robot import BehaviorRobot
+from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 import logging
 from igibson.utils.utils import quatToXYZW, parse_config
 from transforms3d.euler import euler2quat
@@ -110,15 +111,22 @@ def setup(igibson_env, kitchen, configs, args):
     return robot_agent, human_agent
 
 
-def environment_setup(args):
+def environment_setup(args, headless=None):
     exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
     configs = read_in_lsi_config('two_agent_mdp.tml')
 
-    igibson_env = iGibsonEnv(config_file=exp_config['ig_config_file'],
-                             mode=args.mode,
-                             action_timestep=1.0 / 15,
-                             physics_timestep=1.0 / 30,
-                             use_pb_gui=False)
+    igibson_env = iGibsonEnv(
+        config_file=exp_config['ig_config_file'],
+        mode=args.mode,
+        action_timestep=1.0 / 15,
+        physics_timestep=1.0 / 240,  #1.0 / 30,
+        use_pb_gui=False)
+
+    # if not headless:
+    #     # Set a better viewing direction
+    #     igibson_env.simulator.viewer.initial_pos = [-0.3, -0.3, 1.1]
+    #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
+    #     igibson_env.simulator.viewer.reset_viewer()
 
     kitchen = Kitchen(igibson_env)
     kitchen.setup(map_config["layout"])
@@ -136,10 +144,13 @@ def main(args):
 
 
 def main_loop(igibson_env, robot_agent, human_agent, kitchen):
+    count = 0
     while True:
         human_agent.step()
-        robot_agent.step()
+        #robot_agent.step()
+        kitchen.step(count)
         igibson_env.simulator.step()
+        count += 1
 
 
 if __name__ == "__main__":

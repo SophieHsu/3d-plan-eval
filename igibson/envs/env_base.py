@@ -56,13 +56,16 @@ class BaseEnv(gym.Env):
         self.physics_timestep = physics_timestep
         self.rendering_settings = rendering_settings
         self.vr_settings = vr_settings
-        self.texture_randomization_freq = self.config.get("texture_randomization_freq", None)
-        self.object_randomization_freq = self.config.get("object_randomization_freq", None)
+        self.texture_randomization_freq = self.config.get(
+            "texture_randomization_freq", None)
+        self.object_randomization_freq = self.config.get(
+            "object_randomization_freq", None)
         self.object_randomization_idx = 0
         self.num_object_randomization_idx = 10
 
         default_enable_shadows = False  # What to do if it is not specified in the config file
-        enable_shadow = self.config.get("enable_shadow", default_enable_shadows)
+        enable_shadow = self.config.get("enable_shadow",
+                                        default_enable_shadows)
         default_enable_pbr = False  # What to do if it is not specified in the config file
         enable_pbr = self.config.get("enable_pbr", default_enable_pbr)
         texture_scale = self.config.get("texture_scale", 1.0)
@@ -98,8 +101,8 @@ class BaseEnv(gym.Env):
                 mode=mode,
                 physics_timestep=physics_timestep,
                 render_timestep=action_timestep,
-                image_width=self.config.get("image_width", 128),
-                image_height=self.config.get("image_height", 128),
+                image_width=self.config.get("image_width", 256),  #, 128),
+                image_height=self.config.get("image_height", 256),  #, 128),
                 vertical_fov=self.config.get("vertical_fov", 90),
                 device_idx=device_idx,
                 rendering_settings=self.rendering_settings,
@@ -135,7 +138,8 @@ class BaseEnv(gym.Env):
         """
         if self.object_randomization_freq is None:
             return
-        self.object_randomization_idx = (self.object_randomization_idx + 1) % (self.num_object_randomization_idx)
+        self.object_randomization_idx = (self.object_randomization_idx + 1) % (
+            self.num_object_randomization_idx)
         self.simulator.reload()
         self.load()
 
@@ -150,16 +154,20 @@ class BaseEnv(gym.Env):
         elif self.config["scene"] == "gibson":
             scene = StaticIndoorScene(
                 self.config["scene_id"],
-                waypoint_resolution=self.config.get("waypoint_resolution", 0.2),
+                waypoint_resolution=self.config.get("waypoint_resolution",
+                                                    0.2),
                 num_waypoints=self.config.get("num_waypoints", 10),
                 build_graph=self.config.get("build_graph", False),
-                trav_map_resolution=self.config.get("trav_map_resolution", 0.1),
+                trav_map_resolution=self.config.get("trav_map_resolution",
+                                                    0.1),
                 trav_map_erosion=self.config.get("trav_map_erosion", 2),
-                pybullet_load_texture=self.config.get("pybullet_load_texture", False),
+                pybullet_load_texture=self.config.get("pybullet_load_texture",
+                                                      False),
             )
         elif self.config["scene"] == "igibson":
             urdf_file = self.config.get("urdf_file", None)
-            if urdf_file is None and not self.config.get("online_sampling", True):
+            if urdf_file is None and not self.config.get(
+                    "online_sampling", True):
                 urdf_file = "{}_task_{}_{}_{}_fixed_furniture".format(
                     self.config["scene_id"],
                     self.config["task"],
@@ -170,20 +178,28 @@ class BaseEnv(gym.Env):
             scene = InteractiveIndoorScene(
                 self.config["scene_id"],
                 urdf_file=urdf_file,
-                waypoint_resolution=self.config.get("waypoint_resolution", 0.2),
+                waypoint_resolution=self.config.get("waypoint_resolution",
+                                                    0.2),
                 num_waypoints=self.config.get("num_waypoints", 10),
                 build_graph=self.config.get("build_graph", False),
-                trav_map_resolution=self.config.get("trav_map_resolution", 0.1),
+                trav_map_resolution=self.config.get("trav_map_resolution",
+                                                    0.1),
                 trav_map_erosion=self.config.get("trav_map_erosion", 2),
                 trav_map_type=self.config.get("trav_map_type", "with_obj"),
-                texture_randomization=self.texture_randomization_freq is not None,
-                object_randomization=self.object_randomization_freq is not None,
+                texture_randomization=self.texture_randomization_freq
+                is not None,
+                object_randomization=self.object_randomization_freq
+                is not None,
                 object_randomization_idx=self.object_randomization_idx,
-                should_open_all_doors=self.config.get("should_open_all_doors", False),
-                load_object_categories=self.config.get("load_object_categories", None),
-                not_load_object_categories=self.config.get("not_load_object_categories", None),
+                should_open_all_doors=self.config.get("should_open_all_doors",
+                                                      False),
+                load_object_categories=self.config.get(
+                    "load_object_categories", None),
+                not_load_object_categories=self.config.get(
+                    "not_load_object_categories", None),
                 load_room_types=self.config.get("load_room_types", None),
-                load_room_instances=self.config.get("load_room_instances", None),
+                load_room_instances=self.config.get("load_room_instances",
+                                                    None),
                 merge_fixed_links=self.config.get("merge_fixed_links", True)
                 and not self.config.get("online_sampling", False),
                 include_robots=include_robots,
@@ -202,7 +218,8 @@ class BaseEnv(gym.Env):
         if len(scene.robots) == 0:
             # Get corresponding robot class
             robot_name = robot_config.pop("name")
-            assert robot_name in REGISTERED_ROBOTS, "Got invalid robot to instantiate: {}".format(robot_name)
+            assert robot_name in REGISTERED_ROBOTS, "Got invalid robot to instantiate: {}".format(
+                robot_name)
             robot = REGISTERED_ROBOTS[robot_name](**robot_config)
 
             self.simulator.import_object(robot)
@@ -212,7 +229,8 @@ class BaseEnv(gym.Env):
             # The user can also specify "agent_pose" in the config file to use the cached agent pose for any robot
             # For example, the user can load a BehaviorRobot and place it at Fetch's agent pose
             agent_pose_name = self.config.get("agent_pose", robot_name)
-            if isinstance(scene, InteractiveIndoorScene) and agent_pose_name in scene.agent_poses:
+            if isinstance(scene, InteractiveIndoorScene
+                          ) and agent_pose_name in scene.agent_poses:
                 pos, orn = scene.agent_poses[agent_pose_name]
 
                 if agent_pose_name != robot_name:
@@ -223,11 +241,11 @@ class BaseEnv(gym.Env):
                 robot.set_position_orientation(pos, orn)
 
                 if any(
-                    detect_closeness(
-                        bid, exclude_bodyB=scene.objects_by_category["floors"][0].get_body_ids(), distance=0.01
-                    )
-                    for bid in robot.get_body_ids()
-                ):
+                        detect_closeness(
+                            bid,
+                            exclude_bodyB=scene.objects_by_category["floors"]
+                            [0].get_body_ids(),
+                            distance=0.01) for bid in robot.get_body_ids()):
                     log.warning("Robot's cached initial pose has collisions.")
 
         self.scene = scene

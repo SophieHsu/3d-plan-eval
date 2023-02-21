@@ -32,11 +32,14 @@ class ObjectGrouper(BaseObject):
                 obj.states[self.state_type].update()
 
     class AbsoluteStateAggregator(BaseStateAggregator):
+
         def get_value(self):
             if not issubclass(self.state_type, BooleanState):
-                raise ValueError("Aggregator can only aggregate boolean states.")
+                raise ValueError(
+                    "Aggregator can only aggregate boolean states.")
 
-            return all(obj.states[self.state_type].get_value() for obj in self.object_grouper.objects)
+            return all(obj.states[self.state_type].get_value()
+                       for obj in self.object_grouper.objects)
 
         def set_value(self, new_value):
             for obj in self.object_grouper.objects:
@@ -52,11 +55,13 @@ class ObjectGrouper(BaseObject):
         # but dump() directly.
         def dump(self):
             return ObjectGrouper.AbsoluteStateAggregator.GroupedStateDump(
-                obj.states[self.state_type].dump() for obj in self.object_grouper.objects
-            )
+                obj.states[self.state_type].dump()
+                for obj in self.object_grouper.objects)
 
         def load(self, data):
-            if isinstance(data, ObjectGrouper.AbsoluteStateAggregator.GroupedStateDump):
+            if isinstance(
+                    data,
+                    ObjectGrouper.AbsoluteStateAggregator.GroupedStateDump):
                 # We're loading a many-to-many data dump.
                 assert len(data) == len(self.object_grouper.objects)
 
@@ -72,11 +77,14 @@ class ObjectGrouper(BaseObject):
                     obj.states[self.state_type].load(data)
 
     class RelativeStateAggregator(BaseStateAggregator):
+
         def get_value(self, other):
             if not issubclass(self.state_type, BooleanState):
-                raise ValueError("Aggregator can only aggregate boolean states.")
+                raise ValueError(
+                    "Aggregator can only aggregate boolean states.")
 
-            return all(obj.states[self.state_type].get_value(other) for obj in self.object_grouper.objects)
+            return all(obj.states[self.state_type].get_value(other)
+                       for obj in self.object_grouper.objects)
 
         def set_value(self, other, new_value):
             for obj in self.object_grouper.objects:
@@ -98,17 +106,16 @@ class ObjectGrouper(BaseObject):
         state_types = state_types[0]
 
         self.states = {
-            state_type: ObjectGrouper.AbsoluteStateAggregator(state_type, self)
-            if issubclass(state_type, AbsoluteObjectState)
-            else ObjectGrouper.RelativeStateAggregator(state_type, self)
+            state_type:
+            ObjectGrouper.AbsoluteStateAggregator(state_type, self)
+            if issubclass(state_type, AbsoluteObjectState) else
+            ObjectGrouper.RelativeStateAggregator(state_type, self)
             for state_type in state_types
         }
 
         self.procedural_material = (
             ObjectGrouper.ProceduralMaterialAggregator(self)
-            if self.objects[0].procedural_material is not None
-            else None
-        )
+            if self.objects[0].procedural_material is not None else None)
 
     def __getattr__(self, item):
         # Check if the attr is the same for everything
@@ -119,9 +126,12 @@ class ObjectGrouper(BaseObject):
         if callable(attrs[0]):
 
             def grouped_function(*args, **kwargs):
-                rets = [getattr(obj, item)(*args, **kwargs) for obj in self.objects]
+                rets = [
+                    getattr(obj, item)(*args, **kwargs) for obj in self.objects
+                ]
                 if rets.count(rets[0]) != len(rets):
-                    raise ValueError("Methods on grouped objects had different results.")
+                    raise ValueError(
+                        "Methods on grouped objects had different results.")
 
                 return rets[0]
 
@@ -129,12 +139,16 @@ class ObjectGrouper(BaseObject):
 
         # These attributes are used during object import and should return
         # the concatenation results of all objects in self.objects
-        if item in ["visual_mesh_to_material", "link_name_to_vm", "body_ids", "is_fixed", "renderer_instances"]:
+        if item in [
+                "visual_mesh_to_material", "link_name_to_vm", "body_ids",
+                "is_fixed", "renderer_instances"
+        ]:
             return list(itertools.chain.from_iterable(attrs))
 
         # Otherwise, check that it's the same for everyone and then just return the value.
         if attrs.count(attrs[0]) != len(attrs):
-            raise ValueError("Grouped objects had different values for this attribute.")
+            raise ValueError(
+                "Grouped objects had different values for this attribute.")
 
         return attrs[0]
 
@@ -173,7 +187,8 @@ class ObjectGrouper(BaseObject):
 
     def set_base_link_position_orientation(self, pos, orn):
         for obj, (part_pos, part_orn) in zip(self.objects, self.pose_offsets):
-            new_pos, new_orn = p.multiplyTransforms(pos, orn, part_pos, part_orn)
+            new_pos, new_orn = p.multiplyTransforms(pos, orn, part_pos,
+                                                    part_orn)
             obj.set_base_link_position_orientation(new_pos, new_orn)
 
     def dump_state(self):
@@ -193,7 +208,8 @@ class ObjectMultiplexer(BaseObject):
     """A multi-object wrapper that acts as a proxy for the selected one between the set of objects it contains."""
 
     def __init__(self, name, multiplexed_objects, current_index):
-        assert multiplexed_objects and all(isinstance(obj, BaseObject) for obj in multiplexed_objects)
+        assert multiplexed_objects and all(
+            isinstance(obj, BaseObject) for obj in multiplexed_objects)
         assert 0 <= current_index < len(multiplexed_objects)
 
         for obj in multiplexed_objects:
@@ -204,7 +220,9 @@ class ObjectMultiplexer(BaseObject):
         self.current_index = current_index
         self.name = name
         categories = set(x.category for x in multiplexed_objects)
-        assert len(categories) == 1, "All multiplexed objects should be the same category."
+        assert len(
+            categories
+        ) == 1, "All multiplexed objects should be the same category."
         self.category = categories.pop()
 
     def set_selection(self, idx):
@@ -251,7 +269,8 @@ class ObjectMultiplexer(BaseObject):
         return self.current_selection().set_position_orientation(pos, orn)
 
     def set_base_link_position_orientation(self, pos, orn):
-        return self.current_selection().set_base_link_position_orientation(pos, orn)
+        return self.current_selection().set_base_link_position_orientation(
+            pos, orn)
 
     def get_base_link_position_orientation(self):
         return self.current_selection().get_base_link_position_orientation()
@@ -259,12 +278,14 @@ class ObjectMultiplexer(BaseObject):
     def dump_state(self):
         return {
             "current_index": self.current_index,
-            "sub_states": [obj.dump_state() for obj in self._multiplexed_objects],
+            "sub_states":
+            [obj.dump_state() for obj in self._multiplexed_objects],
         }
 
     def load_state(self, dump):
         self.current_index = dump["current_index"]
 
         assert len(dump) == len(self._multiplexed_objects)
-        for obj, obj_dump in zip(self._multiplexed_objects, dump["sub_states"]):
+        for obj, obj_dump in zip(self._multiplexed_objects,
+                                 dump["sub_states"]):
             obj.load_state(obj_dump)

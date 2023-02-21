@@ -6,6 +6,7 @@ _SLICER_LINK_NAME = "slicer"
 
 
 class Slicer(AbsoluteObjectState, LinkBasedStateMixin):
+
     def __init__(self, obj):
         super(Slicer, self).__init__(obj)
 
@@ -24,16 +25,24 @@ class Slicer(AbsoluteObjectState, LinkBasedStateMixin):
         for item in contact_points:
             if item.linkIndexA != self.link_id:
                 continue
-            contact_obj = self.simulator.scene.objects_by_id[item.bodyUniqueIdB]
+            try:
+                contact_obj = self.simulator.scene.objects_by_id[
+                    item.bodyUniqueIdB]
+            except:
+                contact_obj = None
+                for o in self.simulator.scene.get_objects():
+                    if item.bodyUniqueIdB in o._body_ids:
+                        contact_obj = o
+
             if Sliced in contact_obj.states:
-                if (
-                    not contact_obj.states[Sliced].get_value()
-                    and item.normalForce > contact_obj.states[Sliced].slice_force
-                ):
+                if (not contact_obj.states[Sliced].get_value()
+                        and item.normalForce >
+                        contact_obj.states[Sliced].slice_force):
                     contact_obj.states[Sliced].set_value(True)
 
     def _set_value(self, new_value):
-        raise ValueError("set_value not supported for valueless states like Slicer.")
+        raise ValueError(
+            "set_value not supported for valueless states like Slicer.")
 
     def _get_value(self):
         pass

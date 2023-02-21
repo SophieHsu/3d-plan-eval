@@ -6,6 +6,8 @@ from agent import Agent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
 import time
+from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
+from igibson.objects.articulated_object import URDFObject
 
 
 class HumanAgent():
@@ -113,6 +115,8 @@ class HumanAgent():
         end_continuous = grid_to_real_coord(loc)
         selected_object = None
         for o in objects:
+            if type(o) != URDFObject:
+                continue
             pos = o.get_position()
             if self.is_at_location(pos, end_continuous, 0.2):
                 selected_object = o
