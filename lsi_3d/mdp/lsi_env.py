@@ -36,6 +36,7 @@ class LsiEnv(object):
         self.human_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[0])
         self.robot_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[1])
         self.world_state = WorldState(mdp.hl_start_state)
+        self.world_state.players = [self.robot_state, self.human_state]
 
     def update_robot_hl_state(self, next_hl_state, action_object):
         '''

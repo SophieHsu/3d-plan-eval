@@ -25,6 +25,7 @@ from igibson.envs.igibson_env import iGibsonEnv
 import pybullet as p
 from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
+from lsi_3d.agents.hl_qmdp_agent import HlQmdpPlanningAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner
@@ -80,8 +81,12 @@ def setup(igibson_env, kitchen, configs, args):
         hhlp = HLHumanPlanner(mdp, mlp, False)
         robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
         robot_hlp.compute_mdp_policy(order_list)
+
+        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
+        robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
+                                     robot)
     elif planner_config == 2:
-        robot_hlp = HumanSubtaskQMDPPlanner(mdp)
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
         # mdp_planner = planners.HumanAwareMediumMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, hmlp, force_compute_all=True)
 
@@ -90,6 +95,9 @@ def setup(igibson_env, kitchen, configs, args):
 
         #hlp = HighLevelMdpPlanner(mdp)
         robot_hlp.compute_mdp(order_list)
+        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
+        robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
+                                     robot)
 
     # TODO: Get rid of 4.5 offset
     h_x, h_y = human_start
@@ -101,9 +109,7 @@ def setup(igibson_env, kitchen, configs, args):
 
     # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
 
-    human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
-    robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
-                                     robot)
+    
 
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
                              kitchen.grid, hlp, env, igibson_env)
@@ -146,8 +152,8 @@ def main(args):
 def main_loop(igibson_env, robot_agent, human_agent, kitchen):
     count = 0
     while True:
-        human_agent.step()
-        #robot_agent.step()
+        # human_agent.step()
+        robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1

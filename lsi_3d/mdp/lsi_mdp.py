@@ -13,6 +13,8 @@ class LsiMdp(object):
         self.delivery_reward = 20
         self.hl_start_state = hl_start_state
         self.pot_locations = self.get_pot_locations()
+        self.height = len(map)
+        self.width = len(map[0])
 
     @staticmethod
     def from_config(map_config, exp_config, grid):
@@ -90,6 +92,8 @@ class LsiMdp(object):
          tomato: same dict structure as above
         }
         """
+        return self.get_pot_locations()
+
         pots_states_dict = {}
         pots_states_dict['empty'] = []
         pots_states_dict['onion'] = defaultdict(list)

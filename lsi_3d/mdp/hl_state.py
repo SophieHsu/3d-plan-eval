@@ -8,6 +8,7 @@ class WorldState():
         in_pot, orders = self.parse_hl_state(start_hl_state)
         self.in_pot = in_pot
         self.orders = orders
+        self.players = []
 
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
@@ -36,7 +37,7 @@ class SoupState():
         self.onions_in_soup += 1
 
 class AgentState():
-    def __init__(self, hl_state, ml_state, ll_state = None) -> None:
+    def __init__(self, hl_state = None, ml_state = None, ll_state = None) -> None:
         self.hl_state = hl_state
         self.ml_state = ml_state
         self.ll_state = ll_state
@@ -73,6 +74,9 @@ class AgentState():
 
     def is_start_state(self):
         return self.hl_state == self.start_state
+    
+    def has_object(self):
+        return not self.holding == None and not self.holding == 'None'
 
     # def get_ready_pots(self):
     #     ready_pots = []

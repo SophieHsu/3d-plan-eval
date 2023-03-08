@@ -262,7 +262,7 @@ class HighLevelMdpPlanner(object):
                     ValueError()
         elif action == 'pickup' and obj == 'soup':
             if p0_obj != 'dish' and p0_obj != 'None':
-                location = self.drop_item(world_state)
+                location = self.drop_item(world_state, agent_state)
             elif p0_obj == 'None':
                 location = self.mdp.get_dish_dispenser_locations()
                 print(f'Next Dish Location: {location}')
@@ -281,7 +281,9 @@ class HighLevelMdpPlanner(object):
 
         elif action == 'deliver':
             if p0_obj != 'soup':
-                location = self.mdp.get_empty_counter_locations(world_state)
+                # TODO: Implement function
+                # location = self.mdp.get_empty_counter_locations(world_state)
+                location = self.drop_item(world_state, agent_state)
             else:
                 location = self.mdp.get_serving_locations()
 
@@ -300,5 +302,5 @@ class HighLevelMdpPlanner(object):
 
     def drop_item(self, world_state, agent_state):
         agent_state.holding = None
-        return agent_state.ml_state[0:2]
+        return [agent_state.ml_state[0:2]]
 

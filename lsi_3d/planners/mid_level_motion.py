@@ -1,3 +1,4 @@
+import math
 from lsi_3d.planners.two_agent_astar import run_astar_two_agent, single_agent_astar
 
 
@@ -24,5 +25,24 @@ class AStarMotionPlanner(object):
     def compute_single_agent_astar_path(self, start, goal):
         r1,c1,d1 = start
         return single_agent_astar(self.map, (r1,c1,d1), goal)
+
+    def min_cost_to_feature(self, start, feature_locations):
+        """Finds shortest distance to all features
+
+        Args:
+            start (_type_): _description_
+            feature_locations (_type_): _description_
+        """
+        min = None
+        min_feature_loc = None
+
+        for location in feature_locations:
+            path = self.compute_single_agent_astar_path(start, location)
+            dist = len(path) + 1
+            if min == None or dist < min:
+                min = dist
+                min_feature_loc = location
+
+        return (min, min_feature_loc)
 
     
