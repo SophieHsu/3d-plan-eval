@@ -244,6 +244,7 @@ class HighLevelMdpPlanner(object):
         Get the next location the agent will be in based on current world state and medium level actions.
         """
         p0_obj = p0_obj if p0_obj is not None else agent_state.holding
+        # p0_obj = agent_state.holding
         action, obj = action_obj
         #pots_states_dict = self.mdp.get_pot_states()
         location = []
@@ -301,6 +302,6 @@ class HighLevelMdpPlanner(object):
         return key
 
     def drop_item(self, world_state, agent_state):
-        agent_state.holding = None
+        agent_state.holding = 'None'
         return [agent_state.ml_state[0:2]]
 

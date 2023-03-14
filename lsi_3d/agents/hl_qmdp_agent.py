@@ -72,17 +72,25 @@ class HlQmdpPlanningAgent(Agent):
     def action(self, world_state, robot_state, human_sim_state = None):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
 
-        state_str = self.mdp_planner.get_mdp_key_from_state(world_state, robot_state, human_sim_state)
-        state_idx = self.mdp_planner.state_idx_dict[state_str]
+        robot_state_str = self.mdp_planner.get_mdp_key_from_state(world_state, robot_state, human_sim_state)
+        human_holding = self.env.human_state.holding
 
-        # retrieve high level action from policy
-        action_idx = self.mdp_planner.policy_matrix[state_idx]
+        # update the belief in a state by the result of observations
+        # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(state, state.players[0], num_item_in_pot, state.players[1], self.belief, self.prev_dist_to_feature, greedy=self.greedy_known)
+        self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(self.env.world_state, self.env.human_state, self.env.robot_state, self.belief, self.prev_dist_to_feature)
+        # map abstract to low-level state
+        mdp_state_keys = self.mdp_planner.world_to_state_keys(self.env.world_state, self.env.robot_state, self.env.human_state, self.belief)
+        # compute in low-level the action and cost
+        action_idx, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(self.env.world_state, mdp_state_keys, self.belief, 1)
+
+        state_str = f'{robot_state_str}_{human_holding}_pickup_onion'
+        state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # TODO: Eliminate need for this indexing
         #next_state_idx = np.where(self.mdp_planner.transition_matrix[action_idx][state_idx] == 1)[0][0]
         next_state_idx = np.argmax(self.mdp_planner.transition_matrix[action_idx][state_idx])#[0][0]
         next_state = list(self.mdp_planner.state_idx_dict.keys())[list(self.mdp_planner.state_idx_dict.values()).index(next_state_idx)]
-        print(f"Next HL Goal State: {next_state}")
+        # print(f"Next HL Goal State: {next_state}")
         keys = list(self.mdp_planner.action_idx_dict.keys())
         vals = list(self.mdp_planner.action_idx_dict.values())
         action_object_pair = self.mdp_planner.action_dict[keys[vals.index(action_idx)]]
@@ -126,11 +134,11 @@ class HlQmdpPlanningAgent(Agent):
 
         # update the belief in a state by the result of observations
         # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(state, state.players[0], num_item_in_pot, state.players[1], self.belief, self.prev_dist_to_feature, greedy=self.greedy_known)
-        self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(self.env.world_state, self.env.human_state, self.env.robot_state, self.belief, self.prev_dist_to_feature)
-        # map abstract to low-level state
-        mdp_state_keys = self.mdp_planner.world_to_state_keys(self.env.world_state, self.env.robot_state, self.env.human_state, self.belief)
-        # compute in low-level the action and cost
-        action, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(self.env.world_state, mdp_state_keys, self.belief, 1)
+        # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(self.env.world_state, self.env.human_state, self.env.robot_state, self.belief, self.prev_dist_to_feature)
+        # # map abstract to low-level state
+        # mdp_state_keys = self.mdp_planner.world_to_state_keys(self.env.world_state, self.env.robot_state, self.env.human_state, self.belief)
+        # # compute in low-level the action and cost
+        # action, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(self.env.world_state, mdp_state_keys, self.belief, 1)
 
 
         if not self.env.human_state.equal_hl(self.human_sim_state.hl_state):

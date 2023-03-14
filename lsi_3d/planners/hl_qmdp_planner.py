@@ -335,8 +335,6 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
 
     def world_state_to_mdp_state_key(self, state, player, other_player, subtask):
         # a0 pos, a0 dir, a0 hold, a1 pos, a1 dir, a1 hold, len(order_list)
-
-
         player_obj = None; other_player_obj = None
         if player.holding is not None:
             player_obj = player.holding
@@ -352,6 +350,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         #     for obj_pos, obj_state in state.objects.items():
         #         if obj_state.name == 'soup' and obj_state.state[1] > num_item_in_pot:
         #             num_item_in_pot = obj_state.state[1]
+        
         num_item_in_pot = state.in_pot
 
         state_strs = str(player_obj)+'_'+str(num_item_in_pot)+'_'+ order_str + '_' + str(other_player_obj) + '_' + subtask
@@ -594,6 +593,12 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
 
         return joint_action_plan[0], max(plan_costs)# num_of_non_stay_actions+num_of_stay_actions*COST_OF_STAY # in rss paper is max(plan_costs)
 
+    def compute_policy_rollout(self, start_state):
+        curr_state = start_state
+        #while is_not_end_state(curr_state):
+            #self.state_transition
+            #self.next_mdp_state_idx_arr[j]
+
     def step(self, world_state, mdp_state_keys, belief, agent_idx, low_level_action=False):
         """
         Compute plan cost that starts from the next qmdp state defined as next_state_v().
@@ -623,8 +628,11 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                     # print('action_idx =', action_idx)
                     next_state_idx = next_mdp_state_idx_arr[j]
                     after_action_world_state, cost, goals_pos = self.mdp_action_state_to_world_state(action_idx, mdp_state_idx, world_state, with_argmin=True)
+
+                    # calculate value cost from astar rollout of policy
                     # value_cost = self.compute_V(after_action_world_state, self.get_key_from_value(self.state_idx_dict, next_state_idx), search_depth=100)
                     value_cost = self.value_matrix[next_state_idx]
+
                     one_step_cost = cost# joint_action, one_step_cost = self.joint_action_cost(world_state, after_action_world_state.players_pos_and_or)  
                     # print('joint_action =', joint_action, 'one_step_cost =', one_step_cost)
                     # print('Action.ACTION_TO_INDEX[joint_action[agent_idx]] =', Action.ACTION_TO_INDEX[joint_action[agent_idx]])
@@ -633,8 +641,11 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                         next_state_v[i, action_idx] += (value_cost * self.transition_matrix[action_idx, mdp_state_idx, next_state_idx])
                         # print(next_state_v[i, action_idx])
 
+                        # normalized_cost = 
+
                         ## compute one step cost with joint motion considered
-                        action_cost[i, action_idx] -= (one_step_cost)*self.transition_matrix[action_idx, mdp_state_idx, next_state_idx]
+                        # action_cost[i, action_idx] -= (one_step_cost)*self.transition_matrix[action_idx, mdp_state_idx, next_state_idx]
+                        action_cost[i, action_idx] -= (1)*self.transition_matrix[action_idx, mdp_state_idx, next_state_idx]
                     else:
                         next_state_v[i, Action.ACTION_TO_INDEX[joint_action[agent_idx]]] += (value_cost * self.transition_matrix[action_idx, mdp_state_idx, next_state_idx])
                         # print(next_state_v[i, action_idx])
@@ -652,6 +663,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         # print("It took {} seconds for this step".format(time.time() - start_time))
         if low_level_action:
             return Action.INDEX_TO_ACTION[action_idx], None, low_level_action
+            
         return action_idx, self.action_dict[self.get_key_from_value(self.action_idx_dict, action_idx)], low_level_action
 
     def belief_update(self, world_state, human_state, robot_state, belief_vector, prev_dist_to_feature, greedy=False):
@@ -681,7 +693,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             game_logic_prob[i] = self._is_valid_object_subtask_pair(human_obj, subtask_key[i], world_state.in_pot, greedy=greedy)*1.0
     
             ## tune subtask estimation based on current human's position and action (use minimum distance between features)
-            possible_motion_goals = self.map_action_to_location(world_state, human_state, self.subtask_dict[subtask_key[i]])
+            possible_motion_goals = self.map_action_to_location(world_state, human_state, self.subtask_dict[subtask_key[i]], human_state.holding)
             # get next world state from human subtask info (aka. mdp action translate into medium level goal position)
             human_dist_cost, feature_pos = self.mlp.min_cost_to_feature(human_pos_and_or, possible_motion_goals) # select the feature position that is closest to current player's position in world state
             

@@ -57,7 +57,6 @@ class FixedPolicyAgent(Agent):
         #         motion_goals = am.pickup_tomato_actions(counter_objects)
         #     elif next_order is None or next_order == 'any':
         #         motion_goals = am.pickup_onion_actions(counter_objects) + am.pickup_tomato_actions(counter_objects)
-
         action,object = 'stay',agent_state.holding
 
 
