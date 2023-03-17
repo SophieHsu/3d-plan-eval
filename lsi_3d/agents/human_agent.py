@@ -33,6 +33,7 @@ class HumanAgent():
         self.igibson_env = igibson_env
         self.vr = vr
         self.insight_threshold = insight_threshold
+        self.prev_end = None
 
     def set_robot(self, robot):
         self.robot = robot
@@ -49,22 +50,22 @@ class HumanAgent():
             arrived = self._step(end, ori)
             self.lsi_env.update_joint_ml_state()
             if arrived:
-                self.lsi_env.update_human_hl_state(next_hl_state,
-                                                   action_object)
-                # time.sleep(5)
-
+                self.lsi_env.update_human_hl_state(next_hl_state, action_object)
+                # time.sleep(1)
+            
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
-        path = self.planner.find_path((x, y), end, self.occupancy_grid)
-        return self.motion_controller.step(self.human, self.robot, final_ori,
-                                           path)
+        path = self.planner.find_path((x,y), end, self.occupancy_grid)
+        is_new_end = True if (self.prev_end != end).all() else False
+        self.prev_end = end
+        return self.motion_controller.step(self.human, self.robot, final_ori, path, is_new_end)
 
     def pick(self, loc):
-        self.motion_controller.pick(self.human, loc)
+        return self.motion_controller.pick(self.human, loc)
 
-    def drop(self):
-        pass
+    def drop(self, loc):
+        return self.motion_controller.drop(self.human, loc)
 
     def open(self):
         pass
