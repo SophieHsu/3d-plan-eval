@@ -46,7 +46,7 @@ human:
   higher_limits: True
   use_tracked_body: False
   base_name: body
-  grasping_mode: assisted
+  grasping_mode: sticky
   controller_config:
     gripper_right_hand:
       name: JointController

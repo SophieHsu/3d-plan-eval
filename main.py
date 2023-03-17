@@ -16,6 +16,9 @@ from utils import real_to_grid_coord, grid_to_real_coord
 from igibson.simulator_vr import SimulatorVR
 
 from kitchen import Kitchen
+from tracking_env import TrackingEnv
+
+import time
 
 c_pos = [0, 0, 1.5]
 
@@ -76,12 +79,24 @@ def main():
     human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, env)
     human_agent.set_robot(robot)
 
+    tracking_env = TrackingEnv(env, kitchen.pans, kitchen.bowls, kitchen.onions, robot, human)
+
     # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
+    done = False
     while(True):
-        follow_entity_view(human)
-        human_agent.pick([-1.5, 1.5, 1.2])
+        follow_entity_view(tracking_env.pans[0])
+        # follow_entity_view(human)
+        # if done:
+        #     human_agent.drop([-1.5, 1.5, 1.2])
+        # else:
+        #     done = human_agent.pick([-1.5, 1.5, 1.2])
         # motion_controller_robot.step(robot_end, 1.57)
+        # tracking_env
+        # time.sleep(1)
+        # print(tracking_env.is_cooked())
+        # print("--------------------------------")
+        print(tracking_env.get_temp())
         env.simulator.step()
 
 if __name__ == "__main__":

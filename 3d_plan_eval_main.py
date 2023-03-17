@@ -113,7 +113,7 @@ def main(args):
 def main_loop(igibson_env, robot_agent, human_agent):
     while True:
         human_agent.step()
-        robot_agent.step()
+        #robot_agent.step()
         igibson_env.simulator.step()
 
 if __name__ == "__main__":

@@ -2,6 +2,8 @@ import numpy as np
 import os
 import igibson
 from igibson.objects.articulated_object import URDFObject
+from igibson.object_states.heat_source_or_sink import HeatSourceOrSink
+from igibson import object_states
 import pybullet as p
 
 class Kitchen():
@@ -12,6 +14,9 @@ class Kitchen():
         self.orientation_map = ""
         self.grid = ""
         self.bowlpans = []
+        self.bowls = []
+        self.pans = []
+        self.onions = []
 
     def setup(self, filepath):
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
@@ -72,7 +77,8 @@ class Kitchen():
             "bowl" : os.path.join(igibson.ig_dataset_path, "objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf"),
             "pan" : os.path.join(igibson.ig_dataset_path, "objects/frying_pan/36_0/36_0.urdf"),
             "sink" : os.path.join(igibson.ig_dataset_path, "objects/sink/kitchen_sink/kitchen_sink.urdf"),
-            "fridge": os.path.join(igibson.ig_dataset_path, "objects/fridge/11712/11712.urdf")
+            "fridge": os.path.join(igibson.ig_dataset_path, "objects/fridge/11712/11712.urdf"),
+            "onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/17_0/17_0.urdf")
         }
 
         name2scale_map = {
@@ -84,6 +90,7 @@ class Kitchen():
             "pan": np.array([1, 1, 1]),
             "sink": np.array([1.2, 1.25, 1.25]),
             "fridge": np.array([1.5, 1.2, 1.2]),
+            "onion": np.array([1.0, 1.0, 1.0])
         }
 
         name2shift_map = {
@@ -92,9 +99,10 @@ class Kitchen():
             "table_h": (0, 0.5, 0),
             "stove": (0, 0, 0),
             "bowl": (0, 0, 1.2),
-            "pan": (0, 0, 1.24),
+            "pan": (0.15, -0.1, 1.24),
             "sink": (0, 0, 0.1),
             "fridge": (0, 0, 0.2),
+            "onion": (0.15, -0.1, 0)
         }
 
         shift_l = 0.1
@@ -107,22 +115,57 @@ class Kitchen():
 
         objs = []
         for name, x, y in obj_x_y:
-            obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]))
-            self.env.simulator.import_object(obj)
+            obj = None
+            if name == "bowl":
+                obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]))
+                self.env.simulator.import_object(obj)
+                self.bowls.append(obj)
+
+                onion = URDFObject(name2path["onion"], scale=name2scale_map["onion"]/1.15, model_path="/".join(name2path["onion"].split("/")[:-1]), category="vidalia_onion")
+                self.env.simulator.import_object(onion)
+                orn = (0, 0, 0)
+                shift = name2shift_map["onion"]
+                pos = [x+shift[0]-4.5, y+shift[1]-4.5, 2.0+shift[2]]
+                self.env.set_pos_orn_with_z_offset(onion, tuple(pos), orn)
+                self.onions.append(onion)
+            elif name == "pan":
+                obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]))
+                self.env.simulator.import_object(obj)
+                self.pans.append(obj)
+                
+                onion = URDFObject(name2path["onion"], scale=name2scale_map["onion"]/1.15, model_path="/".join(name2path["onion"].split("/")[:-1]), category="vidalia_onion")
+                self.env.simulator.import_object(onion)
+                orn = (0, 0, 0)
+                shift = name2shift_map["onion"]
+                pos = [x+shift[0]-4.5, y+shift[1]-4.5, 2.0+shift[2]]
+                self.env.set_pos_orn_with_z_offset(onion, tuple(pos), orn)
+                self.onions.append(onion)
+            elif name == "stove":
+                obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="stove")
+                self.env.simulator.import_object(obj)
+                obj.states[object_states.ToggledOn].set_value(True)
+                # print(obj.states[object_states.ToggledOn].set_value(True))
+            else:
+                obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]))
+                self.env.simulator.import_object(obj)
 
             orn = orientation_map[(name, x, y)]
             shift = name2shift_map[name]
             if name == "counter":
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
+            elif name == "fridge":
+                x_shift, y_shift = mapping[orn]
+                shift = (x_shift, y_shift, 0)
             # pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
             pos = [x+shift[0]-4.5, y+shift[1]-4.5, 0+shift[2]]
-            self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn) 
+            self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
             if name not in ("bowl", "pan"):
                 objs.append(obj)
             else:
                 self.bowlpans.append((obj, pos))
+
         try:
             for obj in objs:
                 p.changeDynamics(obj.get_body_ids()[0],-1,mass=500)

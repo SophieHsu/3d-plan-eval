@@ -16,8 +16,9 @@ class MotionControllerHuman():
         self.arrived = False
         self.arrived_hand_step = 0
         self.original_hand_position = None
+        self.counter = 0
 
-    def step(self, human, robot, final_ori, path):
+    def step(self, human, robot, final_ori, path, is_new_end):
         x, y, z = human.get_position()
         qx, qy, qz, qw = human.get_orientation()
         _, _, theta = quat2euler(qx, qy, qz, qw)
@@ -40,8 +41,8 @@ class MotionControllerHuman():
                 vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc, robot)
                 self.arrived = False
 
-            # for negative velocities, just turn instead of going backwards
-            if vel[0] < 0 and self.rotate == False:
+            # for new end goal, just rotate
+            if is_new_end:
                 self.rotate = True
                 x_diff = next_loc[0] - x
                 y_diff = next_loc[1] - y
@@ -58,34 +59,53 @@ class MotionControllerHuman():
         return self.arrived
 
     def pick(self, human, loc):
+        pick_action = self.action(0, 0, 0, 0, 0, 1.0)
+        return self.move_hand(human, loc, pick_action)
+        
+    def drop(self, human, loc):
+        pick_action = self.action(0, 0, 0, 0, 0, -1.0)
+        return self.move_hand(human, loc, pick_action)
+
+    def move_hand(self, human, loc, mid_action):
         right_hand = human._parts["right_hand"]
         position = right_hand.get_position()
+        loc = self.original_hand_position if self.arrived_hand_step == 3 else loc
 
         x_diff = loc[0] - position[0]
         y_diff = loc[1] - position[1]
         z_diff = loc[2] - position[2]
-        max_val = max(x_diff, y_diff, z_diff)
+        norm_val =  math.sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
-        x_diff = x_diff / (max_val * 100)
-        y_diff = y_diff / (max_val * 100)
-        z_diff = z_diff / (max_val * 100)
+        x_diff = x_diff / (norm_val * 100)
+        y_diff = y_diff / (norm_val * 100)
+        z_diff = z_diff / (norm_val * 100)
 
-        # Go to location
         if self.arrived_hand_step == 0:
-            if math.dist(loc, position) > 0.1:
+            self.original_hand_position = position
+            self.arrived_hand_step = 1
+        # Go to location
+        elif self.arrived_hand_step == 1:
+            if math.dist(loc, position) > 0.05:
                 action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
                 human.apply_action(action)
             else:
-                self.arrived_hand_step = 1
-        # Grab
-        elif self.arrived_hand_step == 1:
-            action = self.action(0, 0, 0, 0, 0, 1.0)
-            human.apply_action(action)
-            self.arrived_hand_step = 2
-        # Return to location
+                self.arrived_hand_step = 2
+        # Middle action
         elif self.arrived_hand_step == 2:
-            pass
-            
+            human.apply_action(mid_action)
+            if self.counter > 200:
+                self.arrived_hand_step = 3
+                self.counter = 0
+            self.counter += 1
+        # Return to location
+        elif self.arrived_hand_step == 3:
+            if math.dist(loc, position) > 0.05:
+                action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
+                human.apply_action(action)
+            else:
+                self.arrived_hand_step = 0
+                return True
+        return False
 
     def action(self, forward, turn, right_hand_x, right_hand_y, right_hand_z, right_hand_grip):
         # 0 - Linear velocity
@@ -99,7 +119,7 @@ class MotionControllerHuman():
         action[20] = right_hand_y
         action[21] = -right_hand_x
         action[22] = right_hand_z
-        action[19] = right_hand_grip
+        action[26] = right_hand_grip
         return action
 
     def find_velocities_rotate(self, theta, final_ori):
@@ -166,7 +186,7 @@ class MotionControllerHuman():
     def get_possible_velocities(self):
         possible_vels = []
         # Velocities that are limited by acceleration and min/max velocities
-        vl_possible_vels = np.linspace(-self.MAX_LIN_VEL/20, self.MAX_LIN_VEL/20, 12)
+        vl_possible_vels = np.linspace(0, self.MAX_LIN_VEL/20, 7)
         va_possible_vels = np.linspace(-self.MAX_ANG_VEL/20, self.MAX_ANG_VEL/20, 7)
 
         for vl in vl_possible_vels:
