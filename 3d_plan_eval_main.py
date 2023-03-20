@@ -118,8 +118,8 @@ def environment_setup(args, headless=None):
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],
         mode=args.mode,
-        action_timestep=1.0 / 15,
-        physics_timestep=1.0 / 240,  #1.0 / 30,
+        action_timestep=1.0 / 60,
+        physics_timestep=1.0 / 120,  #1.0 / 30,
         use_pb_gui=False)
 
     # if not headless:
