@@ -78,11 +78,14 @@ class HlQmdpPlanningAgent(Agent):
         # update the belief in a state by the result of observations
         # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(state, state.players[0], num_item_in_pot, state.players[1], self.belief, self.prev_dist_to_feature, greedy=self.greedy_known)
         self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(self.env.world_state, self.env.human_state, self.env.robot_state, self.belief, self.prev_dist_to_feature)
+        print('belief: ',self.belief)
+        print('prev_dist_to_feature ' , self.prev_dist_to_feature)
         # map abstract to low-level state
         mdp_state_keys = self.mdp_planner.world_to_state_keys(self.env.world_state, self.env.robot_state, self.env.human_state, self.belief)
         # compute in low-level the action and cost
         action_idx, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(self.env.world_state, mdp_state_keys, self.belief, 1)
-
+        
+        # TODO: state string is used for updating robot state, so pickup onion gets discarded, proper environment update will remove this code
         state_str = f'{robot_state_str}_{human_holding}_pickup_onion'
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
@@ -183,7 +186,7 @@ class HlQmdpPlanningAgent(Agent):
 
             print(f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}')
             print(f'Human Holding {self.env.robot_state.holding}')
-            print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}', )
+            print(f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}')
 
             # self.optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
             

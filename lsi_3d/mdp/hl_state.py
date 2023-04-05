@@ -4,7 +4,7 @@ class WorldState():
     """Keeps track of items in the world that are shared accross agents
     i.e. items in pot, and orders left
     """
-    def __init__(self, start_hl_state):
+    def __init__(self, start_hl_state=None):
         in_pot, orders = self.parse_hl_state(start_hl_state)
         self.in_pot = in_pot
         self.orders = orders
@@ -27,6 +27,11 @@ class WorldState():
 
         if action_object == ('deliver', 'soup'):
             self.orders = self.orders[:-1]
+
+    def from_string(self, state_str):
+        holding, in_pot, *orders = state_str.split('_')
+        self.in_pot = in_pot
+        self.orders = orders
 
 class SoupState():
     def __init__(self, location, onions_in_soup) -> None:

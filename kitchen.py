@@ -1,3 +1,4 @@
+from math import floor
 import numpy as np
 import os
 import igibson
@@ -6,6 +7,8 @@ from igibson.objects.articulated_object import URDFObject
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 from igibson.utils.assets_utils import get_ig_model_path
 import pybullet as p
+
+from lsi_3d.utils.constants import DIRE2POSDIFF
 
 
 class Kitchen():
@@ -18,6 +21,7 @@ class Kitchen():
         self.grid = ""
         self.bowlpans = []
         self.food_obj = []
+        self.tile_location = {}
 
     def setup(self, filepath):
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
@@ -66,6 +70,16 @@ class Kitchen():
                     grid, x, y - 1)  # left and right neighbor
                 orientation_map[(name, x, y)] = self.get_orientation(
                     center_x, center_y, x, y, ori)
+
+            # TODO: complete this
+            if name == 'fridge':
+                self.tile_location['F'] = (x,y)
+            elif name == 'stove':
+                self.tile_location['S'] = (x,y)
+            elif name == 'bowl':
+                self.tile_location['B'] = (x,y)
+            elif name == 'table_h':
+                self.tile_location['T'] = (x,y)
 
         self.orientation_map = orientation_map
         self.grid = grid
@@ -426,20 +440,50 @@ class Kitchen():
                 orientation = (0, 0, -1.5707)
         return orientation
 
+    def get_center(self):
+        grid_center = (floor(len(self.grid)/2),floor(len(self.grid[0])/2))
+        return grid_center
+    
+    def nearest_empty_tile(self, loc):
+        grid_center = (floor(len(self.grid)/2),floor(len(self.grid[0])/2))
+        open_spaces = []
+        x,y = loc
+        if self.grid[x][y] == 'X':
+            return loc
+        else:
+            for dir,add in DIRE2POSDIFF.items():
+                d_x,d_y = add
+                n_x,n_y = (x+d_x, y+d_y)
+                if self.grid[n_x][n_y] == 'X':
+                    open_spaces.append((n_x,n_y))
+
+        # manhattan dist to center pick closest
+        chosen_space = None
+        chosen_dist = 1000000
+        for space in open_spaces:
+            gcx, gcy = grid_center
+            sx,sy = space
+            dist = abs(gcx-sx)+abs(gcy-sy)
+            if dist < chosen_dist:
+                chosen_space = space
+                chosen_dist = dist
+
+        return chosen_space
+
     def step(self, count=0):
         for obj in self.food_obj:
-            try:
-                print(
-                    "%s. Temperature: %.2f. Frozen: %r. Cooked: %r. Burnt: %r."
-                    % (
-                        obj.name,
-                        obj.states[object_states.Temperature].get_value(),
-                        obj.states[object_states.Frozen].get_value(),
-                        obj.states[object_states.Cooked].get_value(),
-                        obj.states[object_states.Burnt].get_value(),
-                    ))
-            except:
-                pass
+            # try:
+            #     print(
+            #         "%s. Temperature: %.2f. Frozen: %r. Cooked: %r. Burnt: %r."
+            #         % (
+            #             obj.name,
+            #             obj.states[object_states.Temperature].get_value(),
+            #             obj.states[object_states.Frozen].get_value(),
+            #             obj.states[object_states.Cooked].get_value(),
+            #             obj.states[object_states.Burnt].get_value(),
+            #         ))
+            # except:
+            #     pass
 
             if obj.name == "green_onion_multiplexer" and count > 80:
                 print("Slicing the green onion and moving the parts")
@@ -458,4 +502,3 @@ class Kitchen():
                     part_obj.set_position(new_pos)
                     self.food_obj.append(part_obj)
 
-        print()

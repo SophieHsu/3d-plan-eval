@@ -73,7 +73,7 @@ def setup(igibson_env, kitchen, configs, args):
 
     #######################################################################################
 
-    mlp = AStarMotionPlanner(kitchen.grid)
+    mlp = AStarMotionPlanner(kitchen)
     # hhlp = HLGreedyHumanPlanner(mdp, mlp)
 
     planner_config = 2
@@ -95,6 +95,7 @@ def setup(igibson_env, kitchen, configs, args):
 
         #hlp = HighLevelMdpPlanner(mdp)
         robot_hlp.compute_mdp(order_list)
+        robot_hlp.post_mdp_setup()
         human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
         robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                      robot)
@@ -125,7 +126,7 @@ def environment_setup(args, headless=None):
         config_file=exp_config['ig_config_file'],
         mode=args.mode,
         action_timestep=1.0 / 15,
-        physics_timestep=1.0 / 240,  #1.0 / 30,
+        physics_timestep=1.0 / 30,  #1.0 / 30,
         use_pb_gui=False)
 
     # if not headless:

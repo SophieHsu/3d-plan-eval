@@ -20,6 +20,9 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
         super().__init__(mdp) #, mlp_params, \
         # state_dict = {}, state_idx_dict = {}, action_dict = {}, action_idx_dict = {}, transition_matrix = None, reward_matrix = None, policy_matrix = None, value_matrix = None, \
         # num_states = 0, num_rounds = 0, epsilon = 0.01, discount = 0.8)
+    
+    def init_cost(self, cost_matrix=None):
+        return super().init_cost(cost_matrix)
 
     def init_human_aware_states(self, state_idx_dict=None, order_list=None):
         # print('In init_human_aware_states()')
@@ -279,6 +282,7 @@ class HLHumanAwareMDPPlanner(HighLevelMdpPlanner):
         self.init_actions()
         self.init_transition_matrix()
         self.init_reward()
+        self.init_cost()
 
     def gen_state_dict_key(self, state, player, soup_finish, other_player):
         # a0 pos, a0 dir, a0 hold, a1 pos, a1 dir, a1 hold, len(order_list)

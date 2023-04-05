@@ -87,6 +87,10 @@ class HighLevelMdpPlanner(object):
         self.transition_matrix = game_logic_transition
         return
 
+    def init_cost(self, cost_matrix=None):
+        self.cost_matrix = cost_matrix if cost_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
+
+
     def ml_state_to_objs(self, state_obj):
         # state: obj + action + bool(soup nearly finish) + orders
         player_obj = state_obj[0]; soup_finish = state_obj[1];
@@ -184,14 +188,27 @@ class HighLevelMdpPlanner(object):
         self.init_actions()
         self.init_transition_matrix()
         self.init_reward()
+        self.init_cost()
 
-    def bellman_operator(self, V=None):
+    # def bellman_operator(self, V=None):
+    #     if V is None:
+    #         V = self.value_matrix
+
+    #     Q = np.zeros((self.num_actions, self.num_states))
+    #     for a in range(self.num_actions):
+    #         Q[a] = self.reward_matrix[a] + self.discount * self.transition_matrix[a].dot(V)
+
+    #     return Q.max(axis=0), Q.argmax(axis=0)
+
+    def bellman_operator(self, V=None, normalize_constant=50):
         if V is None:
             V = self.value_matrix
 
         Q = np.zeros((self.num_actions, self.num_states))
+        self.cost_matrix /= normalize_constant
         for a in range(self.num_actions):
-            Q[a] = self.reward_matrix[a] + self.discount * self.transition_matrix[a].dot(V)
+            # Q[a] = self.reward_matrix[a] - self.cost_matrix[a] + self.discount * self.transition_matrix[a].dot(V)
+            Q[a] = self.reward_matrix[a] + np.sum(self.transition_matrix[a]*((self.discount*V)-self.cost_matrix[a]), axis=1)
 
         return Q.max(axis=0), Q.argmax(axis=0)
 
@@ -238,6 +255,9 @@ class HighLevelMdpPlanner(object):
 
         print("It took {} seconds to create MediumLevelMdpPlanner".format(time.time() - start_time))
         return 
+
+    def post_mdp_setup(self):
+        return
 
     def map_action_to_location(self, world_state, agent_state, action_obj, p0_obj = None):
         """
@@ -301,7 +321,9 @@ class HighLevelMdpPlanner(object):
 
         return key
 
-    def drop_item(self, world_state, agent_state):
+    def drop_item(self, world_state, agent_state=None):
+        if agent_state == None:
+            return [(0,0)]
         agent_state.holding = 'None'
         return [agent_state.ml_state[0:2]]
 
