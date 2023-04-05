@@ -16,6 +16,9 @@ from utils import real_to_grid_coord, grid_to_real_coord
 from igibson.simulator_vr import SimulatorVR
 
 from kitchen import Kitchen
+from tracking_env import TrackingEnv
+
+import time
 
 c_pos = [0, 0, 1.5]
 
@@ -47,7 +50,7 @@ def follow_entity_view_top(entity):
 
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
-    kitchen_layout = "./kitchen_layouts_grid_text\kitchen0.txt"
+    kitchen_layout = "./kitchen_layouts_grid_text\kitchen.txt"
     # Simple test:
     robot_x, robot_y = 0, 0
     # robot_end = (0, 0)
@@ -55,7 +58,7 @@ def main():
     # human_end = (2, 1)
     
     env = iGibsonEnv(
-        config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
+        config_file=config_file, mode="vr", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
     )
 
     kitchen = Kitchen(env)
@@ -73,15 +76,32 @@ def main():
     
     a_star_planner = AStarPlanner(env)
     motion_controller = MotionControllerHuman()
-    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, env)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, env, vr=True)
     human_agent.set_robot(robot)
+
+    tracking_env = TrackingEnv(env, kitchen, robot, human)
 
     # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
+    done = False
     while(True):
-        follow_entity_view(human)
-        human_agent.pick([-1.5, 1.5, 1.2])
+        # follow_entity_view(tracking_env.pans[0])
+        # follow_entity_view(human)
+        # if done:
+        #     human_agent.drop([-1.5, 1.5, 1.2])
+        # else:
+        #     done = human_agent.pick([-1.5, 1.5, 1.2])
         # motion_controller_robot.step(robot_end, 1.57)
+        # tracking_env
+        # time.sleep(1)
+        # print(tracking_env.is_cooked())
+        # print("--------------------------------")
+        human_agent.step()
+        print(tracking_env.obj_in_human_hand())
+        # print(tracking_env.obj_in_human_hand())
+        # test = tracking_env.get_pan_status()
+        # key = list(test.keys())[0]
+        # print(len(test[key]))
         env.simulator.step()
 
 if __name__ == "__main__":
