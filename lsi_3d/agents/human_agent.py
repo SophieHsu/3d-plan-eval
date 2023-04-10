@@ -93,7 +93,7 @@ class HumanAgent():
             action, object = ('pickup', 'dish')
             next_hl_state = f'dish_{world_state.in_pot}'
             agent_state.next_holding = 'dish'
-        elif agent_state.holding == 'dish' and world_state.in_pot == 3:
+        elif agent_state.holding == 'dish' and world_state.in_pot == self.lsi_env.mdp.num_items_for_soup:
             action, object = ('pickup', 'soup')
             # world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
@@ -119,8 +119,26 @@ class HumanAgent():
             if type(o) != URDFObject:
                 continue
             pos = o.get_position()
-            if self.is_at_location(pos, end_continuous, 0.2):
+
+            if 'table' in o.name:
+                if o.name == 'table_h':
+                    pos1 = [pos[0],pos[1]-0.5,pos[2]]
+                    pos2 = [pos[0],pos[1]+0.5,pos[2]]
+                
+                elif o.name == 'table_v':
+                    pos1 = [pos[0]-0.5,pos[1],pos[2]]
+                    pos2 = [pos[0]+0.5,pos[1],pos[2]]
+
+                atleft = self.is_at_location(pos1, end_continuous, 0.2)
+                atright = self.is_at_location(pos2, end_continuous, 0.2)
+                if atleft or atright:
+                    selected_object = o
+                    break
+
+            elif self.is_at_location(pos, end_continuous, 0.2):
                 selected_object = o
+                break
+
         pos, ori = selected_object.get_position_orientation()
         ori = quat2euler(ori[0], ori[1], ori[2], ori[3])[2]
         # absolute transformation
@@ -130,6 +148,7 @@ class HumanAgent():
         return pos[0:2], normalize_radians(ori + math.pi)
 
     def is_at_location(self, loc, dest, tolerance):
+
         if (dest[0] - tolerance) < loc[0] < (dest[0] + tolerance) and (
                 dest[1] - tolerance) < loc[1] < (dest[1] + tolerance):
             return True

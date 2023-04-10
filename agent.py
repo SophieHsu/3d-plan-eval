@@ -23,7 +23,7 @@ class FixedMediumPlan(Agent):
         #     return MLAction.STAY
         # else:
         if self.plan == []:
-            return 'I'
+            return ('I',(0,0,'N'))
         action = self.plan[self.i]
         self.i += 1
         return action

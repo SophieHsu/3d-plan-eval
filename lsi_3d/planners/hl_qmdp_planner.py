@@ -197,7 +197,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         player_obj = human_state[0]; subtask = human_state[1]
         soup_finish = world_info[0]; orders = [] if len(world_info) < 2 else world_info[1:]
         next_obj = player_obj; next_subtasks = []; 
-        next_soup_finish = soup_finish;
+        next_soup_finish = soup_finish
 
         if player_obj == 'None':
             if subtask == 'pickup_dish':
@@ -622,6 +622,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                     # min_plan, min_location = self.mlp.min_cost_to_feature(, next_locations)
 
                     self.cost_matrix[action_idx][curr_state_idx][next_state_idx] = 5
+
                 
 
 

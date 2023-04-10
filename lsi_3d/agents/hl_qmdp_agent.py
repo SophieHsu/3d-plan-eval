@@ -69,6 +69,14 @@ class HlQmdpPlanningAgent(Agent):
 
         return state_str
 
+    
+    def get_first_key_starts_with_str(self, my_dict, my_str):
+        for key in my_dict:
+            if key.startswith(my_str):
+                return key
+        # if no matching key is found
+        return None
+
     def action(self, world_state, robot_state, human_sim_state = None):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
 
@@ -86,7 +94,10 @@ class HlQmdpPlanningAgent(Agent):
         action_idx, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(self.env.world_state, mdp_state_keys, self.belief, 1)
         
         # TODO: state string is used for updating robot state, so pickup onion gets discarded, proper environment update will remove this code
-        state_str = f'{robot_state_str}_{human_holding}_pickup_onion'
+        # state_str = f'{robot_state_str}_{human_holding}_pickup_onion'
+        action,obj = action_object_pair
+        # state_str = f'{robot_state_str}_{human_holding}_pickup_onion'
+        state_str = self.get_first_key_starts_with_str(self.mdp_planner.state_idx_dict, f'{robot_state_str}_{human_holding}')
         state_idx = self.mdp_planner.state_idx_dict[state_str]
 
         # TODO: Eliminate need for this indexing
@@ -230,7 +241,7 @@ class HlQmdpPlanningAgent(Agent):
             h_x,h_y,h_f = self.env.human_state.ml_state
             r_x,r_y,r_f = self.env.robot_state.ml_state
             if (h_x,h_y) != (r_x,r_y):
-                self.env.robot_state.mode == Mode.CALC_HL_PATH
+                self.env.robot_state.mode = Mode.CALC_HL_PATH
         self.env.nav_env.simulator.step()
 
         if self.env.robot_state.mode == Mode.INTERACT:

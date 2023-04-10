@@ -9,7 +9,7 @@ class LsiMdp(object):
         self.map = map
         self.start_order_list = ['onion', 'onion']
         self.start_locations = start_locations
-        self.num_items_for_soup = 3
+        self.num_items_for_soup = 2
         self.delivery_reward = 20
         self.hl_start_state = hl_start_state
         self.pot_locations = self.get_pot_locations()
@@ -30,7 +30,7 @@ class LsiMdp(object):
         #         grid[r].append(split[r][c])
         
 
-
+        
         hl_start_state = exp_config['hl_start_state']
         # start_locations = [(agent_config['start_x'], agent_config['start_y'], agent_config['start_direction']) for agent_config in agent_configs]
         start_locations = [(exp_config['human_start_x'], exp_config['human_start_y'], 'S'), (exp_config['robot_start_x'], exp_config['robot_start_y'], 'S')]

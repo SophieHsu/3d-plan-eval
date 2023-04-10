@@ -30,7 +30,7 @@ class HighLevelMdpPlanner(object):
 
         # objects agent is holding or not
         objects = ['onion', 'soup', 'dish', 'None']
-        max_in_soup = 3
+        max_in_soup = self.mdp.num_items_for_soup
 
         for order_num in range(len(order_list)+1): # +1 for case where nothing is held
             for onion_count in range(max_in_soup+1):

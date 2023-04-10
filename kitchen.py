@@ -25,6 +25,7 @@ class Kitchen():
         self.pans = []
         self.onions = []
         self.table = None
+        self.food_obj = []
 
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
         self.tile_location = {}

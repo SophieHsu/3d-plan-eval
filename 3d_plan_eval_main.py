@@ -153,7 +153,7 @@ def main(args):
 def main_loop(igibson_env, robot_agent, human_agent, kitchen):
     count = 0
     while True:
-        # human_agent.step()
+        human_agent.step()
         robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
