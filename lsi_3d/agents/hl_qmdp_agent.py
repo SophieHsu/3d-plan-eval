@@ -45,6 +45,14 @@ class HlQmdpPlanningAgent(Agent):
 
         self.human_sim_state = AgentState(None, env.human_state.ml_state)
 
+        # for new step function
+        self.ml_robot_action = None
+        self.ml_robot_plan = []
+        self.ml_human_action = None
+        self.ml_human_plan = []
+        self.take_hl_robot_step = True
+        self.take_ml_robot_step = True
+
     def get_pot_status(self, state):
         pot_states = self.mdp_planner.mdp.get_pot_states(state)
         ready_pots = pot_states["tomato"]["ready"] + pot_states["onion"]["ready"]
@@ -141,7 +149,81 @@ class HlQmdpPlanningAgent(Agent):
         n_x, n_y, n_f = grid_transition('F', state)
         return (n_x,n_y) == goal
 
+    def update_world_state(self):
+        if self.ml_robot_action:
+            ml_a, ml_loc = self.ml_robot_action
+
+            if ml_a == 'I':
+                hl_next_robot_state, hl_robot_goal, hl_robot_action_object = self.hl_robot_action
+                self.env.update_robot_hl_state(hl_next_robot_state, hl_robot_action_object)
+
+    def hl_human_step(self):
+
+        if not self.env.human_state.equal_hl(self.human_sim_state.hl_state):
+            self.hl_human_action = self.hl_human_agent.action(self.env.world_state, self.env.human_state, self.env.robot_state)
+
+            self.next_human_hl_state, self.human_goal, self.human_action_object = self.hl_human_action
+            self.human_ml_plan = self.mlp.compute_single_agent_astar_path(self.env.human_state.ml_state, self.human_goal)
+        return self.hl_human_action
+
+    def ml_human_step(self):
+
+        # if simply iterating through return next
+        if not self.env.human_state.equal_ml(self.human_sim_state) or self.ml_human_action == None:
+            self.ml_human_action = self.human_ml_plan.pop(0)
+        return self.ml_human_action
+
+    def hl_robot_step(self):
+        # want to recalculate when recalc_res 
+        if self.take_hl_robot_step or len(self.robot_plan) % self.recalc_res == 0:
+            self.hl_robot_action = self.action(self.env.world_state, self.env.robot_state, self.human_sim_state)
+            self.next_robot_hl_state, self.robot_goal, self.robot_action_object = self.hl_robot_action
+            self.robot_ml_plan = self.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_ml_plan, self.human_goal, radius=2)
+            self.take_hl_robot_step = False
+
+        return self.hl_robot_action
+
+    def ml_robot_step(self):
+        if self.take_ml_robot_step:
+            self.ml_robot_action = self.robot_ml_plan.pop(0)
+            self.take_ml_robot_step = False
+
+    def ll_step(self):
+        self.ig_robot.agent_move_one_step(self.env.nav_env, self.a_r)
+            
+        if self.ig_robot.action_completed(self.ml_robot_action) or self.ml_robot_action == 'D':
+            self.env.update_joint_ml_state()
+            if (self.robot_plan.i == len(self.robot_plan.plan) or self.robot_plan.i == 1 or (self.robot_plan.i % self.recalc_res) == 0) and self.a_r != None: #recalc_res: #or a_r == MLAction.STAY:
+                # calculate path again
+                self.take_hl_robot_step = True
+            else:
+                pos_r, self.a_r = self.robot_plan.action()
+
+                self.env.update_joint_ml_state()
+                self.ig_robot.prepare_for_next_action(self.a_r)
+
+                self._reset_arm_position(self.ig_robot)
+
+                if self.a_r == 'D' and self.env.robot_state.mode != Mode.IDLE:
+                    self.idle_last_ml_location = self.env.human_state.ml_state
+                    self.env.robot_state.mode = Mode.IDLE
+
+                if self.a_r == 'I': #and env.robot_state == robot_goal:
+                    self.env.robot_state.mode = Mode.INTERACT
+
+                if self.human_sim_state.mode == Mode.IDLE:
+                    self.env.human_sim_state.mode = Mode.EXEC_ML_PATH
+
+
     def step(self):
+        self.update_world_state()
+        self.hl_human_action = self.hl_human_step()
+        self.hl_robot_action = self.hl_robot_step()
+        self.ml_human_action = self.ml_human_step()
+        self.ml_robot_action = self.ml_robot_step()
+        self.ll_step()
+
+    def step_old(self):
         hl_robot_agent = self
         init_action = np.zeros(self.env.nav_env.action_space.shape)
         self.ig_robot.object.apply_action(init_action)
@@ -245,6 +327,7 @@ class HlQmdpPlanningAgent(Agent):
         self.env.nav_env.simulator.step()
 
         if self.env.robot_state.mode == Mode.INTERACT:
+
             self.env.update_robot_hl_state(self.next_robot_hl_state, self.robot_action_object_pair)
             self.env.robot_state.mode = Mode.CALC_HL_PATH
 

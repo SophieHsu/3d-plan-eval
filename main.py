@@ -50,7 +50,7 @@ def follow_entity_view_top(entity):
 
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
-    kitchen_layout = "./kitchen_layouts_grid_text\kitchen.txt"
+    kitchen_layout = "./kitchen_layouts_grid_text/kitchen.txt"
     # Simple test:
     robot_x, robot_y = 0, 0
     # robot_end = (0, 0)
@@ -58,7 +58,7 @@ def main():
     # human_end = (2, 1)
     
     env = iGibsonEnv(
-        config_file=config_file, mode="vr", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
+        config_file=config_file, mode="gui_interactive", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
     )
 
     kitchen = Kitchen(env)
@@ -76,7 +76,7 @@ def main():
     
     a_star_planner = AStarPlanner(env)
     motion_controller = MotionControllerHuman()
-    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, env, vr=True)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, env, vr=False)
     human_agent.set_robot(robot)
 
     tracking_env = TrackingEnv(env, kitchen, robot, human)
