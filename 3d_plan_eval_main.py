@@ -13,6 +13,7 @@ from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
 from lsi_3d.agents.human_agent import HumanAgent
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
+from tracking_env import TrackingEnv
 from utils import real_to_grid_coord, grid_to_real_coord
 
 from kitchen import Kitchen
@@ -86,7 +87,9 @@ def setup(igibson_env, kitchen, configs, args):
         robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                      robot)
     elif planner_config == 2:
-        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
+        tracking_env = TrackingEnv(env, kitchen, robot, human)
+        tracking_env.step()
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp, tracking env)
         # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
         # mdp_planner = planners.HumanAwareMediumMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, hmlp, force_compute_all=True)
 
