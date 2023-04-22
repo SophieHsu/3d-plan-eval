@@ -5,6 +5,7 @@ from igibson.objects.articulated_object import URDFObject
 from igibson.robots.manipulation_robot import IsGraspingState
 from igibson import object_states
 import pybullet as p
+from utils import quat2euler
 
 class TrackingEnv():
     def __init__(self, igibsonEnv, kitchen, robot, human):
@@ -63,3 +64,11 @@ class TrackingEnv():
             grasping = self.human.is_grasping_all_arms(body_id)
             if IsGraspingState.TRUE in grasping:
                 return obj
+            
+    def get_human_position(self):
+        return self.human.get_position()
+    
+    def get_human_orientation(self):
+       orientation = self.human.get_orientation()
+       x, y, z = quat2euler(orientation[0], orientation[1], orientation[2], orientation[3])
+       return [x, y, z]

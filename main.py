@@ -49,6 +49,7 @@ def follow_entity_view_top(entity):
 
 
 def main():
+    
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
     kitchen_layout = "./kitchen_layouts_grid_text/kitchen.txt"
     # Simple test:
@@ -58,7 +59,7 @@ def main():
     # human_end = (2, 1)
     
     env = iGibsonEnv(
-        config_file=config_file, mode="gui_interactive", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
+        config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
     )
 
     kitchen = Kitchen(env)
@@ -85,23 +86,29 @@ def main():
     # top_camera_view()
     done = False
     while(True):
-        # follow_entity_view(tracking_env.pans[0])
         # follow_entity_view(human)
         # if done:
         #     human_agent.drop([-1.5, 1.5, 1.2])
         # else:
         #     done = human_agent.pick([-1.5, 1.5, 1.2])
         # motion_controller_robot.step(robot_end, 1.57)
-        # tracking_env
-        # time.sleep(1)
-        # print(tracking_env.is_cooked())
-        # print("--------------------------------")
+
         human_agent.step()
-        print(tracking_env.obj_in_human_hand())
-        # print(tracking_env.obj_in_human_hand())
+        # if tracking_env.obj_in_human_hand() is not None:
+        #     print(tracking_env.obj_in_human_hand().name)
+
+        # test = tracking_env.get_pan_status()
+        # key = list(test.keys())[0]
+        # print(tracking_env.is_pan_cooked(key))
+
         # test = tracking_env.get_pan_status()
         # key = list(test.keys())[0]
         # print(len(test[key]))
+
+        # test = tracking_env.get_bowl_status()
+        # key = list(test.keys())[0]
+        # print(len(test[key]))
+
         env.simulator.step()
 
 if __name__ == "__main__":

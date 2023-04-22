@@ -87,7 +87,7 @@ class Kitchen():
             "sink": "W",
             "fridge": "F",
             "broccoli": "F",
-            "steak": "F",
+            "steak": "P",
             "green_onion": "K",
             "tray": "F",
             "apple": "F",
@@ -129,38 +129,6 @@ class Kitchen():
             "fridge":
             os.path.join(igibson.ig_dataset_path,
                          "objects/fridge/11712/11712.urdf"),
-            "broccoli":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/broccoli/28_0/28_0.urdf"),
-            "green_onion":
-            os.path.join(
-                igibson.ig_dataset_path,
-                "objects/green_onion/green_onion_000/green_onion_000.urdf"),
-            "steak":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/steak/steak_000/steak_000.urdf"),
-            "tray":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/tray/tray_000/tray_000.urdf"),
-            "apple":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/apple/00_0/00_0.urdf"),
-            "plate1":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/plate/plate_000/plate_000.urdf"),
-            "plate2":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/plate/plate_000/plate_000.urdf"),
-            "scrub_brush":
-            os.path.join(
-                igibson.ig_dataset_path,
-                "objects/scrub_brush/scrub_brush_000/scrub_brush_000.urdf"),
-            "chopping_board":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/chopping_board/10_0/10_0.urdf"),
-            "knife":
-            os.path.join(igibson.ig_dataset_path,
-                         "objects/carving_knife/14_1/14_1.urdf"),
             "onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/17_0/17_0.urdf")
         }
 
@@ -171,18 +139,9 @@ class Kitchen():
             "stove": np.array([0.88, 1.1, 0.95]),
             "bowl": np.array([0.8, 0.8, 1]),
             "pan": np.array([1, 1, 1]),
-            "steak": np.array([0.1, 0.1, 0.1]),
-            "broccoli": np.array([0.1, 0.1, 0.1]),
-            "green_onion": np.array([0.1, 0.1, 0.1]),
             "tray": np.array([0.1, 0.1, 0.1]),
             "sink": np.array([1.2, 1.25, 1.25]),
             "fridge": np.array([1.5, 1.2, 1.2]),
-            "apple": np.array([0.1, 0.1, 0.1]),
-            "plate1": np.array([0.01, 0.01, 0.01]),
-            "plate2": np.array([0.01, 0.01, 0.01]),
-            "scrub_brush": np.array([0.01, 0.01, 0.01]),
-            "chopping_board": np.array([1.2, 1.2, 1.2]),
-            "knife": np.array([1, 1, 1]),
             "onion": np.array([1.0, 1.0, 1.0])
         }
 
@@ -195,17 +154,6 @@ class Kitchen():
             "pan": (0.15, -0.1, 1.24),  # shift height
             "sink": (0, 0, 0.1),
             "fridge": (0, 0, 0.2),
-            "steak": (0, 0, 0.9), #(0.23, -0.1, 1.25),
-            "tray": (0, 0, 0.9),
-            "apple": (0, 0.2, 1.0),
-            "broccoli": (0, 0.2, 0.6),
-            # "green_onion": (0, -0.2, 0.6),
-            "green_onion": (0, 0, 1.25),
-            "plate1": (0, 0, 1.2),
-            "plate2": (0, 0, 1.0),
-            "scrub_brush": (0, 0, 1.3),
-            "chopping_board": (0, 0, 1.2),
-            "knife": (0.4, 0, 1.2),
             "onion": (0.15, -0.1, 0)
         }
 
@@ -308,7 +256,6 @@ class Kitchen():
                 obj.set_position([100, 100, -100])
                 for i, (part_obj, _) in enumerate(object_parts):
                     part_obj.set_position([101 + i, 100, -100])
-                multiplexed_obj.states[object_states.Sliced].set_value(False)
 
                 obj = multiplexed_obj
             elif name == "bowl":
@@ -328,17 +275,17 @@ class Kitchen():
                 self.env.simulator.import_object(obj)
                 self.pans.append(obj)
                 
-                # onion = URDFObject(name2path["onion"], scale=name2scale_map["onion"]/1.15, model_path="/".join(name2path["onion"].split("/")[:-1]), category="vidalia_onion")
-                # self.env.simulator.import_object(onion)
-                # orn = (0, 0, 0)
-                # shift = name2shift_map["onion"]
-                # pos = [x+shift[0]-4.5, y+shift[1]-4.5, 2.0+shift[2]]
-                # self.env.set_pos_orn_with_z_offset(onion, tuple(pos), orn)
-                # self.onions.append(onion)
+                onion = URDFObject(name2path["onion"], scale=name2scale_map["onion"]/1.15, model_path="/".join(name2path["onion"].split("/")[:-1]), category="vidalia_onion")
+                self.env.simulator.import_object(onion)
+                orn = (0, 0, 0)
+                shift = name2shift_map["onion"]
+                pos = [x+shift[0]-4.5, y+shift[1]-4.5, 2.0+shift[2]]
+                self.env.set_pos_orn_with_z_offset(onion, tuple(pos), orn)
+                self.onions.append(onion)
             elif name == "stove":
                 obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="stove")
                 self.env.simulator.import_object(obj)
-                obj.states[object_states.ToggledOn].set_value(False)
+                obj.states[object_states.ToggledOn].set_value(True)
                 # print(obj.states[object_states.ToggledOn].set_value(True))
             else:
                 obj = URDFObject(name2path[name],
@@ -381,8 +328,8 @@ class Kitchen():
                     obj.states[object_states.Stained].set_value(True)
             if name == "sink":
                 obj.states[object_states.ToggledOn].set_value(False)
-            if name == "chopping_board":
-                obj.states[object_states.OnTop].set_value(obj, static_objs[-1])
+            # if name == "chopping_board":
+            #     obj.states[object_states.OnTop].set_value(obj, static_objs[-1])
 
         try:
             for obj in static_objs:
@@ -424,11 +371,11 @@ class Kitchen():
                         return_str += "{} {} {}\n".format("counter", x, y)
                     if name == "pan":
                         return_str += "{} {} {}\n".format("stove", x, y)
+                        return_str += "{} {} {}\n".format("steak", x, y)
                     if name == "fridge":
                         return_str += "{} {} {}\n".format("apple", x, y)
                         return_str += "{} {} {}\n".format("tray", x, y)
                         # return_str += "{} {} {}\n".format("green_onion", x, y)
-                        return_str += "{} {} {}\n".format("steak", x, y)
                         return_str += "{} {} {}\n".format("broccoli", x, y)
 
                     if name == "sink":
@@ -485,7 +432,7 @@ class Kitchen():
             except:
                 pass
 
-            if obj.name == "green_onion_multiplexer" and count > 1000000:
+            if obj.name == "green_onion_multiplexer" and count > 80:
                 print("Slicing the green onion and moving the parts")
                 # Slice the apple and set the object parts away
                 part_pos = obj.get_position()
@@ -501,3 +448,5 @@ class Kitchen():
                     new_pos[1] += 0.05 * ((-1)**i)
                     part_obj.set_position(new_pos)
                     self.food_obj.append(part_obj)
+
+        print()
