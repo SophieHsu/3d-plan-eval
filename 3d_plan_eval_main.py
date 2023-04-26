@@ -88,8 +88,8 @@ def setup(igibson_env, kitchen, configs, args):
                                      robot)
     elif planner_config == 2:
         tracking_env = TrackingEnv(env, kitchen, robot, human)
-        tracking_env.step()
-        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp, tracking env)
+        # tracking_env.step()
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
         # mdp_planner = planners.HumanAwareMediumMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, hmlp, force_compute_all=True)
 
