@@ -38,7 +38,6 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-
 def setup(igibson_env, kitchen, configs, args):
     exp_config, map_config = configs
     order_list = exp_config['order_list']
@@ -89,7 +88,7 @@ def setup(igibson_env, kitchen, configs, args):
     elif planner_config == 2:
         tracking_env = TrackingEnv(env, kitchen, robot, human)
         tracking_env.step()
-        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp, tracking env)
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp, tracking_env)
         # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
         # mdp_planner = planners.HumanAwareMediumMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, hmlp, force_compute_all=True)
 
@@ -112,8 +111,6 @@ def setup(igibson_env, kitchen, configs, args):
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
 
     # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
-
-    
 
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
                              kitchen.grid, hlp, env, igibson_env)

@@ -8,7 +8,8 @@ from lsi_3d.mdp.hl_state import AgentState, WorldState
 import time
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 from igibson.objects.articulated_object import URDFObject
-
+from igibson.objects.visual_marker import VisualMarker
+import pybullet as p
 
 class HumanAgent():
 
@@ -19,7 +20,7 @@ class HumanAgent():
                  occupancy_grid,
                  hlp,
                  lsi_env,
-                 igibson_env,
+                 tracking_env,
                  vr=False,
                  insight_threshold=5):
         self.human = human
@@ -30,10 +31,23 @@ class HumanAgent():
         self.hlp = hlp
         self.lsi_env = lsi_env
         self.vision_range = math.pi
-        self.igibson_env = igibson_env
+        self.igibson_env = tracking_env.env
+        self.tracking_env = tracking_env
         self.vr = vr
         self.insight_threshold = insight_threshold
         self.prev_end = None
+        self.object_position = None
+        self.arrived = False
+            
+    def change_state(self):
+        pass
+        # self.lsi_env.update_human_hl_state("onion_0_onion_onion", ("pickup", "onion"))
+        # self.lsi_env.update_human_hl_state("None_1_onion_onion", ("drop", "onion"))
+        # self.lsi_env.update_human_hl_state("onion_1_onion_onion", ("pickup", "onion"))
+        # self.lsi_env.update_human_hl_state("None_2_onion_onion", ("drop", "onion"))
+        # self.lsi_env.update_human_hl_state("onion_2_onion_onion", ("pickup", "onion"))
+        # self.lsi_env.update_human_hl_state("None_3_onion_onion", ("drop", "onion"))
+        # self.lsi_env.update_joint_ml_state()
 
     def set_robot(self, robot):
         self.robot = robot
@@ -47,28 +61,64 @@ class HumanAgent():
             x, y, z = self.human.get_position()
             end, next_hl_state, action_object = self.get_next_goal()
             end, ori = self.transform_end_location(end)
-            arrived = self._step(end, ori)
+            if self.arrived == False:
+                self.arrived = self._step(end, ori)
+            else:
+                self._arrival_step(next_hl_state, action_object)
             self.lsi_env.update_joint_ml_state()
-            if arrived:
-                self.lsi_env.update_human_hl_state(next_hl_state, action_object)
-                # time.sleep(1)
             
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         path = self.planner.find_path((x,y), end, self.occupancy_grid)
-        is_new_end = True if (self.prev_end != end).all() else False
+        round_prev_end = [round(p, 3) for p in self.prev_end] if self.prev_end is not None else self.prev_end
+        round_end = [round(e, 3) for e in end] if end is not None else end
+        is_new_end = True if round_prev_end != round_end else False
         self.prev_end = end
         return self.motion_controller.step(self.human, self.robot, final_ori, path, is_new_end)
+    
+    def _arrival_step(self, next_hl_state, action_object):
+        action = action_object[0]
+        object = action_object[1]
+        if action == "pickup" and object == "onion":
+            if self.object_position is None:
+                onion = self.tracking_env.get_closest_onion()
+                onion_position = onion.get_position()
+                self.object_position = onion_position
+            # marker_2 = VisualMarker(visual_shape=p.GEOM_SPHERE, radius=0.06)
+            # self.igibson_env.simulator.import_object(marker_2)
+            # marker_2.set_position(self.object_position)
+            done = self.pick(self.object_position, [0, 0, 0.05])
+            if done:
+                self.lsi_env.update_human_hl_state(next_hl_state, action_object)
+                self.object_position = None
+                self.arrived = False
+        elif action == "drop" and object == "onion":
+            if self.object_position is None:
+                pan = self.tracking_env.get_closest_pan()
+                pan_position = pan.get_position()
+                self.object_position = pan_position
+            done = self.drop(self.object_position, [0, 0, 0.4])
+            if done:
+                self.lsi_env.update_human_hl_state(next_hl_state, action_object)
+                self.object_position = None
+                self.arrived = False
+        elif action == "pickup" and object == "dish":
+            if self.object_position is None:
+                bowl = self.tracking_env.get_closest_bowl()
+                bowl_position = bowl.get_position()
+                self.object_position = bowl_position
+            done = self.pick(self.object_position, [0, -0.25, 0.1])
+            if done:
+                self.lsi_env.update_human_hl_state(next_hl_state, action_object)
+                self.object_position = None
+                self.arrived = False
+    
+    def pick(self, loc, offset=[0, 0, 0]):
+        return self.motion_controller.pick(self.human, loc, offset)
 
-    def pick(self, loc):
-        return self.motion_controller.pick(self.human, loc)
-
-    def drop(self, loc):
-        return self.motion_controller.drop(self.human, loc)
-
-    def open(self):
-        pass
+    def drop(self, loc, offset=[0, 0, 0]):
+        return self.motion_controller.drop(self.human, loc, offset)
 
     def get_next_goal(self):
         agent_state = self.lsi_env.human_state
@@ -148,7 +198,6 @@ class HumanAgent():
         return pos[0:2], normalize_radians(ori + math.pi)
 
     def is_at_location(self, loc, dest, tolerance):
-
         if (dest[0] - tolerance) < loc[0] < (dest[0] + tolerance) and (
                 dest[1] - tolerance) < loc[1] < (dest[1] + tolerance):
             return True
@@ -165,71 +214,73 @@ class HumanAgent():
                     self.occupancy_grid[i][j] = 'X'
         self.occupancy_grid[loc[0]][loc[1]] = 'R'
 
-    def is_observed(self, object, track):
-        '''
-        An object is defined to be observed if it is in sight for a period of time.
-        track: an array containing True/False. The length should be the same as the insight threshold.
-        '''
-        track.pop(0)
-        track.append(self.is_observable(object))
+    # def is_observed(self, object, track):
+    #     '''
+    #     An object is defined to be observed if it is in sight for a period of time.
+    #     track: an array containing True/False. The length should be the same as the insight threshold.
+    #     '''
+    #     track.pop(0)
+    #     track.append(self.is_observable(object))
 
-        return all(track), track
+    #     return all(track), track
 
-    def is_observable(self, object):
-        object_x, object_y, _ = object.get_position()
+    # def is_observable(self, object):
+    #     object_x, object_y, _ = object.get_position()
 
-        human_x, human_y, _ = self.human.get_position()
-        qx, qy, qz, qw = self.human.get_orientation()
-        _, _, theta = quat2euler(qx, qy, qz, qw)
+    #     human_x, human_y, _ = self.human.get_position()
+    #     qx, qy, qz, qw = self.human.get_orientation()
+    #     _, _, theta = quat2euler(qx, qy, qz, qw)
 
-        slope_x = object_x - human_x
-        slope_y = object_y - human_y
+    #     slope_x = object_x - human_x
+    #     slope_y = object_y - human_y
 
-        # calculate angle between human and object
-        ori_vec_x = math.cos(theta)
-        ori_vec_y = math.sin(theta)
+    #     # calculate angle between human and object
+    #     ori_vec_x = math.cos(theta)
+    #     ori_vec_y = math.sin(theta)
 
-        ori_vec = [ori_vec_x, ori_vec_y]
-        vec = [slope_x, slope_y]
+    #     ori_vec = [ori_vec_x, ori_vec_y]
+    #     vec = [slope_x, slope_y]
 
-        ori_vec = ori_vec / np.linalg.norm(ori_vec)
-        vec = vec / np.linalg.norm(vec)
-        dot_product = np.dot(ori_vec, vec)
-        angle = np.arccos(dot_product)
+    #     ori_vec = ori_vec / np.linalg.norm(ori_vec)
+    #     vec = vec / np.linalg.norm(vec)
+    #     dot_product = np.dot(ori_vec, vec)
+    #     angle = np.arccos(dot_product)
 
-        # calculate gridspaces line of sight intersects with
-        line_of_sight = False
-        block_flag = False
-        grid_spaces = set()
-        slope_x = object_x - human_x
-        slope_y = object_y - human_y
-        dx = 0 if slope_x == 0 else slope_x / (abs(slope_x) * 10)
-        dy = slope_y / (abs(slope_y) *
-                        10) if slope_x == 0 else slope_y / (abs(slope_x) * 10)
-        current_x = human_x
-        current_y = human_y
-        object_coord = real_to_grid_coord((object_x, object_y))
-        # print(object_x, object_y)
-        while True:
-            grid_coord = real_to_grid_coord((current_x, current_y))
-            # print(current_x, current_y)
-            if math.dist([current_x, current_y], [object_x, object_y]) < 0.2:
-                break
-            else:
-                grid_spaces.add(grid_coord)
-            current_x += dx
-            current_y += dy
-            # print(current_x, current_y)
+    #     # calculate gridspaces line of sight intersects with
+    #     line_of_sight = False
+    #     block_flag = False
+    #     grid_spaces = set()
+    #     slope_x = object_x - human_x
+    #     slope_y = object_y - human_y
+    #     dx = 0 if slope_x == 0 else slope_x / (abs(slope_x) * 10)
+    #     dy = slope_y / (abs(slope_y) *
+    #                     10) if slope_x == 0 else slope_y / (abs(slope_x) * 10)
+    #     current_x = human_x
+    #     current_y = human_y
+    #     object_coord = real_to_grid_coord((object_x, object_y))
+    #     # print(object_x, object_y)
+    #     while True:
+    #         grid_coord = real_to_grid_coord((current_x, current_y))
+    #         # print(current_x, current_y)
+    #         if math.dist([current_x, current_y], [object_x, object_y]) < 0.2:
+    #             break
+    #         else:
+    #             grid_spaces.add(grid_coord)
+    #         current_x += dx
+    #         current_y += dy
+    #         # print(current_x, current_y)
 
-        for grid in grid_spaces:
-            if self.occupancy_grid[grid[0]][
-                    grid[1]] != 'X' and self.occupancy_grid[grid[0]][
-                        grid[1]] != 'R':
-                block_flag = True
+    #     for grid in grid_spaces:
+    #         if self.occupancy_grid[grid[0]][
+    #                 grid[1]] != 'X' and self.occupancy_grid[grid[0]][
+    #                     grid[1]] != 'R':
+    #             block_flag = True
 
-        line_of_sight = not block_flag
+    #     line_of_sight = not block_flag
 
-        return line_of_sight and angle <= self.vision_range / 2
+    #     return line_of_sight and angle <= self.vision_range / 2
 
     def get_position(self):
         return self.human.get_position()
+    
+

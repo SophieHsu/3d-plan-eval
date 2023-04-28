@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import math
 import igibson
 from igibson.objects.articulated_object import URDFObject
 from igibson.robots.manipulation_robot import IsGraspingState
@@ -65,6 +66,47 @@ class TrackingEnv():
             if IsGraspingState.TRUE in grasping:
                 return obj
             
+    # def open_fridge(self):
+    #     fridge = self.kitchen.fridges[0]
+    #     print(fridge.states)
+    #     fridge.states[object_states.Open].set_value(True)
+
+    def get_closest_onion(self):
+        closest_onion = None
+        min_dist = 10000
+        position = self.human._parts["right_hand"].get_position()
+        for o in self.kitchen.onions:
+            onion_position = o.get_position()
+            dist = math.dist(position, onion_position)
+            if dist < min_dist:
+                min_dist = dist
+                closest_onion = o
+        return closest_onion
+    
+    def get_closest_pan(self):
+        closest_pan = None
+        min_dist = 10000
+        position = self.human._parts["right_hand"].get_position()
+        for p in self.kitchen.pans:
+            pan_position = p.get_position()
+            dist = math.dist(position, pan_position)
+            if dist < min_dist:
+                min_dist = dist
+                closest_pan = p
+        return closest_pan
+    
+    def get_closest_bowl(self):
+        closest_bowl = None
+        min_dist = 10000
+        position = self.human._parts["right_hand"].get_position()
+        for p in self.kitchen.bowls:
+            bowl_position = p.get_position()
+            dist = math.dist(position, bowl_position)
+            if dist < min_dist:
+                min_dist = dist
+                closest_bowl = p
+        return closest_bowl
+
     def get_human_position(self):
         return self.human.get_position()
     
