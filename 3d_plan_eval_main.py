@@ -38,7 +38,6 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-
 def setup(igibson_env, kitchen, configs, args):
     exp_config, map_config = configs
     order_list = exp_config['order_list']
@@ -113,8 +112,6 @@ def setup(igibson_env, kitchen, configs, args):
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
 
     # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
-
-    
 
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
                              kitchen.grid, hlp, env, igibson_env)

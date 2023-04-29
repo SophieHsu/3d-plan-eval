@@ -25,6 +25,7 @@ class Kitchen():
         self.pans = []
         self.onions = []
         self.table = None
+        self.fridges = []
         self.food_obj = []
 
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
@@ -126,15 +127,18 @@ class Kitchen():
                 igibson.ig_dataset_path,
                 "objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf"
             ),
+            # "pan":
+            # os.path.join(igibson.ig_dataset_path,
+            #              "objects/frying_pan/36_0/36_0.urdf"),
             "pan":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/frying_pan/36_0/36_0.urdf"),
+                         "objects/cauldron/cauldron_000/cauldron_000.urdf"),
             "sink":
             os.path.join(igibson.ig_dataset_path,
                          "objects/sink/kitchen_sink/kitchen_sink.urdf"),
             "fridge":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/fridge/11712/11712.urdf"),
+                         "objects/fridge/10373/10373.urdf"),
             "vidalia_onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/17_0/17_0.urdf")
         }
 
@@ -205,14 +209,17 @@ class Kitchen():
             # pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
             if name == "fridge":
-                obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="refrigerator")
+                # obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="fridge")
+                obj = URDFObject(name2path["counter"], scale=name2scale_map["counter"]/1.15, model_path="/".join(name2path["counter"].split("/")[:-1]), category="counter")
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 # obj.states[object_states.Open].set_value(True)
-                for i in range(20):
+                self.fridges.append(obj)
+                for _ in range(10):
                     onion = URDFObject(name2path["vidalia_onion"], scale=name2scale_map["vidalia_onion"]/1.15, model_path="/".join(name2path["vidalia_onion"].split("/")[:-1]), category="vidalia_onion")
                     self.env.simulator.import_object(onion)
-                    onion.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
+                    # onion.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
+                    onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
                     self.onions.append(onion)
             elif name == "stove":
                 obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="stove")

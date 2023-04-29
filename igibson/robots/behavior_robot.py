@@ -144,14 +144,12 @@ class BehaviorRobot(ManipulationRobot, LocomotionRobot, ActiveCameraRobot):
         self.use_ghost_hands = use_ghost_hands
         self.normal_color = normal_color
         self.show_visual_head = show_visual_head
-
         self._position_limit_coefficient = 1 if higher_limits else LOWER_LIMITS_POSITION_COEFFICIENT
         self._velocity_limit_coefficient = 1 if higher_limits else LOWER_LIMITS_VELOCITY_COEFFICIENT
 
         super(BehaviorRobot, self).__init__(
             reset_joint_pos=reset_joint_pos, base_name=base_name, grasping_mode=grasping_mode, **kwargs
         )
-
         # Set up body parts
         self._parts = dict()
 

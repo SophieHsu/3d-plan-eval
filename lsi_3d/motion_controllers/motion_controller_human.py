@@ -1,7 +1,7 @@
 import math
 from utils import quat2euler, normalize_radians
 import numpy as np
-from igibson.objects.visual_marker import VisualMarker
+from numpy.linalg import inv
 import pybullet as p
 
 class MotionControllerHuman():
@@ -16,13 +16,14 @@ class MotionControllerHuman():
         self.arrived = False
         self.arrived_hand_step = 0
         self.original_hand_position = None
-        self.counter = 0
+        self.counters = [0, 0]
 
     def step(self, human, robot, final_ori, path, is_new_end):
         x, y, z = human.get_position()
         qx, qy, qz, qw = human.get_orientation()
         _, _, theta = quat2euler(qx, qy, qz, qw)
         theta = normalize_radians(theta)
+        vel = None
         if len(path) > 0:
             end = path[-1]
             if len(path) > 1:
@@ -58,14 +59,56 @@ class MotionControllerHuman():
 
         return self.arrived
 
-    def pick(self, human, loc):
-        pick_action = self.action(0, 0, 0, 0, 0, 1.0)
-        return self.move_hand(human, loc, pick_action)
-        
-    def drop(self, human, loc):
-        pick_action = self.action(0, 0, 0, 0, 0, -1.0)
-        return self.move_hand(human, loc, pick_action)
+    # def pick(self, human, loc):
+    #     if self.counters[0] < 50:
+    #         forward_action = self.action(0.01, 0, 0, 0, 0, 0)
+    #         human.apply_action(forward_action)
+    #         self.counters[0] += 1
+    #         return False
+    #     else:
+    #         pick_action = self.action(0, 0, 0, 0, 0, 1.0)
+    #         done = self.move_hand(human, loc, pick_action)
+    #         self.counters[0] = 0 if done else self.counters[0]
+    #         return done
 
+    # def drop(self, human, loc):
+    #     if self.counters[0] < 50:
+    #         forward_action = self.action(0.01, 0, 0, 0, 0, 0)
+    #         human.apply_action(forward_action)
+    #         self.counters[0] += 1
+    #         return False
+    #     else:
+    #         pick_action = self.action(0, 0, 0, 0, 0, -1.0)
+    #         done = self.move_hand(human, loc, pick_action)
+    #         self.counters[0] = 0 if done else self.counters[0]
+    #         return done
+       
+    def pick(self, human, loc, offset=[0, 0, 0]):
+        rotated_basis = self.get_rotated_basis(human)
+        offset_scaling = np.array([
+            [offset[0], 0, 0],
+            [0, offset[1], 0],
+            [0, 0, offset[2]]    
+        ])
+        scaled_rotated_basis = np.matmul(rotated_basis, offset_scaling)
+        translated_loc = np.matmul(scaled_rotated_basis, np.array([1, 1, 1]).transpose()).transpose()
+        translated_loc = translated_loc + np.array(loc)
+        pick_action = self.action(0, 0, 0, 0, 0, 1.0)
+        return self.move_hand(human, translated_loc, pick_action)
+    
+    def drop(self, human, loc, offset=[0, 0, 0]):
+        rotated_basis = self.get_rotated_basis(human)
+        offset_scaling = np.array([
+            [offset[0], 0, 0],
+            [0, offset[1], 0],
+            [0, 0, offset[2]]    
+        ])
+        scaled_rotated_basis = np.matmul(rotated_basis, offset_scaling)
+        translated_loc = np.matmul(scaled_rotated_basis, np.array([1, 1, 1]).transpose()).transpose()
+        translated_loc = translated_loc + np.array(loc)
+        pick_action = self.action(0, 0, 0, 0, 0, -1.0)
+        return self.move_hand(human, translated_loc, pick_action)
+    
     def move_hand(self, human, loc, mid_action):
         right_hand = human._parts["right_hand"]
         position = right_hand.get_position()
@@ -80,31 +123,44 @@ class MotionControllerHuman():
         y_diff = y_diff / (norm_val * 100)
         z_diff = z_diff / (norm_val * 100)
 
+        rotated_basis = self.get_rotated_basis(human)
+        diffs = np.array([x_diff, y_diff, z_diff])
+        diff_new_basis = np.matmul(inv(rotated_basis), diffs)
+
+        x_diff = diff_new_basis[0]
+        y_diff = diff_new_basis[1]
+        z_diff = diff_new_basis[2]
+
         if self.arrived_hand_step == 0:
             self.original_hand_position = position
             self.arrived_hand_step = 1
         # Go to location
         elif self.arrived_hand_step == 1:
-            if math.dist(loc, position) > 0.05:
+            distance = .01 if mid_action[26] == -1 else .01
+            if math.dist(loc, position) > distance:
                 action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
                 human.apply_action(action)
             else:
                 self.arrived_hand_step = 2
+            print(math.dist(loc, position))
+            print("reach")
         # Middle action
         elif self.arrived_hand_step == 2:
             human.apply_action(mid_action)
-            if self.counter > 200:
+            if self.counters[1] > 50:
                 self.arrived_hand_step = 3
-                self.counter = 0
-            self.counter += 1
+                self.counters[1] = 0
+            self.counters[1] += 1
+            print("mid")
         # Return to location
         elif self.arrived_hand_step == 3:
-            if math.dist(loc, position) > 0.05:
+            if math.dist(loc, position) > 0.01:
                 action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
                 human.apply_action(action)
             else:
                 self.arrived_hand_step = 0
                 return True
+            print("return")
         return False
 
     def action(self, forward, turn, right_hand_x, right_hand_y, right_hand_z, right_hand_grip):
@@ -124,9 +180,9 @@ class MotionControllerHuman():
 
     def find_velocities_rotate(self, theta, final_ori):
         theta_difference = self.angle_difference(theta, final_ori)
-        if theta_difference < -0.2:
+        if theta_difference < -0.1:
             vel = (0, -self.MAX_ANG_VEL/15)
-        elif theta_difference > 0.2:
+        elif theta_difference > 0.1:
             vel = (0, self.MAX_ANG_VEL/15)
         else:
             vel = (0, 0)
@@ -206,3 +262,18 @@ class MotionControllerHuman():
             return min_theta
         else:
             return -min_theta
+        
+    def get_rotated_basis(self, human):
+        orientation = human.get_orientation()
+        x, y, z = quat2euler(orientation[0], orientation[1], orientation[2], orientation[3])
+        z_theta = normalize_radians(z) - math.pi/2
+        regular_basis = np.array([
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]])
+        rotation_matrix = np.array([
+            [math.cos(z_theta), -math.sin(z_theta), 0],
+            [math.sin(z_theta), math.cos(z_theta), 0],
+            [0, 0, 1]])
+        rotated_basis = np.matmul(rotation_matrix, regular_basis)
+        return rotated_basis
