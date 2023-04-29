@@ -153,6 +153,8 @@ class HlQmdpPlanningAgent(Agent):
         if self.ml_robot_action:
             ml_loc, ml_a = self.ml_robot_action
 
+            self.env.update_world()
+
             if ml_a == 'I':
                 hl_next_robot_state, hl_robot_goal, hl_robot_action_object = self.hl_robot_action
                 self.env.update_robot_hl_state(hl_next_robot_state, hl_robot_action_object)
@@ -167,6 +169,7 @@ class HlQmdpPlanningAgent(Agent):
             self.human_sim_state.hl_state = self.env.human_state.hl_state
             self.next_human_hl_state, self.human_goal, self.human_action_object = self.hl_human_action
             self.human_ml_plan = self.mlp.compute_single_agent_astar_path(self.human_sim_state.ml_state, self.human_goal)
+            self.human_ml_plan.append((self.human_goal,'I'))
             self.ml_human_action = None
         return self.hl_human_action
 

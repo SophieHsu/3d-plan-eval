@@ -59,7 +59,9 @@ def setup(igibson_env, kitchen, configs, args):
     human = iGibsonAgent(human_bot, human_start, 'S', "human")
 
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
-    env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
+
+    tracking_env = TrackingEnv(igibson_env, kitchen, robot, human)
+    env = LsiEnv(mdp, igibson_env, tracking_env, human, robot, kitchen)
     #robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
     #env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
@@ -87,7 +89,6 @@ def setup(igibson_env, kitchen, configs, args):
         robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                      robot)
     elif planner_config == 2:
-        tracking_env = TrackingEnv(env, kitchen, robot, human)
         # tracking_env.step()
         robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
