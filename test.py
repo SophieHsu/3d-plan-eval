@@ -50,7 +50,7 @@ def main():
     # human_end = (2, 1)
     
     env = iGibsonEnv(
-        config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
+        config_file=config_file, mode="vr", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
     )
 
     kitchen = Kitchen(env)
@@ -70,7 +70,7 @@ def main():
     
     a_star_planner = AStarPlanner(env)
     motion_controller = MotionControllerHuman()
-    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, tracking_env, vr=False)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, tracking_env, vr=True)
     human_agent.set_robot(robot)
 
     # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
@@ -78,25 +78,22 @@ def main():
     done = False
     while(True):
         # follow_entity_view(human)
-        # if done:
-        #     human_agent.drop([-1.5, 1.5, 1.2])
-        # else:
-        #     done = human_agent.pick([-1.5, 1.5, 1.2])
-        # motion_controller_robot.step(robot_end, 1.57)
-        action = np.zeros((28,))
-        action[0] = 0.1
+        # action = np.zeros((28,))
+        # action[0] = 0.1
 
-        human.apply_action(action)
+        # human.apply_action(action)
+
         # if tracking_env.obj_in_human_hand() is not None:
         #     print(tracking_env.obj_in_human_hand().name)
-
+        
+        human_agent.step()
         # test = tracking_env.get_pan_status()
         # key = list(test.keys())[0]
         # print(tracking_env.is_pan_cooked(key))
 
-        # test = tracking_env.get_pan_status()
-        # key = list(test.keys())[0]
-        # print(len(test[key]))
+        test = tracking_env.get_pan_status()
+        key = list(test.keys())[0]
+        print(len(test[key]))
 
         # test = tracking_env.get_bowl_status()
         # key = list(test.keys())[0]

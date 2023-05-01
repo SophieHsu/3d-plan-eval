@@ -27,6 +27,7 @@ class Kitchen():
         self.table = None
         self.fridges = []
         self.food_obj = []
+        self.static_objs = {}
 
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
         self.tile_location = {}
@@ -121,33 +122,33 @@ class Kitchen():
                          "objects/breakfast_table/26670/26670.urdf"),
             "stove":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/stove/102019/102019.urdf"),
+                         "objects/stove/101940/101940.urdf"),
+            # "stove":
+            # os.path.join(igibson.ig_dataset_path,
+            #              "objects/stove/102019/102019.urdf"),
             "bowl":
             os.path.join(
                 igibson.ig_dataset_path,
                 "objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf"
             ),
-            # "pan":
-            # os.path.join(igibson.ig_dataset_path,
-            #              "objects/frying_pan/36_0/36_0.urdf"),
             "pan":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/cauldron/cauldron_000/cauldron_000.urdf"),
+                         "objects/frying_pan/36_0/36_0.urdf"),
             "sink":
             os.path.join(igibson.ig_dataset_path,
                          "objects/sink/kitchen_sink/kitchen_sink.urdf"),
             "fridge":
             os.path.join(igibson.ig_dataset_path,
                          "objects/fridge/10373/10373.urdf"),
-            "vidalia_onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/17_0/17_0.urdf")
+            "vidalia_onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/18_1/18_1.urdf")
         }
 
         name2scale_map = {
             "counter": np.array([1.04, 0.97, 0.95]),
             "table_h": np.array([1.2, 1.2, 1.3]),
             "table_v": np.array([1.2, 1.2, 1.3]),
-            "stove": np.array([0.88, 1.1, 0.95]),
-            "bowl": np.array([0.8, 0.8, 1]),
+            "stove": np.array([1.1, 1, 1]),
+            "bowl": np.array([0.8, 0.8, 0.8]),
             "pan": np.array([1, 1, 1]),
             "tray": np.array([0.1, 0.1, 0.1]),
             "sink": np.array([1.2, 1.25, 1.25]),
@@ -194,7 +195,6 @@ class Kitchen():
             (0, 0, -1.5707): (shift_l, 0),
         }
 
-        static_objs = []
         for name, x, y in obj_x_y:
             obj = None
             orn = orientation_map[(name, x, y)]
@@ -237,22 +237,30 @@ class Kitchen():
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
             if name not in ("bowl", "pan", "vidalia_onion"):
-                static_objs.append(obj)
+                self.static_objs[obj] = (x, y)
             if name == "bowl":
                 self.bowls.append(obj)
+                body_ids = obj.get_body_ids()
+                p.changeDynamics(body_ids[0], -1,
+                                 mass=0.01)
             if name == "pan":
                 self.pans.append(obj)
             if name == "vidalia_onion":
                 self.onions.append(obj)
+                body_ids = obj.get_body_ids()
+                p.changeDynamics(body_ids[0], -1,
+                                 mass=0.001)
             if name == "table_h" or name == "table_v":
                 self.table = obj
+                self.static_objs[obj] = (x, y)
 
         try:
-            for obj in static_objs:
+            for obj in self.static_objs.keys():
                 p.changeDynamics(obj.get_body_ids()[0], -1,
                                  mass=800)  # mass=500
         except:
-            pass
+            print("****** Error *******")
+            # pass
 
     def grid2raw(self, filepath):
         grid = open(filepath, "r").read().strip().split("\n")
@@ -283,10 +291,10 @@ class Kitchen():
                     name = abbr2name[grid[x][y]]
                     if name == "bowl":
                         return_str += "{} {} {}\n".format("counter", x, y)
-                        return_str += "{} {} {}\n".format("vidalia_onion", x, y)
+                        # return_str += "{} {} {}\n".format("vidalia_onion", x, y)
                     if name == "pan":
                         return_str += "{} {} {}\n".format("stove", x, y)
-                        return_str += "{} {} {}\n".format("vidalia_onion", x, y)
+                        # return_str += "{} {} {}\n".format("vidalia_onion", x, y)
 
                     return_str += "{} {} {}\n".format(name, x, y)
         return return_str

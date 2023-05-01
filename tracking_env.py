@@ -30,7 +30,7 @@ class TrackingEnv():
         for p in self.kitchen.pans:
             onions = []
             for o in self.kitchen.onions:
-                if o.states[object_states.Inside].get_value(p):
+                if o.states[object_states.OnTop].get_value(p):
                     onions.append(o)
             data[p] = onions
         return data
@@ -39,7 +39,7 @@ class TrackingEnv():
         num_cooked_onions = 0
         num_uncooked_onions = 0
         for o in self.kitchen.onions:
-            if o.states[object_states.Inside].get_value(pan):
+            if o.states[object_states.OnTop].get_value(pan):
                 if o.states[object_states.Cooked].get_value():
                     num_cooked_onions +=1
                 else:
@@ -71,11 +71,14 @@ class TrackingEnv():
     #     print(fridge.states)
     #     fridge.states[object_states.Open].set_value(True)
 
-    def get_closest_onion(self):
+    def get_closest_onion(self, on_pan=False):
         closest_onion = None
         min_dist = 10000
         position = self.human._parts["right_hand"].get_position()
+        closest_pan = self.get_closest_pan()
         for o in self.kitchen.onions:
+            if on_pan and not o.states[object_states.OnTop].get_value(closest_pan):
+                continue
             onion_position = o.get_position()
             dist = math.dist(position, onion_position)
             if dist < min_dist:

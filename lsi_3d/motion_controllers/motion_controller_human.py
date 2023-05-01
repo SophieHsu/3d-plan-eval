@@ -15,7 +15,8 @@ class MotionControllerHuman():
         self.rotate_angle = 0.0
         self.arrived = False
         self.arrived_hand_step = 0
-        self.original_hand_position = None
+        self.reset_hand_position = None
+        self.reset_right_hand_orientation = [-2.908, 0.229, 0]
         self.counters = [0, 0]
 
     def step(self, human, robot, final_ori, path, is_new_end):
@@ -84,35 +85,19 @@ class MotionControllerHuman():
     #         return done
        
     def pick(self, human, loc, offset=[0, 0, 0]):
-        rotated_basis = self.get_rotated_basis(human)
-        offset_scaling = np.array([
-            [offset[0], 0, 0],
-            [0, offset[1], 0],
-            [0, 0, offset[2]]    
-        ])
-        scaled_rotated_basis = np.matmul(rotated_basis, offset_scaling)
-        translated_loc = np.matmul(scaled_rotated_basis, np.array([1, 1, 1]).transpose()).transpose()
-        translated_loc = translated_loc + np.array(loc)
+        translated_loc = self.translate_loc(human, loc, offset)
         pick_action = self.action(0, 0, 0, 0, 0, 1.0)
         return self.move_hand(human, translated_loc, pick_action)
     
     def drop(self, human, loc, offset=[0, 0, 0]):
-        rotated_basis = self.get_rotated_basis(human)
-        offset_scaling = np.array([
-            [offset[0], 0, 0],
-            [0, offset[1], 0],
-            [0, 0, offset[2]]    
-        ])
-        scaled_rotated_basis = np.matmul(rotated_basis, offset_scaling)
-        translated_loc = np.matmul(scaled_rotated_basis, np.array([1, 1, 1]).transpose()).transpose()
-        translated_loc = translated_loc + np.array(loc)
+        translated_loc = self.translate_loc(human, loc, offset)
         pick_action = self.action(0, 0, 0, 0, 0, -1.0)
         return self.move_hand(human, translated_loc, pick_action)
     
     def move_hand(self, human, loc, mid_action):
         right_hand = human._parts["right_hand"]
         position = right_hand.get_position()
-        loc = self.original_hand_position if self.arrived_hand_step == 3 else loc
+        loc = self.reset_hand_position if self.arrived_hand_step == 3 else loc
 
         x_diff = loc[0] - position[0]
         y_diff = loc[1] - position[1]
@@ -132,7 +117,10 @@ class MotionControllerHuman():
         z_diff = diff_new_basis[2]
 
         if self.arrived_hand_step == 0:
-            self.original_hand_position = position
+            self.reset_hand_position = position
+            # self.original_right_hand_orientation = human._parts["right_hand"].get_orientation()
+            # ori = self.original_right_hand_orientation
+            # print(quat2euler(ori[0], ori[1], ori[2], ori[3]))
             self.arrived_hand_step = 1
         # Go to location
         elif self.arrived_hand_step == 1:
@@ -142,8 +130,8 @@ class MotionControllerHuman():
                 human.apply_action(action)
             else:
                 self.arrived_hand_step = 2
-            print(math.dist(loc, position))
-            print("reach")
+            # print(math.dist(loc, position))
+            # print("reach")
         # Middle action
         elif self.arrived_hand_step == 2:
             human.apply_action(mid_action)
@@ -151,16 +139,34 @@ class MotionControllerHuman():
                 self.arrived_hand_step = 3
                 self.counters[1] = 0
             self.counters[1] += 1
-            print("mid")
+            # print("mid")
         # Return to location
         elif self.arrived_hand_step == 3:
             if math.dist(loc, position) > 0.01:
                 action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
                 human.apply_action(action)
             else:
+                orientation = human.get_orientation()
+                x, y, z = quat2euler(orientation[0], orientation[1], orientation[2], orientation[3])
+                z_theta = normalize_radians(z) - math.pi/2
+                self.reset_right_hand_orientation[2] = z_theta
+
+                self.original_right_hand_orientation = human._parts["right_hand"].get_orientation()
+                ori = self.original_right_hand_orientation
+                # print(quat2euler(ori[0], ori[1], ori[2], ori[3]))
+
+                # print(self.reset_right_hand_orientation)
+
+                human._parts["right_hand"].set_position(loc)
+                human._parts["right_hand"].set_orientation(p.getQuaternionFromEuler(self.reset_right_hand_orientation))
+
+                self.original_right_hand_orientation = human._parts["right_hand"].get_orientation()
+                ori = self.original_right_hand_orientation
+                # print(quat2euler(ori[0], ori[1], ori[2], ori[3]))
+                # print("-------")
                 self.arrived_hand_step = 0
                 return True
-            print("return")
+            # print("return")
         return False
 
     def action(self, forward, turn, right_hand_x, right_hand_y, right_hand_z, right_hand_grip):
@@ -277,3 +283,15 @@ class MotionControllerHuman():
             [0, 0, 1]])
         rotated_basis = np.matmul(rotation_matrix, regular_basis)
         return rotated_basis
+    
+    def translate_loc(self, human, loc, offset):
+        rotated_basis = self.get_rotated_basis(human)
+        offset_scaling = np.array([
+            [offset[0], 0, 0],
+            [0, offset[1], 0],
+            [0, 0, offset[2]]    
+        ])
+        scaled_rotated_basis = np.matmul(rotated_basis, offset_scaling)
+        translated_loc = np.matmul(scaled_rotated_basis, np.array([1, 1, 1]).transpose()).transpose()
+        translated_loc = translated_loc + np.array(loc)
+        return translated_loc
