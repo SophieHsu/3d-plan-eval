@@ -221,6 +221,9 @@ class Kitchen():
                     # onion.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
                     onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
                     self.onions.append(onion)
+                    body_ids = onion.get_body_ids()
+                    p.changeDynamics(body_ids[0], -1,
+                                 mass=0.001)
             elif name == "stove":
                 obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="stove")
                 self.env.simulator.import_object(obj)

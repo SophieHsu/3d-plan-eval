@@ -111,7 +111,7 @@ class HumanAgent():
             if done:
                 self.completed_goal(next_hl_state, action_object)
         elif action == "deliver" and object == "soup":
-            done = self.drop(self.human.get_position, [0, 0.5, 0.3])
+            done = self.drop(self.human.get_position(), [0, 0.5, 0.3])
             if done:
                 self.completed_goal(next_hl_state, action_object)
         elif action == "pickup" and object == "soup":
@@ -119,7 +119,7 @@ class HumanAgent():
                 pan = self.tracking_env.get_closest_pan()
                 self.object_position = pan.get_position()
             if self.step_index == 0:
-                done = self.drop(self.object_position, [-0.4, -0.3, 0.3])
+                done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
                 if done:
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_onion(on_pan=True).get_position()           
@@ -129,7 +129,7 @@ class HumanAgent():
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_bowl().get_position()
             elif self.step_index == 2:
-                done = self.drop(self.object_position, [0, 0, 0.4])
+                done = self.drop(self.object_position, [0, -0.1, 0.3])
                 if done:
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_onion().get_position()        
@@ -139,7 +139,7 @@ class HumanAgent():
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_bowl().get_position()
             elif self.step_index == 4:
-                done = self.drop(self.object_position, [0, 0, 0.4])
+                done = self.drop(self.object_position, [0, -0.1, 0.3])
                 if done:
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_onion(on_pan=True).get_position()  
@@ -149,7 +149,7 @@ class HumanAgent():
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_bowl().get_position()
             elif self.step_index == 6:
-                done = self.drop(self.object_position, [0, 0, 0.4])
+                done = self.drop(self.object_position, [0, -0.1, 0.3])
                 if done:
                     self.step_index = self.step_index + 1
                     self.object_position = self.tracking_env.get_closest_bowl().get_position() 
@@ -159,7 +159,7 @@ class HumanAgent():
                     self.step_index = self.step_index + 1
             else:
                 self.completed_goal(next_hl_state, action_object)
-        print(next_hl_state, action_object)
+        # print(next_hl_state, action_object)
     
     def pick(self, loc, offset=[0, 0, 0]):
         return self.motion_controller.pick(self.human, loc, offset)
