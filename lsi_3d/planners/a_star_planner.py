@@ -10,7 +10,7 @@ class AStarPlanner():
     def __init__(self, env):
         self.env = env
         self.markers = []
-        self.initialize_markers()
+        # self.initialize_markers()
 
     def initialize_markers(self):
         for i in range (30):
@@ -61,7 +61,7 @@ class AStarPlanner():
             end_node = end_node.parent
             path.insert(0, grid_to_real_coord(end_node.loc))
         
-        self.draw_path(path)
+        # self.draw_path(path)
 
         return path
 

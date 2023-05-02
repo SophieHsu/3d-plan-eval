@@ -191,7 +191,7 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, human_bot):
         # else:
         #     done = human_agent.pick([-1.5, 1.5, 1.2])
         human_agent.step()
-        robot_agent.step()
+        # robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1

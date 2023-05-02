@@ -149,7 +149,7 @@ class Kitchen():
             "table_v": np.array([1.2, 1.2, 1.3]),
             "stove": np.array([1.1, 1, 1]),
             "bowl": np.array([0.8, 0.8, 0.8]),
-            "pan": np.array([1, 1, 1]),
+            "pan": np.array([1.3, 1.3, 1]),
             "tray": np.array([0.1, 0.1, 0.1]),
             "sink": np.array([1.2, 1.25, 1.25]),
             "fridge": np.array([1.5, 1.2, 1.2]),

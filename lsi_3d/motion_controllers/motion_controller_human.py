@@ -18,6 +18,7 @@ class MotionControllerHuman():
         self.reset_hand_position = None
         self.reset_right_hand_orientation = [-2.908, 0.229, 0]
         self.counters = [0, 0]
+        self.grasping_delay = 40
 
     def step(self, human, robot, final_ori, path, is_new_end):
         x, y, z = human.get_position()
@@ -135,7 +136,7 @@ class MotionControllerHuman():
         # Middle action
         elif self.arrived_hand_step == 2:
             human.apply_action(mid_action)
-            if self.counters[1] > 50:
+            if self.counters[1] > self.grasping_delay:
                 self.arrived_hand_step = 3
                 self.counters[1] = 0
             self.counters[1] += 1

@@ -111,7 +111,7 @@ class HumanAgent():
             if done:
                 self.completed_goal(next_hl_state, action_object)
         elif action == "deliver" and object == "soup":
-            done = self.drop(self.human.get_position(), [0, 0.5, 0.3])
+            done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
             if done:
                 self.completed_goal(next_hl_state, action_object)
         elif action == "pickup" and object == "soup":

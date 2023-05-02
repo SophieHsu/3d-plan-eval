@@ -48,7 +48,6 @@ class TrackingEnv():
 
     def is_item_on_table(self, items):
         on_table_bool = []
-        # on_table_bool.
         for i in items:
             val = i.states[object_states.OnTop].get_value(self.table)
             on_table_bool.append(val)
