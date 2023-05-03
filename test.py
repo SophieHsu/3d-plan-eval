@@ -39,6 +39,7 @@ from lsi_3d.config.reader import read_in_lsi_config
 
 from tracking_env import TrackingEnv
 import numpy as np
+import time
 
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
@@ -76,23 +77,23 @@ def main():
     # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
     done = False
+    time.sleep(5)
     while(True):
         # follow_entity_view(human)
-        # if done:
-        #     human_agent.drop([-1.5, 1.5, 1.2])
-        # else:
-        #     done = human_agent.pick([-1.5, 1.5, 1.2])
-        # motion_controller_robot.step(robot_end, 1.57)
-        action = np.zeros((28,))
-        action[0] = 0.1
+        # action = np.zeros((28,))
+        # action[0] = 0.1
 
-        human.apply_action(action)
+        # human.apply_action(action)
+
         # if tracking_env.obj_in_human_hand() is not None:
         #     print(tracking_env.obj_in_human_hand().name)
-
+        
+        # human_agent.step()
         # test = tracking_env.get_pan_status()
         # key = list(test.keys())[0]
         # print(tracking_env.is_pan_cooked(key))
+
+        # print(tracking_env.test())
 
         # test = tracking_env.get_pan_status()
         # key = list(test.keys())[0]

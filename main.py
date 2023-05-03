@@ -108,7 +108,7 @@ def setup(igibson_env, kitchen, configs, args):
     h_x, h_y = human_start
     r_x, r_y = robot_start
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1],
-                                          [h_x - 4.5, h_y - 4.5, 0.6], [0, 0, 0])
+                                          [h_x - 4.5, h_y - 4.5, 0.8], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
     
@@ -182,15 +182,10 @@ def main(args):
 
 def main_loop(igibson_env, robot_agent, human_agent, kitchen, human_bot):
     count = 0
-    done = False
     while True:
         follow_entity_view(human_bot)
-        # if done:
-        #     human_agent.drop([-1.5, 1.5, 1.2])
-        # else:
-        #     done = human_agent.pick([-1.5, 1.5, 1.2])
         human_agent.step()
-        # robot_agent.step()
+        robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1
