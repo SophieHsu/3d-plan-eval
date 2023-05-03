@@ -3,6 +3,7 @@ from utils import quat2euler, normalize_radians
 import numpy as np
 from numpy.linalg import inv
 import pybullet as p
+from igibson import object_states
 
 class MotionControllerHuman():
 
@@ -13,7 +14,6 @@ class MotionControllerHuman():
         self.num_dt_to_predict = 100
         self.rotate = False
         self.rotate_angle = 0.0
-        self.arrived = False
         self.arrived_hand_step = 0
         self.reset_hand_position = None
         self.reset_right_hand_orientation = [-2.908, 0.229, 0]
@@ -26,6 +26,7 @@ class MotionControllerHuman():
         _, _, theta = quat2euler(qx, qy, qz, qw)
         theta = normalize_radians(theta)
         vel = None
+        arrived = False
         if len(path) > 0:
             end = path[-1]
             if len(path) > 1:
@@ -38,11 +39,10 @@ class MotionControllerHuman():
             if math.dist([x,y], end) < 0.05:
                 vel = self.find_velocities_rotate(theta, final_ori)
                 if vel[0] == 0 and vel[1] == 0:
-                    self.arrived = True
+                    arrived = True
             else:
                 possible_vels = self.get_possible_velocities()
-                vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc, robot)
-                self.arrived = False
+                vel = self.find_best_velocities(x, y, theta, possible_vels, next_loc, robot, human)
 
             # for new end goal, just rotate
             if is_new_end:
@@ -59,7 +59,7 @@ class MotionControllerHuman():
             action = self.action(vel[0]/self.MAX_LIN_VEL, vel[1]/self.MAX_ANG_VEL, 0, 0, 0, 0)
             human.apply_action(action)
 
-        return self.arrived
+        return arrived
 
     # def pick(self, human, loc):
     #     if self.counters[0] < 50:
@@ -151,23 +151,13 @@ class MotionControllerHuman():
                 x, y, z = quat2euler(orientation[0], orientation[1], orientation[2], orientation[3])
                 z_theta = normalize_radians(z) - math.pi/2
                 self.reset_right_hand_orientation[2] = z_theta
-
                 self.original_right_hand_orientation = human._parts["right_hand"].get_orientation()
-                ori = self.original_right_hand_orientation
-                # print(quat2euler(ori[0], ori[1], ori[2], ori[3]))
-
-                # print(self.reset_right_hand_orientation)
 
                 human._parts["right_hand"].set_position(loc)
                 human._parts["right_hand"].set_orientation(p.getQuaternionFromEuler(self.reset_right_hand_orientation))
 
-                self.original_right_hand_orientation = human._parts["right_hand"].get_orientation()
-                ori = self.original_right_hand_orientation
-                # print(quat2euler(ori[0], ori[1], ori[2], ori[3]))
-                # print("-------")
                 self.arrived_hand_step = 0
                 return True
-            # print("return")
         return False
 
     def action(self, forward, turn, right_hand_x, right_hand_y, right_hand_z, right_hand_grip):
@@ -195,7 +185,7 @@ class MotionControllerHuman():
             vel = (0, 0)
         return vel
 
-    def find_best_velocities(self, x, y, theta, possible_vels, destination, robot):
+    def find_best_velocities(self, x, y, theta, possible_vels, destination, robot, human):
         robot_x, robot_y, robot_z = robot.get_position()
         selected_vel = (0, 0)
 
@@ -212,7 +202,8 @@ class MotionControllerHuman():
                 pos_no_theta = [pos[0], pos[1]]
                 dist = math.dist(pos_no_theta, destination)
                 robot_dist = math.dist(pos_no_theta, [robot_x, robot_y])
-                if robot_dist < 0.5:
+                robot_in_FOV_human = robot.get_body_ids()[0] in human.states[object_states.ObjectsInFOVOfRobot].get_value()
+                if robot_dist < 0.5 and robot_in_FOV_human:
                     break
                 if dist < min_dist:
                     path = positions[0:idx]

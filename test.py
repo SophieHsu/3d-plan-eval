@@ -39,6 +39,7 @@ from lsi_3d.config.reader import read_in_lsi_config
 
 from tracking_env import TrackingEnv
 import numpy as np
+import time
 
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
@@ -50,7 +51,7 @@ def main():
     # human_end = (2, 1)
     
     env = iGibsonEnv(
-        config_file=config_file, mode="vr", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
+        config_file=config_file, mode="headless", action_timestep=1.0 / 30.0, physics_timestep=1.0 / 120.0, use_pb_gui=True
     )
 
     kitchen = Kitchen(env)
@@ -70,12 +71,13 @@ def main():
     
     a_star_planner = AStarPlanner(env)
     motion_controller = MotionControllerHuman()
-    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, tracking_env, vr=True)
+    human_agent = HumanAgent(human, a_star_planner, motion_controller, occupancy_grid, None, None, tracking_env, vr=False)
     human_agent.set_robot(robot)
 
     # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
     done = False
+    time.sleep(5)
     while(True):
         # follow_entity_view(human)
         # action = np.zeros((28,))
@@ -86,14 +88,16 @@ def main():
         # if tracking_env.obj_in_human_hand() is not None:
         #     print(tracking_env.obj_in_human_hand().name)
         
-        human_agent.step()
+        # human_agent.step()
         # test = tracking_env.get_pan_status()
         # key = list(test.keys())[0]
         # print(tracking_env.is_pan_cooked(key))
 
-        test = tracking_env.get_pan_status()
-        key = list(test.keys())[0]
-        print(len(test[key]))
+        # print(tracking_env.test())
+
+        # test = tracking_env.get_pan_status()
+        # key = list(test.keys())[0]
+        # print(len(test[key]))
 
         # test = tracking_env.get_bowl_status()
         # key = list(test.keys())[0]

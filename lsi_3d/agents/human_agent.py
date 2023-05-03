@@ -41,16 +41,16 @@ class HumanAgent():
         self.step_index = 0
             
     def change_state(self):
-        pass
-        # self.lsi_env.update_human_hl_state("onion_0_onion_onion", ("pickup", "onion"))
-        # self.lsi_env.update_human_hl_state("None_1_onion_onion", ("drop", "onion"))
-        # self.lsi_env.update_human_hl_state("onion_1_onion_onion", ("pickup", "onion"))
-        # self.lsi_env.update_human_hl_state("None_2_onion_onion", ("drop", "onion"))
+        # pass
+        self.lsi_env.update_human_hl_state("onion_0_onion_onion", ("pickup", "onion"))
+        self.lsi_env.update_human_hl_state("None_1_onion_onion", ("drop", "onion"))
+        self.lsi_env.update_human_hl_state("onion_1_onion_onion", ("pickup", "onion"))
+        self.lsi_env.update_human_hl_state("None_2_onion_onion", ("drop", "onion"))
         # self.lsi_env.update_human_hl_state("onion_2_onion_onion", ("pickup", "onion"))
         # self.lsi_env.update_human_hl_state("None_3_onion_onion", ("drop", "onion"))
         # self.lsi_env.update_human_hl_state("dish_3_onion_onion", ("pickup", "dish"))
         # self.lsi_env.update_human_hl_state("soup_3_onion_onion", ("pickup", "soup"))
-        # self.lsi_env.update_joint_ml_state()
+        self.lsi_env.update_joint_ml_state()
 
     def set_robot(self, robot):
         self.robot = robot
@@ -63,10 +63,7 @@ class HumanAgent():
         else:
             x, y, z = self.human.get_position()
             end, next_hl_state, action_object = self.get_next_goal()
-            # print(end)
             end, ori = self.transform_end_location(end)
-            # print(end)
-            # print(self.arrived)
             if self.arrived == False:
                 self.arrived = self._step(end, ori)
             else:
