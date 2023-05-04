@@ -7,8 +7,10 @@ class WorldState():
     def __init__(self, start_hl_state=None):
         in_pot, orders = self.parse_hl_state(start_hl_state)
         self.in_pot = in_pot
+        self.sim_in_pot = in_pot
         self.orders = orders
         self.players = []
+
 
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
@@ -20,6 +22,7 @@ class WorldState():
         if action_object == ('drop', 'onion') and self.in_pot == 3:
             print("Attempted to add onion to pot, but pot was full. Dropping on floor")
         elif action_object == ('drop', 'onion'):
+            self.sim_in_pot += 1
             self.in_pot += 1
 
         if action_object == ('pickup', 'soup') and self.in_pot == 3:

@@ -59,7 +59,7 @@ def setup(igibson_env, kitchen, configs, args):
 
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
 
-    tracking_env = TrackingEnv(igibson_env, kitchen, robot, human)
+    tracking_env = TrackingEnv(igibson_env, kitchen, robot, human_bot)
     env = LsiEnv(mdp, igibson_env, tracking_env, human, robot, kitchen)
     #robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
     #env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
@@ -67,11 +67,11 @@ def setup(igibson_env, kitchen, configs, args):
     #######################################################################################
     igibson_env.simulator.import_object(human_bot)
     igibson_env.set_pos_orn_with_z_offset(
-        human_bot, [human_start[0], human_start[1], 0.35], [0, 0, 0])
+        human_bot, [human_start[0], human_start[1], 0.6], [0, 0, 0])
     a_star_planner = AStarPlanner(igibson_env)
     motion_controller = MotionControllerHuman()
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
-                             kitchen.grid, hlp, env, igibson_env, human_vr)
+                             kitchen.grid, hlp, env, tracking_env, human_vr)
 
     #######################################################################################
 
@@ -107,14 +107,14 @@ def setup(igibson_env, kitchen, configs, args):
     h_x, h_y = human_start
     r_x, r_y = robot_start
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1],
-                                          [h_x - 4.5, h_y - 4.5, 0], [0, 0, 0])
+                                          [h_x - 4.5, h_y - 4.5, 0.8], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
 
     # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
 
-    human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
-                             kitchen.grid, hlp, env, igibson_env)
+    # human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
+    #                          kitchen.grid, hlp, env, tracking_env)
 
     return robot_agent, human_agent
 

@@ -785,9 +785,14 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             future_dist_cost = 0
             policy_a = self.policy_matrix[curr_state_idx]
             orders_left = len(self.parse_state(self.get_key_from_value(self.state_idx_dict, curr_state_idx))[2])
+
+            if orders_left == 0:
+                future_dist_cost = 1000000
+                self.dist_value_matrix[curr_state_idx] = future_dist_cost
+                continue
+            
             while not self.reward_matrix[policy_a][curr_state_idx] > 0:
                 if orders_left == 0:
-                    future_dist_cost = 1000000
                     break
                 policy_a = self.policy_matrix[curr_state_idx]
                 action = self.get_key_from_value(self.action_idx_dict, policy_a)
@@ -801,8 +806,8 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                 orders_left = len(self.parse_state(self.get_key_from_value(self.state_idx_dict, curr_state_idx))[2])
 
                 
-
-            self.dist_value_matrix[curr_state_idx] = future_dist_cost
+            print(f'future cost {self.get_key_from_value(self.state_idx_dict,curr_state_idx)}: {future_dist_cost}')
+            self.dist_value_matrix[start_state_idx] = future_dist_cost
 
             # curr_state = self.get_key_from_value(self.state_idx_dict, i)
             # parsed_state = self.parse_state(curr_state)

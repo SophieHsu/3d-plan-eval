@@ -44,8 +44,10 @@ class LsiEnv(object):
     def update_world(self):
         pot_to_onion_dict = self.tracking_env.get_pan_status()
         onions  = pot_to_onion_dict[self.kitchen.pans[0]]
-        self.world_state.in_pot = len(onions)
+        real_onions = len(onions)
+        self.world_state.in_pot
 
+        self.world_state.in_pot = real_onions + self.world_state.sim_in_pot
         return
 
     def update_robot_hl_state(self, next_hl_state, action_object):
