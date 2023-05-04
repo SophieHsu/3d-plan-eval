@@ -166,7 +166,7 @@ class HumanAgent():
 
     def completed_goal(self, next_hl_state, action_object):
         self.step_index = 0
-        self.lsi_env.update_human_hl_state(next_hl_state, action_object)
+        self.lsi_env.human_state.update_hl_state(next_hl_state, self.lsi_env.world_state)
         self.object_position = None
         self.arrived = False
 

@@ -203,6 +203,10 @@ class HlQmdpPlanningAgent(Agent):
         return self.ml_robot_action
 
     def ll_step(self):
+        # init_action = np.zeros(self.env.nav_env.action_space.shape)
+        # self.ig_robot.object.apply_action(init_action)
+        self._reset_arm_position(self.ig_robot)
+
         if self.ml_robot_action == None:
             return
 

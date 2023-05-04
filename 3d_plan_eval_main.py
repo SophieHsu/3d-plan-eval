@@ -126,9 +126,12 @@ def environment_setup(args, headless=None):
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],
         mode=args.mode,
-        action_timestep=1.0 / 15,
-        physics_timestep=1.0 / 30,  #1.0 / 30,
-        use_pb_gui=False)
+        # action_timestep=1.0 / 15,
+        # physics_timestep=1.0 / 30,  #1.0 / 30,
+        action_timestep=1.0 / 30,
+        physics_timestep=1.0 / 120,  #1.0 / 30,
+        
+        use_pb_gui=True)
 
     # if not headless:
     #     # Set a better viewing direction
@@ -171,7 +174,7 @@ if __name__ == "__main__":
             "headless", "headless_tensor", "gui_non_interactive",
             "gui_interactive", "vr"
         ],
-        default="gui_interactive",
+        default="headless",
         help="which mode for simulation (default: gui_interactive)",
     )
 
