@@ -2,12 +2,15 @@ from math import floor
 import numpy as np
 import os
 import igibson
+import math
 from igibson import object_states
 from igibson.objects.articulated_object import URDFObject
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 from igibson.utils.assets_utils import get_ig_model_path
 from igibson.object_states.heat_source_or_sink import HeatSourceOrSink
 from igibson import object_states
+from utils import quat2euler, normalize_radians
+
 import pybullet as p
 
 from lsi_3d.utils.constants import DIRE2POSDIFF
@@ -50,7 +53,8 @@ class Kitchen():
             name, x, y = line.split()
             x, y = int(x), int(y)
             obj_x_y.append((name, x, y))
-            if (grid[x][y] == "X" or grid[x][y] == "C") and name != "vidalia_onion":
+            if (grid[x][y] == "X"
+                    or grid[x][y] == "C") and name != "vidalia_onion":
                 grid[x][y] = self.name2abbr(name)
             if name == "table_h":
                 grid[x][y + 1] = self.name2abbr(name)
@@ -82,13 +86,13 @@ class Kitchen():
 
             # TODO: complete this
             if name == 'fridge':
-                self.tile_location['F'] = (x,y)
+                self.tile_location['F'] = (x, y)
             elif name == 'stove':
-                self.tile_location['S'] = (x,y)
+                self.tile_location['S'] = (x, y)
             elif name == 'bowl':
-                self.tile_location['B'] = (x,y)
+                self.tile_location['B'] = (x, y)
             elif name == 'table_h':
-                self.tile_location['T'] = (x,y)
+                self.tile_location['T'] = (x, y)
 
         self.orientation_map = orientation_map
         self.grid = grid
@@ -140,7 +144,9 @@ class Kitchen():
             "fridge":
             os.path.join(igibson.ig_dataset_path,
                          "objects/fridge/10373/10373.urdf"),
-            "vidalia_onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/18_1/18_1.urdf")
+            "vidalia_onion":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/vidalia_onion/18_1/18_1.urdf")
         }
 
         name2scale_map = {
@@ -162,7 +168,7 @@ class Kitchen():
             "table_h": (0, 0.5, 0),
             "stove": (0, 0, 0),
             "bowl": (0, 0, 1.2),
-            "pan": (0.15, -0.1, 1.24),  # shift height
+            "pan": (0.23, 0.24, 1.24),  # shift height
             "sink": (0, 0, 0.1),
             "fridge": (0, 0, 0.2),
             "vidalia_onion": (0.15, -0.1, 1.3)
@@ -210,32 +216,58 @@ class Kitchen():
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
             if name == "fridge":
                 # obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="fridge")
-                obj = URDFObject(name2path["counter"], scale=name2scale_map["counter"]/1.15, model_path="/".join(name2path["counter"].split("/")[:-1]), category="counter")
+                obj = URDFObject(name2path["counter"],
+                                 scale=name2scale_map["counter"] / 1.15,
+                                 model_path="/".join(
+                                     name2path["counter"].split("/")[:-1]),
+                                 category="counter")
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 # obj.states[object_states.Open].set_value(True)
                 self.fridges.append(obj)
                 for _ in range(10):
-                    onion = URDFObject(name2path["vidalia_onion"], scale=name2scale_map["vidalia_onion"]/1.15, model_path="/".join(name2path["vidalia_onion"].split("/")[:-1]), category="vidalia_onion")
+                    onion = URDFObject(
+                        name2path["vidalia_onion"],
+                        scale=name2scale_map["vidalia_onion"] / 1.15,
+                        model_path="/".join(
+                            name2path["vidalia_onion"].split("/")[:-1]),
+                        category="vidalia_onion")
                     self.env.simulator.import_object(onion)
                     # onion.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
-                    onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+                    onion.states[object_states.OnTop].set_value(
+                        obj, True, use_ray_casting_method=True)
                     self.onions.append(onion)
                     body_ids = onion.get_body_ids()
-                    p.changeDynamics(body_ids[0], -1,
-                                 mass=0.001)
+                    p.changeDynamics(body_ids[0], -1, mass=0.001)
             elif name == "stove":
-                obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="stove")
+                obj = URDFObject(name2path[name],
+                                 scale=name2scale_map[name] / 1.15,
+                                 model_path="/".join(
+                                     name2path[name].split("/")[:-1]),
+                                 category="stove")
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 obj.states[object_states.ToggledOn].set_value(True)
+
+            elif name == "pan":
+                obj = URDFObject(name2path[name],
+                                 name=name,
+                                 category=name,
+                                 scale=name2scale_map[name] / 1.15,
+                                 model_path="/".join(
+                                     name2path[name].split("/")[:-1]))
+                rotated_basis = self.get_rotated_basis(orn)
+                translated_pos = self.translate_loc(
+                    rotated_basis, tuple([x - 4.5, y - 4.5, 0]), shift)
+                self.env.simulator.import_object(obj)
+                self.env.set_pos_orn_with_z_offset(obj, translated_pos, orn)
             else:
                 obj = URDFObject(name2path[name],
-                             name=name,
-                             category=name,
-                             scale=name2scale_map[name] / 1.15,
-                             model_path="/".join(
-                                 name2path[name].split("/")[:-1]))
+                                 name=name,
+                                 category=name,
+                                 scale=name2scale_map[name] / 1.15,
+                                 model_path="/".join(
+                                     name2path[name].split("/")[:-1]))
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
@@ -244,15 +276,14 @@ class Kitchen():
             if name == "bowl":
                 self.bowls.append(obj)
                 body_ids = obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1,
-                                 mass=0.01)
+                p.changeDynamics(body_ids[0], -1, mass=0.01)
             if name == "pan":
                 self.pans.append(obj)
+
             if name == "vidalia_onion":
                 self.onions.append(obj)
                 body_ids = obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1,
-                                 mass=0.001)
+                p.changeDynamics(body_ids[0], -1, mass=0.001)
             if name == "table_h" or name == "table_v":
                 self.table = obj
                 self.static_objs[obj] = (x, y)
@@ -328,30 +359,50 @@ class Kitchen():
                 orientation = (0, 0, -1.5707)
         return orientation
 
+    def get_rotated_basis(self, ori):
+        _, _, z = ori
+        z_theta = normalize_radians(z) - math.pi / 2
+        regular_basis = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        rotation_matrix = np.array([[math.cos(z_theta), -math.sin(z_theta), 0],
+                                    [math.sin(z_theta),
+                                     math.cos(z_theta), 0], [0, 0, 1]])
+        rotated_basis = np.matmul(rotation_matrix, regular_basis)
+        return rotated_basis
+
+    def translate_loc(self, rotated_basis, loc, offset):
+        offset_scaling = np.array([[offset[0], 0, 0], [0, offset[1], 0],
+                                   [0, 0, offset[2]]])
+        scaled_rotated_basis = np.matmul(rotated_basis, offset_scaling)
+        translated_loc = np.matmul(scaled_rotated_basis,
+                                   np.array([1, 1,
+                                             1]).transpose()).transpose()
+        translated_loc = translated_loc + np.array(loc)
+        return translated_loc
+
     def get_center(self):
-        grid_center = (floor(len(self.grid)/2),floor(len(self.grid[0])/2))
+        grid_center = (floor(len(self.grid) / 2), floor(len(self.grid[0]) / 2))
         return grid_center
-    
+
     def nearest_empty_tile(self, loc):
-        grid_center = (floor(len(self.grid)/2),floor(len(self.grid[0])/2))
+        grid_center = (floor(len(self.grid) / 2), floor(len(self.grid[0]) / 2))
         open_spaces = []
-        x,y = loc
+        x, y = loc
         if self.grid[x][y] == 'X':
             return loc
         else:
-            for dir,add in DIRE2POSDIFF.items():
-                d_x,d_y = add
-                n_x,n_y = (x+d_x, y+d_y)
+            for dir, add in DIRE2POSDIFF.items():
+                d_x, d_y = add
+                n_x, n_y = (x + d_x, y + d_y)
                 if self.grid[n_x][n_y] == 'X':
-                    open_spaces.append((n_x,n_y))
+                    open_spaces.append((n_x, n_y))
 
         # manhattan dist to center pick closest
         chosen_space = None
         chosen_dist = 1000000
         for space in open_spaces:
             gcx, gcy = grid_center
-            sx,sy = space
-            dist = abs(gcx-sx)+abs(gcy-sy)
+            sx, sy = space
+            dist = abs(gcx - sx) + abs(gcy - sy)
             if dist < chosen_dist:
                 chosen_space = space
                 chosen_dist = dist
@@ -389,4 +440,3 @@ class Kitchen():
                     new_pos[1] += 0.05 * ((-1)**i)
                     part_obj.set_position(new_pos)
                     self.food_obj.append(part_obj)
-
