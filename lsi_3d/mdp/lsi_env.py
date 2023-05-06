@@ -55,6 +55,9 @@ class LsiEnv(object):
         Update hl state by updated in_pot and orders for world
         and holding for specific agent
         '''
+        if action_object == ('pickup', 'soup') and self.world_state.in_pot == self.mdp.num_items_for_soup:
+            self.tracking_env.clear_pot()
+
         self.world_state.update(next_hl_state, action_object)
         self.robot_state.update_hl_state(next_hl_state, self.world_state)
 
@@ -90,14 +93,6 @@ class LsiEnv(object):
 
 
     def update_joint_ml_state(self):
-        # r_x,r_y,z = self.ig_robot.object.get_position()
-        # pos_x = math.trunc(r_x + 1) * -1
-        # pos_y = math.trunc(r_y + 1) * -1
-        
-        # x,y,z,w = self.ig_robot.object.get_orientation()
-        # r,p,y = quat2euler(x,y,z,w)
-        # facing = orn_to_cardinal(y)
-        
         human_ml_state = self.get_ml_state(self.ig_human)
         robot_ml_state = self.get_ml_state(self.ig_robot)
         # human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
@@ -116,20 +111,12 @@ class LsiEnv(object):
         facing = orn_to_cardinal(y)
         
         return (pos_r, pos_c, facing)
-    
-    # def parse_hl_state(self, hl_state):
-    #     parsed = hl_state.split('_')
-    #     self.in_pot = parsed[1]
-    #     self.orders = parsed[2:]
 
     def update(self, new_hl_state, new_ml_state):
         prev_in_pot = self.in_pot
 
         human_hl, robot_hl = new_hl_state
         human_ml, robot_ml = new_ml_state
-
-        #self.joint_hl_state = new_hl_state
-        #self.ml_state = new_ml_state
 
         self.human_state.update(human_hl, human_ml)
         self.robot_state.update(robot_hl, robot_ml)
@@ -142,3 +129,18 @@ class LsiEnv(object):
             self.soup_states[0].onions_in_soup = self.in_pot
 
         return self
+    
+    def map_action_to_location(self, action_object):
+        action,object = action_object
+        if action == "pickup" and object == "onion":
+            location = self.tracking_env.get_closest_onion().get_position()
+        elif action == "drop" and object == "onion":
+            location =  self.tracking_env.get_closest_pan().get_position()
+        elif action == "pickup" and object == "dish":
+            location = self.tracking_env.get_closest_bowl().get_position()
+        elif action == "deliver" and object == "soup":
+            location = self.mdp.get_counter_locations()[0]
+        elif action == "pickup" and object == "soup":
+            location = self.tracking_env.get_closest_pan().get_position()
+
+        return location

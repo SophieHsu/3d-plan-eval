@@ -10,6 +10,7 @@ class WorldState():
         self.sim_in_pot = in_pot
         self.orders = orders
         self.players = []
+        self.max_in_pot = 2
 
 
     def parse_hl_state(self, hl_state):
@@ -19,13 +20,13 @@ class WorldState():
     def update(self, new_hl_state, action_object):
         #in_pot, orders = self.parse_hl_state(new_hl_state)
 
-        if action_object == ('drop', 'onion') and self.in_pot == 3:
+        if action_object == ('drop', 'onion') and self.in_pot == self.max_in_pot:
             print("Attempted to add onion to pot, but pot was full. Dropping on floor")
         elif action_object == ('drop', 'onion'):
             self.sim_in_pot += 1
             self.in_pot += 1
 
-        if action_object == ('pickup', 'soup') and self.in_pot == 3:
+        if action_object == ('pickup', 'soup') and self.in_pot == self.max_in_pot:
             self.in_pot = 0
 
         if action_object == ('deliver', 'soup'):
