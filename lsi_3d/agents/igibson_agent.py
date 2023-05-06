@@ -126,9 +126,11 @@ class iGibsonAgent:
             current_heading = self.get_current_orn_z()
             angle_delta = self.calc_angle_distance(goal_angle, current_heading)
 
-            if angle_delta > 0.1:
-                self.turn_toward(env, goal_angle, angle_delta, cur_x, cur_y)
-
+            if angle_delta > 0.2:
+                while angle_delta > 0.1:
+                    self.turn_toward(env, goal_angle, angle_delta, cur_x, cur_y)
+                    current_heading = self.get_current_orn_z()
+                    angle_delta = self.calc_angle_distance(goal_angle, current_heading)
             else:
                 self.agent_forward_one_step(env)
         else:
@@ -147,19 +149,19 @@ class iGibsonAgent:
                 self.object.set_position_orientation([x,y-ONE_STEP,z], self.object.get_orientation())
         else:
             action = np.zeros(env.action_space.shape)
-            action[0] = 0.15
+            action[0] = 0.2
             action[1] = 0
             start_x, start_y = self.object.get_position()[:2]
 
             cur_x, cur_y = self.object.get_position()[:2]
             distance_to_target = self.forward_distance(cur_x, cur_y, self.target_x, self.target_y, self.direction)
 
-            if distance_to_target < 0.2:
-                action[0] /= 2
+            if distance_to_target < 0.3:
+                action[0] *= 0.8
             elif distance_to_target < 0.1:
-                action[0] /= 4
-            elif distance_to_target < 0.05:
-                action[0] /= 8
+                action[0] *= 0.7
+            # elif distance_to_target < 0.05:
+            #     action[0] /= 8
             self.object.apply_action(action)
 
     def calc_angle_distance(self, a1, a2):
@@ -190,12 +192,12 @@ class iGibsonAgent:
         #print((cur_orn_z-target_orn_z) / (action[1]/action[1]), action[1], cur_orn_z, target_orn_z)
         if ((cur_orn_z-target_orn_z) / (action[1]/abs(action[1]))) > 4: # > 3.14
             action[1] = -action[1] 
-        if abs(target_orn_z - cur_orn_z) < 0.5:
+        if abs(target_orn_z - cur_orn_z) < 0.15:
             action[1] /= 2
-        elif abs(target_orn_z - cur_orn_z) < 0.2:
+        elif abs(target_orn_z - cur_orn_z) < 0.08:
             action[1] /= 4
         self.object.apply_action(action)
-        #env.simulator.step()
+        env.simulator.step()
 
 
     def agent_turn_one_step(self, env, action):

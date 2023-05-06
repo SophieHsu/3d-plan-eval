@@ -58,18 +58,20 @@ def setup(igibson_env, kitchen, configs, args):
     human = iGibsonAgent(human_bot, human_start, 'S', "human")
 
     robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
-    env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
+
+    tracking_env = TrackingEnv(igibson_env, kitchen, robot, human_bot)
+    env = LsiEnv(mdp, igibson_env, tracking_env, human, robot, kitchen)
     #robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
     #env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
     #######################################################################################
     igibson_env.simulator.import_object(human_bot)
     igibson_env.set_pos_orn_with_z_offset(
-        human_bot, [human_start[0], human_start[1], 0.35], [0, 0, 0])
+        human_bot, [human_start[0], human_start[1], 0.6], [0, 0, 0])
     a_star_planner = AStarPlanner(igibson_env)
     motion_controller = MotionControllerHuman()
     human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
-                             kitchen.grid, hlp, env, igibson_env, human_vr)
+                             kitchen.grid, hlp, env, tracking_env, human_vr)
 
     #######################################################################################
 
@@ -86,9 +88,8 @@ def setup(igibson_env, kitchen, configs, args):
         robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                      robot)
     elif planner_config == 2:
-        tracking_env = TrackingEnv(env, kitchen, robot, human)
-        tracking_env.step()
-        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp, tracking_env)
+        # tracking_env.step()
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         # mdp_planner = planners.HumanSubtaskQMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, force_compute_all=True)
         # mdp_planner = planners.HumanAwareMediumMDPPlanner.from_pickle_or_compute(scenario_1_mdp, NO_COUNTERS_PARAMS, hmlp, force_compute_all=True)
 
@@ -106,14 +107,14 @@ def setup(igibson_env, kitchen, configs, args):
     h_x, h_y = human_start
     r_x, r_y = robot_start
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1],
-                                          [h_x - 4.5, h_y - 4.5, 0], [0, 0, 0])
+                                          [h_x - 4.5, h_y - 4.5, 0.8], [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
 
     # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
 
-    human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
-                             kitchen.grid, hlp, env, igibson_env)
+    # human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
+    #                          kitchen.grid, hlp, env, tracking_env)
 
     return robot_agent, human_agent
 
@@ -125,9 +126,12 @@ def environment_setup(args, headless=None):
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],
         mode=args.mode,
-        action_timestep=1.0 / 15,
-        physics_timestep=1.0 / 30,  #1.0 / 30,
-        use_pb_gui=False)
+        # action_timestep=1.0 / 15,
+        # physics_timestep=1.0 / 30,  #1.0 / 30,
+        action_timestep=1.0 / 30,
+        physics_timestep=1.0 / 120,  #1.0 / 30,
+        
+        use_pb_gui=True)
 
     # if not headless:
     #     # Set a better viewing direction
@@ -170,7 +174,7 @@ if __name__ == "__main__":
             "headless", "headless_tensor", "gui_non_interactive",
             "gui_interactive", "vr"
         ],
-        default="gui_interactive",
+        default="headless",
         help="which mode for simulation (default: gui_interactive)",
     )
 

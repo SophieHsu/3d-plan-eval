@@ -6,6 +6,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
+from tracking_env import TrackingEnv
 
 class LsiEnv(object):
     """
@@ -19,6 +20,7 @@ class LsiEnv(object):
     def __init__(
         self, mdp:LsiMdp,
         nav_env:iGibsonEnv, 
+        tracking_env: TrackingEnv,
         ig_human:iGibsonAgent, 
         ig_robot:iGibsonAgent, 
         kitchen:Kitchen, 
@@ -28,6 +30,7 @@ class LsiEnv(object):
         #self.joint_hl_state = mdp.hl_start_state
         self.kitchen = kitchen
         self.nav_env = nav_env
+        self.tracking_env = tracking_env
         self.mdp = mdp
         self.ig_human = ig_human
         self.ig_robot = ig_robot
@@ -37,6 +40,15 @@ class LsiEnv(object):
         self.robot_state = AgentState(mdp.hl_start_state,self.mdp.start_locations[1])
         self.world_state = WorldState(mdp.hl_start_state)
         self.world_state.players = [self.robot_state, self.human_state]
+
+    def update_world(self):
+        pot_to_onion_dict = self.tracking_env.get_pan_status()
+        onions  = pot_to_onion_dict[self.kitchen.pans[0]]
+        real_onions = len(onions)
+        self.world_state.in_pot
+
+        self.world_state.in_pot = real_onions + self.world_state.sim_in_pot
+        return
 
     def update_robot_hl_state(self, next_hl_state, action_object):
         '''
