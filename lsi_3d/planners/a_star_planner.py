@@ -23,6 +23,8 @@ class AStarPlanner():
     def find_path(self, start, end, occupancy_grid):
         start = real_to_grid_coord(start)
         end_grid = real_to_grid_coord(end)
+        end_grid_item = occupancy_grid[end_grid[0]][end_grid[1]]
+        occupancy_grid[end_grid[0]][end_grid[1]] = "X"
 
         open = []
         closed = []
@@ -62,7 +64,7 @@ class AStarPlanner():
             path.insert(0, grid_to_real_coord(end_node.loc))
         
         # self.draw_path(path)
-
+        occupancy_grid[end_grid[0]][end_grid[1]] = end_grid_item
         return path
 
     def draw_path(self, path):
