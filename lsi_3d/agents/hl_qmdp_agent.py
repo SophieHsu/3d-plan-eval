@@ -186,7 +186,7 @@ class HlQmdpPlanningAgent(Agent):
             self.hl_robot_action = self.action(self.env.world_state, self.env.robot_state, self.human_sim_state)
             self.next_robot_hl_state, self.robot_goal, self.robot_action_object = self.hl_robot_action
             human_pos, human_ml_action = self.ml_human_action
-            plan = self.avoidance_motion_plan((human_pos, self.env.robot_state.ml_state), self.robot_goal, self.human_ml_plan, self.human_goal, radius=0)
+            plan = self.avoidance_motion_plan((human_pos, self.env.robot_state.ml_state), self.robot_goal, self.human_ml_plan, self.human_goal, radius=1)
             plan.append((self.robot_goal,'I'))
             self.ml_robot_plan = plan
             self.take_hl_robot_step = False
