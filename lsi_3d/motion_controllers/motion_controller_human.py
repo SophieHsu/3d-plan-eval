@@ -201,10 +201,10 @@ class MotionControllerHuman():
                 # p.addUserDebugLine([pos[0], pos[1], 1.0], [pos[0], pos[1] + 0.01, 1.0], lifeTime=20.0)
                 pos_no_theta = [pos[0], pos[1]]
                 dist = math.dist(pos_no_theta, destination)
-                robot_dist = math.dist(pos_no_theta, [robot_x, robot_y])
-                robot_in_FOV_human = robot.get_body_ids()[0] in human.states[object_states.ObjectsInFOVOfRobot].get_value()
-                if robot_dist < 0.5 and robot_in_FOV_human:
-                    break
+                # robot_dist = math.dist(pos_no_theta, [robot_x, robot_y])
+                # robot_in_FOV_human = robot.get_body_ids()[0] in human.states[object_states.ObjectsInFOVOfRobot].get_value()
+                # if robot_dist < 0.5 and robot_in_FOV_human:
+                #     break
                 if dist < min_dist:
                     path = positions[0:idx]
                     min_dist = dist
