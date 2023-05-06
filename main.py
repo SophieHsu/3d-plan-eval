@@ -184,7 +184,7 @@ def main(args):
 def main_loop(igibson_env, robot_agent, human_agent, kitchen, human_bot):
     count = 0
     while True:
-        # follow_entity_view(human_bot)
+        follow_entity_view(human_bot)
         human_agent.step()
         robot_agent.step()
         kitchen.step(count)
