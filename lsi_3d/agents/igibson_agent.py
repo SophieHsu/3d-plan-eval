@@ -53,6 +53,7 @@ class iGibsonAgent:
         self.object_position = None
         self.grasping_delay = 10
         self.counters = [0, 0]
+        self.prev_gripper_action = []
         if self.name == 'robot':
             self.arm_init()
 
@@ -298,7 +299,7 @@ class iGibsonAgent:
             self.object.apply_action(action)
 
     def interact_ll_control(self, action_object, tracking_env):
-        HEIGHT_OFFSET = 0.1
+        HEIGHT_OFFSET = 0.3
         action = action_object[0]
         object = action_object[1]
         if action == "pickup" and object == "onion":
@@ -320,23 +321,23 @@ class iGibsonAgent:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "drop" and object == "onion":
-            if self.object_position is None:
-                # self.object_position = tracking_env.get_closest_pan(
-                # agent_pos=self.object.get_eef_position()).get_position()
-                self.object_position = self.object.get_eef_position()
+            # if self.object_position is None:
+            self.object_position = tracking_env.get_closest_pan(
+                agent_pos=self.object.get_eef_position()).get_position()
+            # self.object_position = self.object.get_eef_position()
             done = self.drop(self.object_position,
                              tracking_env,
                              tracking_env.get_closest_pan(
                                  agent_pos=self.object.get_eef_position()),
                              name='onion',
-                             offset=[0, -0.1, 0.25 + HEIGHT_OFFSET])
+                             offset=[0, 0, 0.25 + HEIGHT_OFFSET])
             if done:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "pickup" and object == "dish":
-            if self.object_position is None:
-                self.object_position = tracking_env.get_closest_bowl(
-                    agent_pos=self.object.get_eef_position()).get_position()
+            # if self.object_position is None:
+            self.object_position = tracking_env.get_closest_bowl(
+                agent_pos=self.object.get_eef_position()).get_position()
             done = self.pick(self.object_position,
                              tracking_env,
                              tracking_env.get_closest_bowl(
@@ -561,8 +562,8 @@ class iGibsonAgent:
              name=None,
              offset=[0, 0, 0],
              obj_name=None):
-        if obj_name is not None:
-            offset = self.arm_eef_to_obj_dict[obj_name]
+        # if obj_name is not None:
+        #     offset = self.arm_eef_to_obj_dict[obj_name]
         translated_loc = self.translate_loc(loc, offset)
         gripper_action = [0.01, 0.01]
         return self.move_hand(translated_loc, tracking_env, None, name,
@@ -570,7 +571,10 @@ class iGibsonAgent:
 
     def move_hand(self, loc, tracking_env, target_obj, name, gripper_action):
         position = self.object.get_eef_position()
-        loc = self.reset_hand_position if self.arrived_hand_step == 3 else loc
+        if gripper_action != self.prev_gripper_action:
+            # loc = self.reset_hand_position
+            self.prev_gripper_action = gripper_action
+            self.arrived_hand_step = 0
 
         x_diff = loc[0] - position[0]
         y_diff = loc[1] - position[1]
@@ -606,6 +610,14 @@ class iGibsonAgent:
                     self.arrived_hand_step = 2
             else:
                 self.arrived_hand_step = 2
+                joint_pos = self.accurate_calculate_inverse_kinematics(
+                    self.robot_id,
+                    self.object.eef_links[self.object.default_arm].link_id,
+                    position, 0.05, 100)
+                if joint_pos is not None and len(joint_pos) > 0:
+                    print("Solution found. Setting new arm configuration.")
+                    set_joint_positions(self.robot_id, self.arm_joint_ids,
+                                        joint_pos)
             # print(math.dist(loc, position))
             # print("reach")
         # Middle action (grasp or drop)
@@ -627,7 +639,8 @@ class iGibsonAgent:
                 if target_obj is not None:
                     tracking_env.set_in_robot_hand(name, target_obj)
                 else:
-                    tracking_env.remove_in_robot_hand(name, target_obj)
+                    for i in tracking_env.kitchen.in_robot_hand:
+                        tracking_env.remove_in_robot_hand(i)
                 self.arrived_hand_step = 3
                 self.counters[1] = 0
             self.counters[1] += 1
@@ -643,8 +656,10 @@ class iGibsonAgent:
                 # human.apply_action(action)
                 if not self.robot_arm_move(position, x_diff, y_diff, z_diff):
                     done = True
+                    self.arrived_hand_step = 0
             else:
                 done = True
+                self.arrived_hand_step = 0
 
             if done:
                 # orientation = self.object.get_orientation()

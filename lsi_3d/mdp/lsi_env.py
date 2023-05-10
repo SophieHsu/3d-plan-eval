@@ -51,7 +51,7 @@ class LsiEnv(object):
         real_onions = len(onions)
         self.world_state.in_pot
 
-        self.world_state.in_pot = real_onions + self.world_state.sim_in_pot
+        self.world_state.in_pot = real_onions  # + self.world_state.sim_in_pot
         return
 
     def update_robot_hl_state(self, action_object):

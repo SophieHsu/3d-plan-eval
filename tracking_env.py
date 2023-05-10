@@ -81,8 +81,8 @@ class TrackingEnv():
     def set_in_robot_hand(self, name, obj):
         self.kitchen.in_robot_hand.append([name, obj])
 
-    def remove_in_robot_hand(self, name, obj):
-        self.kitchen.in_robot_hand.remove([name, obj])
+    def remove_in_robot_hand(self, item):
+        self.kitchen.in_robot_hand.remove(item)
 
     def get_closest_onion(self, agent_pos=None, on_pan=False):
         closest_onion = None
