@@ -67,6 +67,12 @@ class TrackingEnv():
             if IsGraspingState.TRUE in grasping:
                 return obj
 
+    def clear_pot(self):
+        pan = self.kitchen.pans[0]
+        for o in self.kitchen.onions:
+            if o.states[object_states.OnTop].get_value(pan):
+                o.set_position([0, 0, 0])
+
     # def open_fridge(self):
     #     fridge = self.kitchen.fridges[0]
     #     print(fridge.states)
@@ -83,6 +89,15 @@ class TrackingEnv():
         min_dist = 10000
         if agent_pos is None:
             position = self.human._parts["right_hand"].get_position()
+        else:
+            position = agent_pos
+
+    def get_closest_onion(self, agent_pos=None, on_pan=False, position=None):
+        closest_onion = None
+        min_dist = 10000
+        if agent_pos is None:
+            position = self.human._parts["right_hand"].get_position(
+            ) if position is None else position
         else:
             position = agent_pos
         closest_pan = self.get_closest_pan()

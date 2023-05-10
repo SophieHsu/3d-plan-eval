@@ -10,7 +10,7 @@ class AStarPlanner():
     def __init__(self, env):
         self.env = env
         self.markers = []
-        # self.initialize_markers()
+        self.initialize_markers()
 
     def initialize_markers(self):
         for i in range (30):
@@ -23,6 +23,9 @@ class AStarPlanner():
     def find_path(self, start, end, occupancy_grid):
         start = real_to_grid_coord(start)
         end_grid = real_to_grid_coord(end)
+        print(end_grid)
+        end_grid_item = occupancy_grid[end_grid[0]][end_grid[1]]
+        occupancy_grid[end_grid[0]][end_grid[1]] = "X"
 
         open = []
         closed = []
@@ -61,8 +64,8 @@ class AStarPlanner():
             end_node = end_node.parent
             path.insert(0, grid_to_real_coord(end_node.loc))
         
-        # self.draw_path(path)
-
+        self.draw_path(path)
+        occupancy_grid[end_grid[0]][end_grid[1]] = end_grid_item
         return path
 
     def draw_path(self, path):

@@ -178,13 +178,13 @@ def main(args):
     igibson_env, kitchen, configs = environment_setup(args)
     robot_agent, human_agent, human_bot = setup(igibson_env, kitchen, configs, args)
     human_agent.set_robot(igibson_env.robots[0])
-    human_agent.change_state()
+    # human_agent.change_state()
     main_loop(igibson_env, robot_agent, human_agent, kitchen, human_bot)
 
 def main_loop(igibson_env, robot_agent, human_agent, kitchen, human_bot):
     count = 0
     while True:
-        # follow_entity_view(human_bot)
+        follow_entity_view(human_bot)
         human_agent.step()
         robot_agent.step()
         kitchen.step(count)

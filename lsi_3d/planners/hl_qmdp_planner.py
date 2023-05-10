@@ -791,7 +791,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                 self.dist_value_matrix[curr_state_idx] = future_dist_cost
                 continue
             
-            while not self.reward_matrix[policy_a][curr_state_idx] > 0:
+            while orders_left != 0:
                 if orders_left == 0:
                     break
                 policy_a = self.policy_matrix[curr_state_idx]

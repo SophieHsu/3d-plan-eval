@@ -73,10 +73,11 @@ class HumanAgent():
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
+        robot_x, robot_y, _ = self.robot.get_position()
+        if math.dist([x, y], [robot_x, robot_y]) < 1.0:
+            end = self.loc_to_avoid_robot()
         path = self.planner.find_path((x,y), end, self.occupancy_grid)
-        # print(path)
-        # print(end)
-        # print("--------")
+
         round_prev_end = [round(p, 3) for p in self.prev_end] if self.prev_end is not None else self.prev_end
         round_end = [round(e, 3) for e in end] if end is not None else end
         is_new_end = True if round_prev_end != round_end else False
@@ -246,6 +247,28 @@ class HumanAgent():
                 if self.occupancy_grid[i][j] == 'R':
                     self.occupancy_grid[i][j] = 'X'
         self.occupancy_grid[loc[0]][loc[1]] = 'R'
+
+    def loc_to_avoid_robot(self):
+        human_x, human_y, _ = self.human.get_position()
+        human_pos_grid = real_to_grid_coord([human_x, human_y])
+        robot_x, robot_y, _ = self.robot.get_position()
+
+        relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        # relative_neighbor_locs = [ (-1, 0), (0, -1), (0, 1), (1, 0)]
+        farthest_neighbor = None
+        dist = -1
+        for n in relative_neighbor_locs:
+            x_neighbor = human_pos_grid[0] + n[0]
+            y_neighbor = human_pos_grid[1] + n[1]
+
+            if 0 <= x_neighbor < 8 and 0 <= y_neighbor < 8 and self.occupancy_grid[x_neighbor][y_neighbor] == "X":
+                neighbor_continuous = grid_to_real_coord([x_neighbor, y_neighbor])
+                neighbor_dist = math.dist([neighbor_continuous[0], neighbor_continuous[1]], [robot_x, robot_y])
+                if neighbor_dist > dist:
+                    farthest_neighbor = [x_neighbor, y_neighbor]
+                    dist = neighbor_dist
+        return grid_to_real_coord(farthest_neighbor)
+
 
     # def is_observed(self, object, track):
     #     '''

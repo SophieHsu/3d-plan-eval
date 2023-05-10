@@ -277,6 +277,7 @@ class HighLevelMdpPlanner(object):
                 elif obj == 'tomato':
                     location = self.mdp.get_tomato_dispenser_locations()
                 elif obj == 'dish':
+                    # TODO: Update from tracking env
                     location = self.mdp.get_dish_dispenser_locations()
                 else:
                     print(p0_obj, action, obj)

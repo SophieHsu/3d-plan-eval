@@ -228,7 +228,7 @@ class HlQmdpPlanningAgent(Agent):
                 self.robot_goal,
                 self.human_ml_plan,
                 self.human_goal,
-                radius=0)
+                radius=1)
             plan.append((self.robot_goal, 'I'))
             self.ml_robot_plan = plan
             self.take_hl_robot_step = False
