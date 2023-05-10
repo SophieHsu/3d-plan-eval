@@ -31,6 +31,7 @@ class Kitchen():
         self.fridges = []
         self.food_obj = []
         self.static_objs = {}
+        self.in_robot_hand = []
 
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
         self.tile_location = {}
@@ -440,3 +441,6 @@ class Kitchen():
                     new_pos[1] += 0.05 * ((-1)**i)
                     part_obj.set_position(new_pos)
                     self.food_obj.append(part_obj)
+
+        for obj in self.in_robot_hand:
+            obj[-1].set_position(self.env.robots[0].get_eef_position())

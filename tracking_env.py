@@ -8,7 +8,9 @@ from igibson import object_states
 import pybullet as p
 from utils import quat2euler
 
+
 class TrackingEnv():
+
     def __init__(self, igibsonEnv, kitchen, robot, human):
         self.env = igibsonEnv
         self.kitchen = kitchen
@@ -24,7 +26,7 @@ class TrackingEnv():
                     onions.append(o)
             data[b] = onions
         return data
-    
+
     def get_pan_status(self):
         data = {}
         for p in self.kitchen.pans:
@@ -34,14 +36,14 @@ class TrackingEnv():
                     onions.append(o)
             data[p] = onions
         return data
-    
+
     def is_pan_cooked(self, pan):
         num_cooked_onions = 0
         num_uncooked_onions = 0
         for o in self.kitchen.onions:
             if o.states[object_states.OnTop].get_value(pan):
                 if o.states[object_states.Cooked].get_value():
-                    num_cooked_onions +=1
+                    num_cooked_onions += 1
                 else:
                     num_uncooked_onions += 1
         return [num_cooked_onions, num_uncooked_onions]
@@ -52,10 +54,10 @@ class TrackingEnv():
             val = i.states[object_states.OnTop].get_value(self.table)
             on_table_bool.append(val)
         return on_table_bool
-    
+
     def obj_in_robot_hand(self):
         # return object in robot hand
-        pass
+        return self.kitchen.in_robot_hand
 
     def obj_in_human_hand(self):
         all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls
@@ -64,19 +66,29 @@ class TrackingEnv():
             grasping = self.human.is_grasping_all_arms(body_id)
             if IsGraspingState.TRUE in grasping:
                 return obj
-            
+
     # def open_fridge(self):
     #     fridge = self.kitchen.fridges[0]
     #     print(fridge.states)
     #     fridge.states[object_states.Open].set_value(True)
 
-    def get_closest_onion(self, on_pan=False):
+    def set_in_robot_hand(self, name, obj):
+        self.kitchen.in_robot_hand.append([name, obj])
+
+    def remove_in_robot_hand(self, name, obj):
+        self.kitchen.in_robot_hand.remove([name, obj])
+
+    def get_closest_onion(self, agent_pos=None, on_pan=False):
         closest_onion = None
         min_dist = 10000
-        position = self.human._parts["right_hand"].get_position()
+        if agent_pos is None:
+            position = self.human._parts["right_hand"].get_position()
+        else:
+            position = agent_pos
         closest_pan = self.get_closest_pan()
         for o in self.kitchen.onions:
-            if on_pan and not o.states[object_states.OnTop].get_value(closest_pan):
+            if on_pan and not o.states[object_states.OnTop].get_value(
+                    closest_pan):
                 continue
             onion_position = o.get_position()
             dist = math.dist(position, onion_position)
@@ -84,11 +96,15 @@ class TrackingEnv():
                 min_dist = dist
                 closest_onion = o
         return closest_onion
-    
-    def get_closest_pan(self):
+
+    def get_closest_pan(self, agent_pos=None):
         closest_pan = None
         min_dist = 10000
         position = self.human._parts["right_hand"].get_position()
+        if agent_pos is None:
+            position = self.human._parts["right_hand"].get_position()
+        else:
+            position = agent_pos
         for p in self.kitchen.pans:
             pan_position = p.get_position()
             dist = math.dist(position, pan_position)
@@ -96,11 +112,15 @@ class TrackingEnv():
                 min_dist = dist
                 closest_pan = p
         return closest_pan
-    
-    def get_closest_bowl(self):
+
+    def get_closest_bowl(self, agent_pos=None):
         closest_bowl = None
         min_dist = 10000
         position = self.human._parts["right_hand"].get_position()
+        if agent_pos is None:
+            position = self.human._parts["right_hand"].get_position()
+        else:
+            position = agent_pos
         for p in self.kitchen.bowls:
             bowl_position = p.get_position()
             dist = math.dist(position, bowl_position)
@@ -111,8 +131,9 @@ class TrackingEnv():
 
     def get_human_position(self):
         return self.human.get_position()
-    
+
     def get_human_orientation(self):
-       orientation = self.human.get_orientation()
-       x, y, z = quat2euler(orientation[0], orientation[1], orientation[2], orientation[3])
-       return [x, y, z]
+        orientation = self.human.get_orientation()
+        x, y, z = quat2euler(orientation[0], orientation[1], orientation[2],
+                             orientation[3])
+        return [x, y, z]

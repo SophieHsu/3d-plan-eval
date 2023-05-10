@@ -3,6 +3,13 @@ from utils import quat2euler
 import numpy as np
 from igibson.objects.visual_marker import VisualMarker
 import pybullet as p
+from igibson.external.pybullet_tools.utils import (
+    get_max_limits,
+    get_min_limits,
+    get_sample_fn,
+    joints_from_names,
+    set_joint_positions,
+)
 
 class MotionControllerRobot():
 
@@ -142,3 +149,5 @@ class MotionControllerRobot():
             return -min_theta
         else:
             return min_theta
+        
+    def pick():
