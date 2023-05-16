@@ -270,7 +270,7 @@ class HighLevelMdpPlanner(object):
         location = []
         if action == 'pickup' and obj != 'soup':
             if p0_obj != 'None':
-                location = self.drop_item(world_state)
+                location = self.drop_item(world_state, agent_state=agent_state)
             else:
                 if obj == 'onion':
                     location = self.mdp.get_onion_dispenser_locations()

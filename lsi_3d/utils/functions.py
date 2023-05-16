@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from numpy import diff
-from lsi_3d.utils.constants import TARGET_ORNS, DIRE2POSDIFF
+from lsi_3d.utils.constants import TARGET_ORNS, DIRE2POSDIFF, FORWARD_RADIUS_POS
 
 def orn_to_cardinal(angle):
 
@@ -81,3 +81,19 @@ def find_nearby_open_space(grid, loc):
         if 0 <= newLocR < len(grid) and 0 <= newLocC < len(grid[0]) and grid[newLocR][newLocC] == 'X':
             return (newLocR, newLocC, dir)
     return None
+
+def get_states_in_forward_radius(state, radius):
+    y,x,f = state
+    xmin_mul, xmax_mul, ymin_mul, ymax_mul = FORWARD_RADIUS_POS[f]
+    x_min = x + radius * xmin_mul
+    x_max = x + radius * xmax_mul
+    y_min = y + radius * ymin_mul
+    y_max = y + radius * ymax_mul
+
+    states_within_radius = []
+    for i in range(y_min, y_max+1):
+        for j in range(x_min, x_max+1):
+            #if manhattan((y,x),(i,j)) < radius:
+            states_within_radius.append((i,j))
+
+    return states_within_radius

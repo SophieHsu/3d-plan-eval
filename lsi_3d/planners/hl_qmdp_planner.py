@@ -636,6 +636,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             the action_dix will be representing the 6 low level action index (north, south...).
             If the low_level_action is False, it will be the action_dict (pickup_onion, pickup_soup...).
         """
+        VALUE_OFFSET = (self.mdp.height*self.mdp.width)*2 
         start_time = time.time()
         next_state_v = np.zeros((len(belief), len(self.action_dict)), dtype=float)
         action_cost = np.zeros((len(belief), len(self.action_dict)), dtype=float)
@@ -663,6 +664,8 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                     # value_cost = self.compute_policy_rollout(next_state_idx, world_state)
 
                     one_step_cost = cost# joint_action, one_step_cost = self.joint_action_cost(world_state, after_action_world_state.players_pos_and_or)  
+                    
+                    value_cost = max(0, VALUE_OFFSET - value_cost)
                     # print('joint_action =', joint_action, 'one_step_cost =', one_step_cost)
                     # print('Action.ACTION_TO_INDEX[joint_action[agent_idx]] =', Action.ACTION_TO_INDEX[joint_action[agent_idx]])
                     if not low_level_action:
@@ -787,7 +790,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             orders_left = len(self.parse_state(self.get_key_from_value(self.state_idx_dict, curr_state_idx))[2])
 
             if orders_left == 0:
-                future_dist_cost = 1000000
+                future_dist_cost = 0
                 self.dist_value_matrix[curr_state_idx] = future_dist_cost
                 continue
             

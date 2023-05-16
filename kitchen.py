@@ -393,6 +393,8 @@ class Kitchen():
             for dir, add in DIRE2POSDIFF.items():
                 d_x, d_y = add
                 n_x, n_y = (x + d_x, y + d_y)
+                if n_x > len(self.grid)-1 or n_y > len(self.grid)-1:
+                    continue
                 if self.grid[n_x][n_y] == 'X':
                     open_spaces.append((n_x, n_y))
 

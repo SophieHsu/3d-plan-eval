@@ -116,7 +116,7 @@ def setup(igibson_env, kitchen, configs, args):
     # human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
     #                          kitchen.grid, hlp, env, tracking_env)
 
-    return robot_agent, human_agent
+    return robot_agent, human_agent, env
 
 
 def environment_setup(args, headless=None):
@@ -149,12 +149,12 @@ def environment_setup(args, headless=None):
 
 def main(args):
     igibson_env, kitchen, configs = environment_setup(args)
-    robot_agent, human_agent = setup(igibson_env, kitchen, configs, args)
+    robot_agent, human_agent, lsi_env = setup(igibson_env, kitchen, configs, args)
     human_agent.set_robot(igibson_env.robots[0])
-    main_loop(igibson_env, robot_agent, human_agent, kitchen)
+    main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env)
 
 
-def main_loop(igibson_env, robot_agent, human_agent, kitchen):
+def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
     count = 0
     while True:
         human_agent.step()
@@ -162,6 +162,10 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen):
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1
+
+        if lsi_env.world_state.orders == []:
+            print("Orders Completed")
+            break
 
 
 if __name__ == "__main__":

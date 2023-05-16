@@ -28,7 +28,7 @@ class WorldState():
 
         if action_object == ('pickup', 'soup') and self.in_pot == self.max_in_pot:
             self.in_pot = 0
-
+            self.sim_in_pot = 0
         if action_object == ('deliver', 'soup'):
             self.orders = self.orders[:-1]
 
@@ -78,8 +78,11 @@ class AgentState():
     def equal_hl(self, new_hl_state):
         return self.hl_state == new_hl_state
 
-    def equal_ml(self, new_state):
-        return (self.ml_state[0], self.ml_state[1]) == (new_state.ml_state[0],new_state.ml_state[1])
+    def equal_ml(self, new_state, facing = False):
+        if not facing:
+            return (self.ml_state[0], self.ml_state[1]) == (new_state.ml_state[0],new_state.ml_state[1])
+        else:
+            return self.ml_state == new_state.ml_state
 
     def is_start_state(self):
         return self.hl_state == self.start_state

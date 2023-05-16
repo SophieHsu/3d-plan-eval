@@ -136,7 +136,7 @@ def cost_func_radius(grid, ex, ey, x, y, f, action, radius = None, avoid_state =
             for f_state in get_states_in_forward_radius(avoid_state, radius):
                 fx, fy = f_state
                 if (fx, fy) == (nx, ny):
-                    cost = 1.3
+                    cost = 10
             
             return cost
                 
@@ -410,14 +410,21 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
         #if end_achieved(grid, cx1, cy1, ex1, ey1, cf1) and end_achieved(grid, cx2, cy2, ex2, ey2, cf2, ef2):
         # args = [cx1, cy1, ex1, ey1, cf1, cx2, cy2, ex2, ey2, cf2, ef2]
         # print(f'{args}')
-        if end_achieved_same_goal_check(grid, (cx1,cy1,cf1), (cx2,cy2,cf2), (ex1, ey1), (ex2, ey2), ef2) or end_achieved(grid, cx2, cy2, ex2, ey2, cf2, ef2):
+        both_finished = end_achieved_same_goal_check(grid, (cx1,cy1,cf1), (cx2,cy2,cf2), (ex1, ey1), (ex2, ey2), ef2)
+        robot_finished = end_achieved(grid, cx2, cy2, ex2, ey2, cf2, ef2)
+
+        # Note: if human is allowed to finish its path then robot may choose to just delay
+        # human_finished = end_achieved(grid, cx1, cy1, ex1, ey1, cf1, ef2)
+
+        if both_finished or robot_finished:#  or human_finished:
             last_state = cur_state
             break_all = True
             break
+
         
         # Add human actions at current time step for robot to avoid
         avoid_actions = []
-        # avoid_actions.append('D')
+        avoid_actions.append('D')
         if len(avoid_path_queue) > avoid_path_t_step:
             avoid_actions.append(avoid_path[avoid_path_t_step])
         
@@ -462,14 +469,18 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
         return path
     px1, py1, pf1, px2, py2, pf2 = last_state
     sx1, sy1, sf1, sx2, sy2, sf2 = start_state
+    total_cost = 0
     while (px1, py1, pf1, px2, py2, pf2) != (sx1, sy1, sf1, sx2, sy2, sf2):
         p_state, command1, command2 = path_prev[(px1, py1, pf1, px2, py2, pf2)]
         #path.append(((px1, py1, pf1, px2, py2, pf2), command1, command2))
         path.append((((px1, py1, pf1),command1), ((px2, py2, pf2), command2)))
         px1, py1, pf1, px2, py2, pf2 = p_state
-
+        # total_cost += cost
     path = path[::-1]
 
+    if robot_finished:
+        path.append((((ex1,ey1,ef2),'F'), ((ex2,ey2,ef2), 'I')))
+    print(f'Total path cost: {total_cost}')
     return path
 
 def astar_avoid_path_with_lookahead(grid, start_state, ex1, ey1, ex2, ey2, avoid_path, lookahead_distance):
