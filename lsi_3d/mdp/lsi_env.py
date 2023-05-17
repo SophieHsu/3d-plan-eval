@@ -48,6 +48,9 @@ class LsiEnv(object):
         self.world_state.in_pot
 
         self.world_state.in_pot = real_onions + self.world_state.sim_in_pot
+
+        if self.world_state.in_pot > self.mdp.num_items_for_soup:
+            self.world_state.in_pot = self.mdp.num_items_for_soup
         return
 
     def update_robot_hl_state(self, next_hl_state, action_object):
