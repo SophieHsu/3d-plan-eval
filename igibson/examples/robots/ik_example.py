@@ -13,6 +13,7 @@ from igibson.external.pybullet_tools.utils import (
     get_sample_fn,
     joints_from_names,
     set_joint_positions,
+    get_joint_positions,
 )
 from igibson.objects.visual_marker import VisualMarker
 from igibson.robots.fetch import Fetch
@@ -38,7 +39,8 @@ def main(selection="user", headless=False, short_exec=False):
             "-p",
             dest="programmatic_pos",
             action="store_true",
-            help="if the IK solvers should be used with the GUI or programmatically",
+            help=
+            "if the IK solvers should be used with the GUI or programmatically",
         )
         args = parser.parse_args()
         programmatic_pos = args.programmatic_pos
@@ -46,7 +48,8 @@ def main(selection="user", headless=False, short_exec=False):
         programmatic_pos = True
 
     # Create simulator, scene and robot (Fetch)
-    config = parse_config(os.path.join(igibson.configs_path, "fetch_reaching.yaml"))
+    config = parse_config(
+        os.path.join(igibson.configs_path, "fetch_reaching.yaml"))
     s = Simulator(mode="headless", use_pb_gui=True if not headless else False)
     scene = EmptyScene()
     s.import_scene(scene)
@@ -62,7 +65,7 @@ def main(selection="user", headless=False, short_exec=False):
     robot_id = body_ids[0]
 
     arm_default_joint_positions = (
-        0.10322468280792236,
+        0.385,
         -1.414019864768982,
         1.5178184935241699,
         0.8189625336474915,
@@ -72,13 +75,11 @@ def main(selection="user", headless=False, short_exec=False):
         0.0008453550418615341,
     )
 
-    robot_default_joint_positions = (
-        [0.0, 0.0]
-        + [arm_default_joint_positions[0]]
-        + [0.0, 0.0]
-        + list(arm_default_joint_positions[1:])
-        + [0.01, 0.01]
-    )
+    robot_default_joint_positions = ([0.0, 0.0] +
+                                     [arm_default_joint_positions[0]] +
+                                     [0.0, 0.0] +
+                                     list(arm_default_joint_positions[1:]) +
+                                     [0.01, 0.01])
 
     robot_joint_names = [
         "r_wheel_joint",
@@ -108,7 +109,10 @@ def main(selection="user", headless=False, short_exec=False):
     ]
 
     # Indices of the joints of the arm in the vectors returned by IK and motion planning (excluding wheels, head, fingers)
-    robot_arm_indices = [robot_joint_names.index(arm_joint_name) for arm_joint_name in arm_joints_names]
+    robot_arm_indices = [
+        robot_joint_names.index(arm_joint_name)
+        for arm_joint_name in arm_joints_names
+    ]
 
     # PyBullet ids of the joints corresponding to the joints of the arm
     arm_joint_ids = joints_from_names(robot_id, arm_joints_names)
@@ -128,12 +132,18 @@ def main(selection="user", headless=False, short_exec=False):
     # fingers (indices 12 and 13)
     max_limits = get_max_limits(robot_id, all_joint_ids)
     min_limits = get_min_limits(robot_id, all_joint_ids)
+    min_limits[2] = 0.37
     rest_position = robot_default_joint_positions
     joint_range = list(np.array(max_limits) - np.array(min_limits))
     joint_range = [item + 1 for item in joint_range]
     joint_damping = [0.1 for _ in joint_range]
 
-    def accurate_calculate_inverse_kinematics(robot_id, eef_link_id, target_pos, threshold, max_iter):
+    def accurate_calculate_inverse_kinematics(robot_id,
+                                              eef_link_id,
+                                              target_pos,
+                                              threshold,
+                                              max_iter,
+                                              init_pos=None):
         print("IK solution to end effector position {}".format(target_pos))
         # Save initial robot pose
         state_id = p.saveState()
@@ -141,14 +151,15 @@ def main(selection="user", headless=False, short_exec=False):
         max_attempts = 5
         solution_found = False
         joint_poses = None
+        print(target_pos)
         for attempt in range(1, max_attempts + 1):
             print("Attempt {} of {}".format(attempt, max_attempts))
-            # Get a random robot pose to start the IK solver iterative process
-            # We attempt from max_attempt different initial random poses
-            sample_fn = get_sample_fn(robot_id, arm_joint_ids)
-            sample = np.array(sample_fn())
-            # Set the pose of the robot there
-            set_joint_positions(robot_id, arm_joint_ids, sample)
+            # # Get a random robot pose to start the IK solver iterative process
+            # # We attempt from max_attempt different initial random poses
+            # sample_fn = get_sample_fn(robot_id, arm_joint_ids)
+            # sample = np.array(sample_fn())
+            # # Set the pose of the robot there
+            # set_joint_positions(robot_id, arm_joint_ids, sample)
 
             it = 0
             # Query IK, set the pose to the solution, check if it is good enough repeat if not
@@ -176,7 +187,8 @@ def main(selection="user", headless=False, short_exec=False):
                 it += 1
 
             if solution_found:
-                print("Solution found at iter: " + str(it) + ", residual: " + str(dist))
+                print("Solution found at iter: " + str(it) + ", residual: " +
+                      str(dist))
                 break
             else:
                 print("Attempt failed. Retry")
@@ -189,12 +201,13 @@ def main(selection="user", headless=False, short_exec=False):
     threshold = 0.03
     max_iter = 100
     if programmatic_pos or headless:
-        query_positions = [[1, 0, 0.8], [1, 1, 1], [0.5, 0.5, 0], [0.5, 0.5, 0.5]]
+        query_positions = [[1, 0, 0.8], [1, 1, 1], [0.5, 0.5, 0],
+                           [0.5, 0.5, 0.5]]
         for pos in query_positions:
             print("Querying joint configuration to current marker position")
             joint_pos = accurate_calculate_inverse_kinematics(
-                robot_id, fetch.eef_links[fetch.default_arm].link_id, pos, threshold, max_iter
-            )
+                robot_id, fetch.eef_links[fetch.default_arm].link_id, pos,
+                threshold, max_iter)
             if joint_pos is not None and len(joint_pos) > 0:
                 print("Solution found. Setting new arm configuration.")
                 set_joint_positions(robot_id, arm_joint_ids, joint_pos)
@@ -226,10 +239,12 @@ def main(selection="user", headless=False, short_exec=False):
                 if k == ord("x") and (v & p.KEY_IS_DOWN):
                     z -= 0.01
                 if k == ord(" "):
-                    print("Querying joint configuration to current marker position")
-                    joint_pos = accurate_calculate_inverse_kinematics(
-                        robot_id, fetch.eef_links[fetch.default_arm].link_id, [x, y, z], threshold, max_iter
+                    print(
+                        "Querying joint configuration to current marker position"
                     )
+                    joint_pos = accurate_calculate_inverse_kinematics(
+                        robot_id, fetch.eef_links[fetch.default_arm].link_id,
+                        [x, y, z], threshold, max_iter)
                     if joint_pos is not None and len(joint_pos) > 0:
                         print("Solution found. Setting new arm configuration.")
                         set_joint_positions(robot_id, arm_joint_ids, joint_pos)
@@ -258,7 +273,8 @@ def print_message():
     print("*" * 80)
     print("Move the marker to a desired position to query IK and press SPACE")
     print("Up/Down arrows: move marker further away or closer to the robot")
-    print("Left/Right arrows: move marker to the left or the right of the robot")
+    print(
+        "Left/Right arrows: move marker to the left or the right of the robot")
     print("z/x: move marker up and down")
     print("q: quit")
 

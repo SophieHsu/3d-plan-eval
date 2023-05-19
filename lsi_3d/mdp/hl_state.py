@@ -1,9 +1,11 @@
 from lsi_3d.utils.enums import Mode
 
+
 class WorldState():
     """Keeps track of items in the world that are shared accross agents
     i.e. items in pot, and orders left
     """
+
     def __init__(self, start_hl_state=None):
         in_pot, orders = self.parse_hl_state(start_hl_state)
         self.in_pot = in_pot
@@ -12,12 +14,11 @@ class WorldState():
         self.players = []
         self.max_in_pot = 2
 
-
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
         return (int(parsed[1]), parsed[2:])
 
-    def update(self, new_hl_state, action_object):
+    def update(self, action_object):
         #in_pot, orders = self.parse_hl_state(new_hl_state)
 
         if action_object == ('drop', 'onion') and self.in_pot == self.max_in_pot:
@@ -26,9 +27,9 @@ class WorldState():
             self.sim_in_pot += 1
             self.in_pot += 1
 
-        if action_object == ('pickup', 'soup') and self.in_pot == self.max_in_pot:
-            self.in_pot = 0
-            self.sim_in_pot = 0
+        # if action_object == ('pickup', 'soup') and self.in_pot == self.max_in_pot:
+        #     self.in_pot = 0
+        #     self.sim_in_pot = 0
         if action_object == ('deliver', 'soup'):
             self.orders = self.orders[:-1]
 
@@ -37,7 +38,9 @@ class WorldState():
         self.in_pot = in_pot
         self.orders = orders
 
+
 class SoupState():
+
     def __init__(self, location, onions_in_soup) -> None:
         self.onions_in_soup = onions_in_soup
         self.location = location
@@ -45,8 +48,10 @@ class SoupState():
     def add_onion(self):
         self.onions_in_soup += 1
 
+
 class AgentState():
-    def __init__(self, hl_state = None, ml_state = None, ll_state = None) -> None:
+
+    def __init__(self, hl_state=None, ml_state=None, ll_state=None) -> None:
         self.hl_state = hl_state
         self.ml_state = ml_state
         self.ll_state = ll_state
@@ -56,10 +61,21 @@ class AgentState():
 
         self.holding = 'None'
         self.next_holding = 'None'
-    
-    def parse_hl_state(self, hl_state, world_state:WorldState):
+
+    def parse_hl_state(self, hl_state, world_state: WorldState):
         parsed = hl_state.split('_')
         self.holding = parsed[0]
+        self.hl_state = f'{self.holding}_{world_state.in_pot}'
+
+        for order in world_state.orders:
+            self.hl_state += f'_{order}'
+
+    def update(self, tracking_env, world_state):
+        if len(tracking_env.obj_in_robot_hand()) > 0:
+            self.holding = tracking_env.obj_in_robot_hand()[0][0]
+        else:
+            self.holding = 'None'
+
         self.hl_state = f'{self.holding}_{world_state.in_pot}'
 
         for order in world_state.orders:
@@ -86,7 +102,7 @@ class AgentState():
 
     def is_start_state(self):
         return self.hl_state == self.start_state
-    
+
     def has_object(self):
         return not self.holding == None and not self.holding == 'None'
 

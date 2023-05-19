@@ -38,6 +38,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
+
 def setup(igibson_env, kitchen, configs, args):
     exp_config, map_config = configs
     order_list = exp_config['order_list']
@@ -86,7 +87,7 @@ def setup(igibson_env, kitchen, configs, args):
 
         human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
         robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
-                                     robot)
+                                         robot)
     elif planner_config == 2:
         # tracking_env.step()
         robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
@@ -101,13 +102,14 @@ def setup(igibson_env, kitchen, configs, args):
         robot_hlp.post_mdp_setup()
         human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
         robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
-                                     robot)
+                                          robot)
 
     # TODO: Get rid of 4.5 offset
     h_x, h_y = human_start
     r_x, r_y = robot_start
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1],
-                                          [h_x - 4.5, h_y - 4.5, 0.8], [0, 0, 0])
+                                          [h_x - 4.5, h_y - 4.5, 0.8],
+                                          [0, 0, 0])
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
 
@@ -130,7 +132,6 @@ def environment_setup(args, headless=None):
         # physics_timestep=1.0 / 30,  #1.0 / 30,
         action_timestep=1.0 / 30,
         physics_timestep=1.0 / 120,  #1.0 / 30,
-        
         use_pb_gui=True)
 
     # if not headless:
