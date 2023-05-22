@@ -74,7 +74,7 @@ class HumanAgent():
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         robot_x, robot_y, _ = self.robot.get_position()
-        if math.dist([x, y], [robot_x, robot_y]) < 1.0:
+        if math.dist([x, y], [robot_x, robot_y]) < 1.5:
             end = self.loc_to_avoid_robot()
         path = self.planner.find_path((x,y), end, self.occupancy_grid)
 
@@ -264,11 +264,12 @@ class HumanAgent():
             if 0 <= x_neighbor < 8 and 0 <= y_neighbor < 8 and self.occupancy_grid[x_neighbor][y_neighbor] == "X":
                 neighbor_continuous = grid_to_real_coord([x_neighbor, y_neighbor])
                 neighbor_dist = math.dist([neighbor_continuous[0], neighbor_continuous[1]], [robot_x, robot_y])
-                if neighbor_dist > dist:
-                    farthest_neighbor = [x_neighbor, y_neighbor]
+                neighbor = grid_to_real_coord([x_neighbor, y_neighbor])
+                path = self.planner.find_path((human_x, human_y), neighbor, self.occupancy_grid)
+                if neighbor_dist > dist and len(path) > 0:
+                    farthest_neighbor = neighbor
                     dist = neighbor_dist
-        return grid_to_real_coord(farthest_neighbor)
-
+        return farthest_neighbor
 
     # def is_observed(self, object, track):
     #     '''

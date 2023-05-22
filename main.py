@@ -80,7 +80,7 @@ def setup(igibson_env, kitchen, configs, args):
     mlp = AStarMotionPlanner(kitchen)
     # hhlp = HLGreedyHumanPlanner(mdp, mlp)
 
-    planner_config = 1
+    planner_config = 2
     if planner_config == 1:
         hhlp = HLHumanPlanner(mdp, mlp, False)
         robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
