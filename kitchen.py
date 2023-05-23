@@ -227,13 +227,6 @@ class Kitchen():
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 # obj.states[object_states.Open].set_value(True)
-                
-                pos[2] = 1.5
-                marker = VisualMarker(visual_shape=p.GEOM_SPHERE, radius=0.06)
-                self.env.simulator.import_object(marker)
-                marker.set_position(pos)
-                print(pos)
-                print("-------------------------")
 
                 self.fridges.append(obj)
                 for _ in range(10):
