@@ -39,6 +39,7 @@ class HumanAgent():
         self.object_position = None
         self.arrived = False
         self.step_index = 0
+        self.avoiding_robot = False
             
     def change_state(self):
         # pass
@@ -74,8 +75,11 @@ class HumanAgent():
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         robot_x, robot_y, _ = self.robot.get_position()
-        if math.dist([x, y], [robot_x, robot_y]) < 1.5:
+        if math.dist([x, y], [robot_x, robot_y]) < 1.0 or self.avoiding_robot:
+            self.avoiding_robot = True
             end = self.loc_to_avoid_robot()
+        if math.dist([x, y], [robot_x, robot_y]) > 1.5:
+            self.avoiding_robot = False  
         path = self.planner.find_path((x,y), end, self.occupancy_grid)
 
         round_prev_end = [round(p, 3) for p in self.prev_end] if self.prev_end is not None else self.prev_end
@@ -253,8 +257,8 @@ class HumanAgent():
         human_pos_grid = real_to_grid_coord([human_x, human_y])
         robot_x, robot_y, _ = self.robot.get_position()
 
-        relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-        # relative_neighbor_locs = [ (-1, 0), (0, -1), (0, 1), (1, 0)]
+        # relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        relative_neighbor_locs = [ (-1, 0), (0, -1), (0, 1), (1, 0)]
         farthest_neighbor = None
         dist = -1
         for n in relative_neighbor_locs:

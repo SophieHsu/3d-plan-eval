@@ -3,6 +3,7 @@ import numpy as np
 import os
 import igibson
 import math
+import random
 from igibson import object_states
 from igibson.objects.articulated_object import URDFObject
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
@@ -14,6 +15,7 @@ from utils import quat2euler, normalize_radians
 import pybullet as p
 
 from lsi_3d.utils.constants import DIRE2POSDIFF
+from igibson.objects.visual_marker import VisualMarker
 
 
 class Kitchen():
@@ -225,6 +227,14 @@ class Kitchen():
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 # obj.states[object_states.Open].set_value(True)
+                
+                pos[2] = 1.5
+                marker = VisualMarker(visual_shape=p.GEOM_SPHERE, radius=0.06)
+                self.env.simulator.import_object(marker)
+                marker.set_position(pos)
+                print(pos)
+                print("-------------------------")
+
                 self.fridges.append(obj)
                 for _ in range(10):
                     onion = URDFObject(
@@ -234,9 +244,10 @@ class Kitchen():
                             name2path["vidalia_onion"].split("/")[:-1]),
                         category="vidalia_onion")
                     self.env.simulator.import_object(onion)
-                    # onion.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
-                    onion.states[object_states.OnTop].set_value(
-                        obj, True, use_ray_casting_method=True)
+                    onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+                    # pos[0], pos[1] = self.sample_position(pos[0], pos[1], 0.1)
+                    # pos[2] = 1.1
+                    # self.env.set_pos_orn_with_z_offset(onion, pos)
                     self.onions.append(onion)
                     body_ids = onion.get_body_ids()
                     p.changeDynamics(body_ids[0], -1, mass=0.001)
@@ -333,6 +344,11 @@ class Kitchen():
 
                     return_str += "{} {} {}\n".format(name, x, y)
         return return_str
+
+    def sample_position(self, x, y, range):
+        x_range = random.uniform(x - range, x + range)
+        y_range = random.uniform(y - range, y + range)
+        return x_range, y_range
 
     def ori_filter(self, grid, x, y):
         if not (x >= 0 and x < self.HEIGHT and y >= 0 and y < self.WIDTH):
