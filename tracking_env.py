@@ -27,6 +27,13 @@ class TrackingEnv():
             data[b] = onions
         return data
 
+    def items_in_bowl(self, bowl):
+        data = []
+        for o in self.kitchen.onions:
+            if o.states[object_states.Inside].get_value(bowl):
+                data.append(o)
+        return data
+
     def get_pan_status(self):
         data = {}
         for p in self.kitchen.pans:
@@ -81,8 +88,14 @@ class TrackingEnv():
     def set_in_robot_hand(self, name, obj):
         self.kitchen.in_robot_hand.append([name, obj])
 
-    def remove_in_robot_hand(self, item):
+    def remove_in_robot_hand(self, item, pos=None):
         self.kitchen.in_robot_hand.remove(item)
+        ori_ori = item[1].get_orientation()
+        ori_pos = item[1].get_position()
+        item[1].set_orientation([ori_ori[0], 0, 0, 0])
+        if pos is not None:
+            item[1].set_position(pos)
+            item[1].set_orientation([0, 0, 0, 1])
 
     def get_closest_onion(self, agent_pos=None, on_pan=False):
         closest_onion = None

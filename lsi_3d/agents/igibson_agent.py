@@ -298,7 +298,10 @@ class iGibsonAgent:
                 action[1] /= 4
             self.object.apply_action(action)
 
-    def interact_ll_control(self, action_object, tracking_env):
+    def interact_ll_control(self,
+                            action_object,
+                            tracking_env,
+                            num_item_needed_in_dish=1):
         HEIGHT_OFFSET = 0.3
         action = action_object[0]
         object = action_object[1]
@@ -310,14 +313,14 @@ class iGibsonAgent:
                 # self.igibson_env.simulator.import_object(marker_2)
                 # marker_2.set_position(self.object_position)
                 self.object_position = self.object.get_position().copy()
-            done = self.pick(self.object_position,
-                             tracking_env,
-                             tracking_env.get_closest_onion(
-                                 agent_pos=self.object.get_eef_position()),
-                             name='onion',
-                             offset=[0, 0.5, 1.3
-                                     ])  # offset=[0, 0, 0.05 + HEIGHT_OFFSET])
-            if done:
+            done, in_hand = self.pick(
+                self.object_position,
+                tracking_env,
+                tracking_env.get_closest_onion(
+                    agent_pos=self.object.get_eef_position()),
+                name='onion',
+                offset=[0, 0.5, 1.3])  # offset=[0, 0, 0.05 + HEIGHT_OFFSET])
+            if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "drop" and object == "onion":
@@ -325,36 +328,58 @@ class iGibsonAgent:
             self.object_position = tracking_env.get_closest_pan(
                 agent_pos=self.object.get_eef_position()).get_position()
             # self.object_position = self.object.get_eef_position()
-            done = self.drop(self.object_position,
-                             tracking_env,
-                             tracking_env.get_closest_pan(
-                                 agent_pos=self.object.get_eef_position()),
-                             name='onion',
-                             offset=[0, 0, 0.25 + HEIGHT_OFFSET])
-            if done:
+            done, in_hand = self.drop(
+                self.object_position,
+                tracking_env,
+                tracking_env.get_closest_pan(
+                    agent_pos=self.object.get_eef_position()),
+                name='onion',
+                offset=[0, 0, 0.25 + HEIGHT_OFFSET])
+            if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
+
+        elif action == "drop" and object == "dish":
+            # if self.object_position is None:
+            self.object_position = tracking_env.get_closest_pan(
+                agent_pos=self.object.get_eef_position()).get_position()
+            # self.object_position = self.object.get_eef_position()
+            done, in_hand = self.drop(
+                self.object_position,
+                tracking_env,
+                tracking_env.get_closest_pan(
+                    agent_pos=self.object.get_eef_position()),
+                name='dish',
+                offset=[-0.4, -0.25, 0.3 + HEIGHT_OFFSET])
+            if done or in_hand:
+                self.interact_step_index = -1
+                self.object_position = None
+
         elif action == "pickup" and object == "dish":
             # if self.object_position is None:
             self.object_position = tracking_env.get_closest_bowl(
                 agent_pos=self.object.get_eef_position()).get_position()
-            done = self.pick(self.object_position,
-                             tracking_env,
-                             tracking_env.get_closest_bowl(
-                                 agent_pos=self.object.get_eef_position()),
-                             name='dish',
-                             offset=[0, -0.25, 0.1 + HEIGHT_OFFSET])
-            if done:
+            done, in_hand = self.pick(
+                self.object_position,
+                tracking_env,
+                tracking_env.get_closest_bowl(
+                    agent_pos=self.object.get_eef_position()),
+                name='dish',
+                offset=[0, -0.25, 0.1 + HEIGHT_OFFSET])
+            if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "deliver" and object == "soup":
-            done = self.drop(self.human.get_position(),
-                             tracking_env,
-                             tracking_env.get_closest_bowl(
-                                 agent_pos=self.object.get_eef_position()),
-                             name='soup',
-                             offset=[0, 0.5, 0.2 + HEIGHT_OFFSET])
-            if done:
+            if self.object_position is None:
+                self.object_position = self.object.get_position()
+            done, in_hand = self.drop(
+                self.object_position,
+                tracking_env,
+                tracking_env.get_closest_bowl(
+                    agent_pos=self.object.get_eef_position()),
+                name='soup',
+                offset=[0, 1, 1.2 + HEIGHT_OFFSET])
+            if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "pickup" and object == "soup":
@@ -363,99 +388,115 @@ class iGibsonAgent:
                     agent_pos=self.object.get_eef_position())
                 self.object_position = pan.get_position()
             if self.interact_step_index == 0:
-                done = self.drop(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_pan(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[-0.4, -0.25, 0.3 + HEIGHT_OFFSET])
-                if done:
+                done, in_hand = self.drop(
+                    self.object_position,
+                    tracking_env,
+                    tracking_env.get_closest_pan(
+                        agent_pos=self.object.get_eef_position()),
+                    name='soup',
+                    offset=[-0.6, 0, 0.2])
+                if done or in_hand:
                     self.interact_step_index = 1
                     self.object_position = tracking_env.get_closest_onion(
                         agent_pos=self.object.get_eef_position(),
                         on_pan=True).get_position()
+                    self.item_in_bowl = 0
+
+            # start pick and drop items from pan/pot to bowl/dish/plate
             elif self.interact_step_index == 1:
-                done = self.pick(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_onion(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[0, -0.05, 0.05 + HEIGHT_OFFSET])
-                if done:
-                    self.interact_step_index = self.interact_step_index + 1
+                done, in_hand = self.pick(
+                    self.object_position,
+                    tracking_env,
+                    tracking_env.get_closest_onion(
+                        agent_pos=self.object.get_eef_position()),
+                    name='soup',
+                    offset=[0, -0.05, 0.05 + HEIGHT_OFFSET])
+                if done or in_hand:
+                    self.interact_step_index = self.interact_step_index = 2
                     self.object_position = tracking_env.get_closest_bowl(
                         agent_pos=self.object.get_eef_position()).get_position(
                         )
             elif self.interact_step_index == 2:
-                done = self.drop(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_bowl(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[0, -0.1, 0.3 + HEIGHT_OFFSET])
-                if done:
-                    self.interact_step_index = self.interact_step_index + 1
-                    self.object_position = tracking_env.get_closest_onion(
-                        agent_pos=self.object.get_eef_position()).get_position(
-                        )
-            elif self.interact_step_index == 3:
-                done = self.pick(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_onion(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[0, 0, 0.05 + HEIGHT_OFFSET])
-                if done:
-                    self.interact_step_index = self.interact_step_index + 1
-                    self.object_position = tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_eef_position()).get_position(
-                        )
-            elif self.interact_step_index == 4:
-                done = self.drop(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_bowl(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[0, -0.1, 0.3 + HEIGHT_OFFSET])
-                if done:
-                    self.interact_step_index = self.interact_step_index + 1
-                    self.object_position = tracking_env.get_closest_onion(
-                        agent_pos=self.object.get_eef_position(),
-                        on_pan=True).get_position()
-            elif self.interact_step_index == 5:
-                done = self.pick(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_onion(
-                                     agent_pos=self.object.get_eef_position(),
-                                     on_pan=True,
-                                     name='soup',
-                                 ),
-                                 offset=[0, 0, 0.05 + HEIGHT_OFFSET])
-                if done:
-                    self.interact_step_index = self.interact_step_index + 1
-                    self.object_position = tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_eef_position()).get_position(
-                        )
-            elif self.interact_step_index == 6:
-                done = self.drop(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_bowl(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[0, -0.1, 0.3 + HEIGHT_OFFSET])
-                if done:
-                    self.interact_step_index = self.interact_step_index + 1
-                    self.object_position = tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_eef_position()).get_position(
-                        )
-            elif self.interact_step_index == 7:
-                done = self.pick(self.object_position,
-                                 tracking_env,
-                                 tracking_env.get_closest_bowl(
-                                     agent_pos=self.object.get_eef_position()),
-                                 name='soup',
-                                 offset=[0, -0.3, 0.1 + HEIGHT_OFFSET])
-                if done:
+                done, in_hand = self.drop(
+                    self.object_position,
+                    tracking_env,
+                    tracking_env.get_closest_bowl(
+                        agent_pos=self.object.get_eef_position()),
+                    name='soup',
+                    offset=[0, -0.1, HEIGHT_OFFSET])
+                if done or in_hand:
+                    self.item_in_bowl += 1
+                    if self.item_in_bowl < num_item_needed_in_dish:
+                        self.interact_step_index = self.interact_step_index = 1
+                        self.object_position = tracking_env.get_closest_onion(
+                            agent_pos=self.object.get_eef_position(),
+                            on_pan=True).get_position()
+                    else:
+                        self.interact_step_index = self.interact_step_index = 3
+
+            # elif self.interact_step_index == 3:
+            #     done, in_hand = self.pick(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_onion(
+            #             agent_pos=self.object.get_eef_position()),
+            #         name='soup',
+            #         offset=[0, 0, 0.05 + HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.interact_step_index = self.interact_step_index + 1
+            #         self.object_position = tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_eef_position()).get_position(
+            #             )
+            # elif self.interact_step_index == 4:
+            #     done, in_hand = self.drop(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_eef_position()),
+            #         name='soup',
+            #         offset=[0, -0.1, 0.3 + HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.interact_step_index = self.interact_step_index + 1
+            #         self.object_position = tracking_env.get_closest_onion(
+            #             agent_pos=self.object.get_eef_position(),
+            #             on_pan=True).get_position()
+            # elif self.interact_step_index == 5:
+            #     done, in_hand = self.pick(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_onion(
+            #             agent_pos=self.object.get_eef_position(),
+            #             on_pan=True,
+            #             name='soup',
+            #         ),
+            #         offset=[0, 0, 0.05 + HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.interact_step_index = self.interact_step_index + 1
+            #         self.object_position = tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_eef_position()).get_position(
+            #             )
+            # elif self.interact_step_index == 6:
+            #     done, in_hand = self.drop(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_eef_position()),
+            #         name='soup',
+            #         offset=[0, -0.1, 0.3 + HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.interact_step_index = self.interact_step_index + 1
+            #         self.object_position = tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_eef_position()).get_position(
+            #             )
+            elif self.interact_step_index == 3:  #7:
+                done, in_hand = self.pick(
+                    self.object_position,
+                    tracking_env,
+                    tracking_env.get_closest_bowl(
+                        agent_pos=self.object.get_eef_position()),
+                    name='soup',
+                    offset=[0, -0.3, 0.1 + HEIGHT_OFFSET])
+                if done or in_hand:
                     self.interact_step_index = self.interact_step_index + 1
             else:
                 self.interact_step_index = -1
@@ -593,6 +634,8 @@ class iGibsonAgent:
         y_diff = diff_new_basis[1]
         z_diff = diff_new_basis[2]
 
+        in_hand = False
+
         if self.arrived_hand_step == 0:
             self.reset_hand_position = position
             # self.original_right_hand_orientation = human._parts["right_hand"].get_orientation()
@@ -637,16 +680,21 @@ class iGibsonAgent:
                                 gripper_new_pos)
             if self.counters[1] > self.grasping_delay:
                 if target_obj is not None:
+                    if target_obj.name == 'bowl':
+                        for i in tracking_env.items_in_bowl(target_obj):
+                            tracking_env.set_in_robot_hand(name, i)
                     tracking_env.set_in_robot_hand(name, target_obj)
+                    in_hand = True
                 else:
                     for i in tracking_env.kitchen.in_robot_hand:
-                        tracking_env.remove_in_robot_hand(i)
+                        tracking_env.remove_in_robot_hand(i, pos=loc)
                 self.arrived_hand_step = 3
                 self.counters[1] = 0
             self.counters[1] += 1
             # print("mid")
         # Return to location
         elif self.arrived_hand_step == 3:
+            # in_hand = True
             distance = 0.52
             done = False
             # if not (abs(loc - position) - distance <= 0).all():
@@ -684,8 +732,8 @@ class iGibsonAgent:
                     set_joint_positions(self.robot_id, self.arm_joint_ids,
                                         joint_pos)
                 self.arrived_hand_step = 0
-                return True
-        return False
+                return True, in_hand
+        return False, in_hand
 
     def get_rotated_basis(self):
         orientation = self.object.get_orientation()
