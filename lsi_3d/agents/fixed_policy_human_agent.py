@@ -33,10 +33,9 @@ from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
 
 class FixedPolicyAgent(Agent):
-    def __init__(self, hlp, mlp, onions_for_soup) -> None:
+    def __init__(self, hlp, mlp) -> None:
         self.hlp = hlp
         self.mlp = mlp
-        self.onions_for_soup = onions_for_soup
 
     def action(self, world_state:WorldState, agent_state:AgentState, robot_state:AgentState):
         # goes from fridge to onion
@@ -80,7 +79,7 @@ class FixedPolicyAgent(Agent):
             action,object = ('pickup','dish')
             next_hl_state = f'dish_{world_state.in_pot}'
             agent_state.next_holding = 'dish'
-        elif agent_state.holding == 'dish' and (world_state.in_pot == self.onions_for_soup or robot_state.holding == 'onion'):
+        elif agent_state.holding == 'dish' and (world_state.in_pot == 3 or robot_state.holding == 'onion'):
             action,object = ('pickup','soup')
             #world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'

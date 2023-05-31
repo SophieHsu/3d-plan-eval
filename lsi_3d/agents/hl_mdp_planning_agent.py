@@ -158,7 +158,7 @@ class HlMdpPlanningAgent(Agent):
                 pos_h, self.a_h = self.human.action()
             # self.ig_human.prepare_for_next_action(self.a_h)
 
-        if not self.env.human_state.equal_ml(self.human_sim_state.ml_state):
+        if not self.env.human_state.equal_ml(self.human_sim_state):
             self.human_sim_state.ml_state = self.env.human_state.ml_state
             self.human_plan = self.mlp.compute_single_agent_astar_path(self.env.human_state.ml_state, self.human_goal)
             self.human = FixedMediumPlan(self.human_plan)

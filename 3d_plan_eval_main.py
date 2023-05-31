@@ -85,7 +85,7 @@ def setup(igibson_env, kitchen, configs, args):
         robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
         robot_hlp.compute_mdp_policy(order_list)
 
-        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
+        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
         robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                          robot)
     elif planner_config == 2:
@@ -100,7 +100,7 @@ def setup(igibson_env, kitchen, configs, args):
         #hlp = HighLevelMdpPlanner(mdp)
         robot_hlp.compute_mdp(order_list)
         robot_hlp.post_mdp_setup()
-        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
+        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp)
         robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                           robot)
 
