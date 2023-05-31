@@ -186,12 +186,13 @@ class HlQmdpPlanningAgent(Agent):
         if self.ml_robot_action:
             ml_loc, ml_a = self.ml_robot_action
 
-            self.env.update_world()
+            # self.env.update_world()
 
-            if ml_a == 'I':
+            if ml_a == 'I' and self.ig_robot.action_completed(ml_a):
+                self.env.update_world()
+                self.human_sim_state.ml_state = self.env.human_state.ml_state
                 _, _, hl_robot_action_object = self.hl_robot_action
                 self.env.update_robot_hl_state(hl_robot_action_object)
-                self.human_sim_state.ml_state = self.env.human_state.ml_state
                 self.take_hl_robot_step = True
 
     def hl_human_step(self):
@@ -201,7 +202,8 @@ class HlQmdpPlanningAgent(Agent):
             # TODO update env.human.hl_state to pull from world. currently env.human_state is not getting updated when human arrives at goal
             self.human_sim_state.hl_state = self.env.human_state.hl_state
             self.next_human_hl_state, self.human_goal, self.human_action_object = self.hl_human_action
-            self.human_ml_plan = self.mlp.compute_single_agent_astar_path(self.human_sim_state.ml_state, self.human_goal)
+            self.human_ml_plan = self.mlp.compute_single_agent_astar_path(
+                self.human_sim_state.ml_state, self.human_goal)
 
             # if self.human_ml_plan != []:
             #     self.human_ml_plan.append((self.human_goal,'I'))
@@ -228,9 +230,14 @@ class HlQmdpPlanningAgent(Agent):
             self.recalculate_ml_plan = True
 
         if self.recalculate_ml_plan:
-            plan = self.avoidance_motion_plan((self.human_sim_state.ml_state, self.env.robot_state.ml_state), self.robot_goal, self.human_ml_plan, self.human_goal, radius=0)
+            plan = self.avoidance_motion_plan(
+                (self.human_sim_state.ml_state, self.env.robot_state.ml_state),
+                self.robot_goal,
+                self.human_ml_plan,
+                self.human_goal,
+                radius=0)
             if plan == []:
-                plan.append((self.env.robot_state.ml_state,'D'))
+                plan.append((self.env.robot_state.ml_state, 'D'))
             self.ml_robot_plan = plan
             self.take_ml_robot_step = True
             self.recalculate_ml_plan = False
@@ -240,9 +247,12 @@ class HlQmdpPlanningAgent(Agent):
     def ml_robot_step(self):
         if self.take_ml_robot_step:
             # if human is directly in front of robot then just wait
-            if self.env.human_state.ml_state[:2] in get_states_in_forward_radius(self.env.robot_state.ml_state, 0):
-                self.ml_robot_plan = [(None,'D')]
-    
+            if self.env.human_state.ml_state[:
+                                             2] in get_states_in_forward_radius(
+                                                 self.env.robot_state.ml_state,
+                                                 0):
+                self.ml_robot_plan = [(None, 'D')]
+
             self.ml_robot_action = self.ml_robot_plan.pop(0)
             self.take_ml_robot_step = False
 
@@ -263,14 +273,17 @@ class HlQmdpPlanningAgent(Agent):
             return
         ml_goal, ml_action = self.ml_robot_action
         if ml_action == 'I':
-            self.ig_robot.interact_ll_control(self.hl_robot_action[-1],
-                                              self.env.tracking_env)
+            self.ig_robot.interact_ll_control(
+                self.hl_robot_action[-1],
+                self.env.tracking_env,
+                num_item_needed_in_dish=self.mdp_planner.mdp.num_items_for_soup
+            )
         else:
             self.ig_robot.agent_move_one_step(self.env.nav_env, ml_action)
             self._reset_arm_position(self.ig_robot)
 
-        if self.ig_robot.action_completed(ml_action) or ml_action == 'D':
-            self.env.update_joint_ml_state()
+            if self.ig_robot.action_completed(ml_action) or ml_action == 'D':
+                self.env.update_joint_ml_state()
 
             if len(self.ml_robot_plan) == 0 or (len(self.ml_robot_plan) %
                                                 self.recalc_res) == 0:
@@ -284,7 +297,7 @@ class HlQmdpPlanningAgent(Agent):
             self.stuck_time = time.time()
             self.stuck_ml_pos = self.env.robot_state.ml_state
 
-        elapsed = time.time() - self.stuck_time 
+        elapsed = time.time() - self.stuck_time
         if elapsed > STUCK_TIME_LIMIT:
             # set a new ml goal to adjacent square and recalculate plan
             self.recalculate_ml_plan = True
@@ -302,7 +315,8 @@ class HlQmdpPlanningAgent(Agent):
         for dir, add in DIRE2POSDIFF.items():
             d_x, d_y = add
             n_x, n_y = (x + d_x, y + d_y)
-            if n_x > len(self.env.kitchen.grid)-1 or n_y > len(self.env.kitchen.grid)-1:
+            if n_x > len(self.env.kitchen.grid) - 1 or n_y > len(
+                    self.env.kitchen.grid) - 1:
                 continue
 
             h_x,h_y,h_f = human_ml_state
@@ -315,7 +329,7 @@ class HlQmdpPlanningAgent(Agent):
         self.ml_human_action = self.ml_human_step()
         self.hl_robot_action = self.hl_robot_step()
         self.ml_robot_action = self.ml_robot_step()
-        self.stuck_handler()
+        # self.stuck_handler()
         self.ll_step()
 
     def step_old(self):
