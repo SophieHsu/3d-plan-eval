@@ -6,6 +6,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
+from utils import real_to_grid_coord
 from tracking_env import TrackingEnv
 
 
@@ -152,4 +153,6 @@ class LsiEnv(object):
         elif action == "pickup" and object == "soup":
             location = self.tracking_env.get_closest_pan().get_position()
 
+        if location is not None:
+            location = real_to_grid_coord(location)
         return location

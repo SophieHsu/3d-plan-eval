@@ -13,7 +13,7 @@ from lsi_3d.utils.enums import Mode
 from lsi_3d.utils.functions import grid_transition, get_states_in_forward_radius
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 
-STUCK_TIME_LIMIT = 20
+STUCK_TIME_LIMIT = 60
 
 
 class HlQmdpPlanningAgent(Agent):
@@ -142,13 +142,10 @@ class HlQmdpPlanningAgent(Agent):
         vals = list(self.mdp_planner.action_idx_dict.values())
         action_object_pair = self.mdp_planner.action_dict[keys[vals.index(
             action_idx)]]
-        # print(self.mdp_planner.state_idx_dict[state_str], action_idx, action_object_pair)
 
         # map back the medium level action to low level action
-        possible_motion_goals = self.mdp_planner.map_action_to_location(
-            world_state, robot_state, action_object_pair)
-        goal = possible_motion_goals[0]
-        #start = ml_state[0] + ml_state[1]
+        goal = self.env.map_action_to_location(
+            action_object_pair)
 
         return (next_state, goal, tuple(action_object_pair))
 
@@ -199,7 +196,7 @@ class HlQmdpPlanningAgent(Agent):
 
     def hl_human_step(self):
         # take high level step when the human has completed an interact
-        if not self.env.human_state.equal_hl(self.human_sim_state.hl_state) or not self.env.human_state.equal_ml(self.human_sim_state, facing=True):
+        if not self.env.human_state.equal_hl(self.human_sim_state.hl_state) or not self.env.human_state.equal_ml(self.human_sim_state.ml_state, facing=True):
             self.hl_human_action = self.hl_human_agent.action(self.env.world_state, self.env.human_state, self.env.robot_state)
             # TODO update env.human.hl_state to pull from world. currently env.human_state is not getting updated when human arrives at goal
             self.human_sim_state.hl_state = self.env.human_state.hl_state
@@ -213,7 +210,7 @@ class HlQmdpPlanningAgent(Agent):
 
     def ml_human_step(self):
         # if simply iterating through return next
-        if (not self.env.human_state.equal_ml(self.human_sim_state, facing=True) or self.ml_human_action == None) and self.human_ml_plan != []:
+        if (not self.env.human_state.equal_ml(self.human_sim_state.ml_state, facing=True) or self.ml_human_action == None) and self.human_ml_plan != []:
             self.ml_human_action = self.human_ml_plan.pop(0)
             self.human_sim_state.ml_state = self.env.human_state.ml_state
             if self.robot_delay:
@@ -255,8 +252,8 @@ class HlQmdpPlanningAgent(Agent):
         return self.ml_robot_action
 
     def ll_step(self):
-        # init_action = np.zeros(self.env.nav_env.action_space.shape)
-        # self.ig_robot.object.apply_action(init_action)
+        init_action = np.zeros(self.env.nav_env.action_space.shape)
+        self.ig_robot.object.apply_action(init_action)
         # self._reset_arm_position(self.ig_robot)
 
         if self.robot_delay:
@@ -279,23 +276,7 @@ class HlQmdpPlanningAgent(Agent):
                                                 self.recalc_res) == 0:
                 # calculate path again
                 self.take_hl_robot_step = True
-            # else:
-            #     # pos_r, self.a_r = self.robot_plan.action()
-            #     ml_goal, ml_action = self.ml_robot_plan.pop(0)
 
-            #     self.ig_robot.prepare_for_next_action(ml_action)
-
-            #     self._reset_arm_position(self.ig_robot)
-
-            #     if ml_action == 'D' and self.robot_delay == False:
-            #         self.idle_last_ml_location = self.env.human_state.ml_state
-            #         self.robot_delay = True
-
-            #     if ml_action == 'I': #and env.robot_state == robot_goal:
-            #         self.env.robot_state.mode = Mode.INTERACT
-
-            #     if self.human_sim_state.mode == Mode.IDLE:
-            #         self.env.human_sim_state.mode = Mode.EXEC_ML_PATH
     def stuck_handler(self):
 
         if self.stuck_time == None or self.stuck_ml_pos == None:
@@ -307,23 +288,25 @@ class HlQmdpPlanningAgent(Agent):
         if elapsed > STUCK_TIME_LIMIT:
             # set a new ml goal to adjacent square and recalculate plan
             self.recalculate_ml_plan = True
-            new_ml_goal = self.adjacent_empty_square()
+            new_ml_goal = self.adjacent_empty_square(self.human_sim_state.ml_state)
             self.robot_goal = new_ml_goal
             self.stuck_time = time.time()
 
-        if self.stuck_ml_pos != self.env.robot_state.ml_state:
+        if not self.env.robot_state.equal_ml(self.stuck_ml_pos):
             # reset timer when robot moves
             self.stuck_ml_pos = self.env.robot_state.ml_state
             self.stuck_time = time.time()
 
-    def adjacent_empty_square(self):
+    def adjacent_empty_square(self, human_ml_state):
         x,y,f = self.env.robot_state.ml_state
         for dir, add in DIRE2POSDIFF.items():
             d_x, d_y = add
             n_x, n_y = (x + d_x, y + d_y)
             if n_x > len(self.env.kitchen.grid)-1 or n_y > len(self.env.kitchen.grid)-1:
                 continue
-            if self.env.kitchen.grid[n_x][n_y] == 'X':
+
+            h_x,h_y,h_f = human_ml_state
+            if self.env.kitchen.grid[n_x][n_y] == 'X' and not (n_x,n_y) == (h_x,h_y):
                 return (n_x,n_y)
 
     def step(self):
@@ -374,7 +357,7 @@ class HlQmdpPlanningAgent(Agent):
                 pos_h, self.a_h = self.human.action()
             # self.ig_human.prepare_for_next_action(self.a_h)
 
-        if not self.env.human_state.equal_ml(self.human_sim_state):
+        if not self.env.human_state.equal_ml(self.human_sim_state.ml_state):
             self.human_sim_state.ml_state = self.env.human_state.ml_state
             self.human_plan = self.mlp.compute_single_agent_astar_path(
                 self.env.human_state.ml_state, self.human_goal)
