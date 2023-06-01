@@ -13,7 +13,7 @@ from lsi_3d.utils.enums import Mode
 from lsi_3d.utils.functions import grid_transition, get_states_in_forward_radius
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 
-STUCK_TIME_LIMIT = 20
+STUCK_TIME_LIMIT = 60
 
 
 class HlQmdpPlanningAgent(Agent):
@@ -170,6 +170,8 @@ class HlQmdpPlanningAgent(Agent):
                               avoid_goal,
                               radius=None):
         # extract only actions for avoidance plan
+        if goal == None:
+            return []
         avoid_path = [s[1] for s in avoid_path]
         paths = self.mlp.compute_motion_plan(joint_ml_state,
                                              (avoid_goal, goal), avoid_path,
@@ -188,7 +190,7 @@ class HlQmdpPlanningAgent(Agent):
             self.env.update_world()
 
             if ml_a == 'I' and self.ig_robot.action_completed(ml_a):
-                self.env.update_world()
+                # self.env.update_world()
                 self.human_sim_state.ml_state = self.env.human_state.ml_state
                 _, _, hl_robot_action_object = self.hl_robot_action
                 self.env.update_robot_hl_state(hl_robot_action_object)

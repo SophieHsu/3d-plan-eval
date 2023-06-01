@@ -164,9 +164,9 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
         igibson_env.simulator.step()
         count += 1
 
-        if lsi_env.world_state.orders == []:
-            print("Orders Completed")
-            break
+        # if lsi_env.world_state.orders == []:
+        #     print("Orders Completed")
+        #     break
 
 
 if __name__ == "__main__":

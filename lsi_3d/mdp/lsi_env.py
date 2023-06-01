@@ -141,17 +141,45 @@ class LsiEnv(object):
         return self
 
     def map_action_to_location(self, action_object):
+        location = None
         action, object = action_object
         if action == "pickup" and object == "onion":
             location = self.tracking_env.get_closest_onion().get_position()
         elif action == "drop" and object == "onion":
-            location = self.tracking_env.get_closest_pan().get_position()
+            pan_status = self.tracking_env.get_pan_status()
+            min_onions_left = self.mdp.num_items_for_soup + 1 
+            best_pan = None
+            for pan in self.kitchen.pans:
+                onions = len(pan_status[pan])
+                onions_left = self.mdp.num_items_for_soup - onions
+
+                if onions_left < min_onions_left and onions_left > 0:
+                    best_pan = pan
+                    min_onions_left = onions_left
+
+            location = best_pan.get_position()
+
+            # location = self.tracking_env.get_closest_pan().get_position()
         elif action == "pickup" and object == "dish":
             location = self.tracking_env.get_closest_bowl().get_position()
         elif action == "deliver" and object == "soup":
-            location = self.mdp.get_counter_locations()[0]
+            location = self.mdp.get_serving_locations()[0]
+            return location
         elif action == "pickup" and object == "soup":
-            location = self.tracking_env.get_closest_pan().get_position()
+            most_done_pan = self.kitchen.pans[0]
+            most_onions = 0
+
+            for pan in self.kitchen.pans:
+                cooked_onions, uncooked_onions = self.tracking_env.is_pan_cooked(pan)
+                total_onions = cooked_onions + uncooked_onions
+                if total_onions >= self.mdp.num_items_for_soup:
+                    location = pan.get_position()
+                    break
+
+                # if total_onions > most_onions:
+                #     most_done_pan = pan
+                #     most_onions = total_onions
+                #     location = pan.get_position()
 
         if location is not None:
             location = real_to_grid_coord(location)

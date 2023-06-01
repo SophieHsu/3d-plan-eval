@@ -53,7 +53,7 @@ class TrackingEnv():
                     num_cooked_onions += 1
                 else:
                     num_uncooked_onions += 1
-        return [num_cooked_onions, num_uncooked_onions]
+        return (num_cooked_onions, num_uncooked_onions)
 
     def is_item_on_table(self, items):
         on_table_bool = []
