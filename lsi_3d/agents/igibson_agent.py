@@ -686,8 +686,11 @@ class iGibsonAgent:
                     tracking_env.set_in_robot_hand(name, target_obj)
                     in_hand = True
                 else:
-                    for i in tracking_env.kitchen.in_robot_hand:
-                        tracking_env.remove_in_robot_hand(i, pos=loc)
+                    for i, item in enumerate(
+                            tracking_env.kitchen.in_robot_hand[::-1]):
+                        tracking_env.remove_in_robot_hand(item,
+                                                          pos=loc,
+                                                          counter=i)
                 self.arrived_hand_step = 3
                 self.counters[1] = 0
             self.counters[1] += 1
@@ -762,7 +765,7 @@ class iGibsonAgent:
         target_pos = [
             ori_pos[0] + x_diff, ori_pos[1] + y_diff, ori_pos[2] + z_diff
         ]
-        threshold = 0.05
+        threshold = 0.03  #0.05
         max_iter = 100
 
         joint_pos = self.accurate_calculate_inverse_kinematics(

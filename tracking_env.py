@@ -88,12 +88,13 @@ class TrackingEnv():
     def set_in_robot_hand(self, name, obj):
         self.kitchen.in_robot_hand.append([name, obj])
 
-    def remove_in_robot_hand(self, item, pos=None):
+    def remove_in_robot_hand(self, item, pos=None, counter=0):
         self.kitchen.in_robot_hand.remove(item)
         ori_ori = item[1].get_orientation()
         ori_pos = item[1].get_position()
         item[1].set_orientation([ori_ori[0], 0, 0, 0])
         if pos is not None:
+            pos[-1] += counter * 0.01
             item[1].set_position(pos)
             item[1].set_orientation([0, 0, 0, 1])
 

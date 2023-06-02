@@ -309,7 +309,8 @@ class HlQmdpPlanningAgent(Agent):
         if elapsed > STUCK_TIME_LIMIT:
             # set a new ml goal to adjacent square and recalculate plan
             self.recalculate_ml_plan = True
-            new_ml_goal = self.adjacent_empty_square(self.human_sim_state.ml_state)
+            new_ml_goal = self.adjacent_empty_square(
+                self.human_sim_state.ml_state)
             self.robot_goal = new_ml_goal
             self.stuck_time = time.time()
 
@@ -327,8 +328,9 @@ class HlQmdpPlanningAgent(Agent):
                     self.env.kitchen.grid) - 1:
                 continue
 
-            h_x,h_y,h_f = human_ml_state
-            if self.env.kitchen.grid[n_x][n_y] == 'X' and not (n_x,n_y) == (h_x,h_y):
+            h_x, h_y, h_f = human_ml_state
+            if self.env.kitchen.grid[n_x][n_y] == 'X' and not (n_x, n_y) == (
+                    h_x, h_y):
                 return (n_x, n_y)
 
     def step(self):
@@ -508,12 +510,23 @@ class HlQmdpPlanningAgent(Agent):
         #     0.0008453550418615341,
         # )
 
+        # arm_default_joint_positions = (
+        #     0.385,
+        #     0,
+        #     -1.0178184935241699,  #1.5178184935241699,
+        #     0,  #0.8189625336474915,
+        #     2.200358942909668,
+        #     2.9631312579803466,
+        #     -1.2862852996643066,
+        #     0,  #0.0008453550418615341,
+        # )
+
         arm_default_joint_positions = (
             0.385,
-            0,
+            0,  #1.3,
             -1.0178184935241699,  #1.5178184935241699,
             0,  #0.8189625336474915,
-            2.200358942909668,
+            -1.7,  #2.200358942909668,
             2.9631312579803466,
             -1.2862852996643066,
             0,  #0.0008453550418615341,
