@@ -1,5 +1,6 @@
 # Human
 import argparse
+import time
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.utils.motion_planning_wrapper import MotionPlanningWrapper
 from igibson.robots.behavior_robot import BehaviorRobot
@@ -37,6 +38,8 @@ import logging
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
+
+TIME_LIMIT_FAILURE = 300 # 5 mins
 
 
 def setup(igibson_env, kitchen, configs, args):
@@ -141,7 +144,10 @@ def environment_setup(args, headless=None):
     #     igibson_env.simulator.viewer.reset_viewer()
 
     kitchen = Kitchen(igibson_env)
-    kitchen.setup(map_config["layout"])
+
+    kitchen.setup(args.kitchen)
+    # kitchen.setup(map_config["layout"])
+
     print(map_config['layout'])
     _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
 
@@ -154,8 +160,29 @@ def main(args):
     human_agent.set_robot(igibson_env.robots[0])
     main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env)
 
+def check_completion(lsi_env, start_time, kitchen):
+    if lsi_env.world_state.orders == []:
+        print("Orders Completed")
+
+        filename = 'lsi_3d/test_logs/' + kitchen.kitchen_name + '_log.txt'
+        f = open(filename, 'a')
+        f.write("success")
+        f.close()
+        return True
+
+    elapsed = time.time() - start_time
+    if elapsed > TIME_LIMIT_FAILURE:
+        filename = 'lsi_3d/test_logs/' + kitchen.kitchen_name + '_log.txt'
+        f = open(filename, 'a')
+        f.write("failure")
+        f.close()
+        return True
+    
+    return False
+
 
 def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
+    start_time = time.time()
     count = 0
     while True:
         human_agent.step()
@@ -164,9 +191,8 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
         igibson_env.simulator.step()
         count += 1
 
-        # if lsi_env.world_state.orders == []:
-        #     print("Orders Completed")
-        #     break
+        if check_completion(lsi_env, start_time, kitchen):
+            break 
 
 
 if __name__ == "__main__":
@@ -183,5 +209,13 @@ if __name__ == "__main__":
         help="which mode for simulation (default: gui_interactive)",
     )
 
+    parser.add_argument(
+        "--kitchen",
+        "-k",
+        default="kitchen0.txt",
+        help="filepath of kitchen layout",
+    )
+
     args = parser.parse_args()
+    print(args.kitchen)
     main(args)

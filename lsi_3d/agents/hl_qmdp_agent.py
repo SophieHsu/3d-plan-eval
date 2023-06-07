@@ -267,6 +267,9 @@ class HlQmdpPlanningAgent(Agent):
             self.robot_delay = self.ml_robot_action[1] == 'D'
             self.ig_robot.prepare_for_next_action(self.ml_robot_action[1])
 
+            # log every ml step
+            self.log_state()
+
         return self.ml_robot_action
 
     def ll_step(self):
@@ -297,6 +300,18 @@ class HlQmdpPlanningAgent(Agent):
                                                     self.recalc_res) == 0:
                     # calculate path again
                     self.take_hl_robot_step = True
+
+    def log_state(self):
+        filename = 'lsi_3d/test_logs/' + self.env.kitchen.kitchen_name + '_log.txt'
+        f = open(filename, "a")
+        s = ''
+        s += 'QMDP Index: ' + str(self.env.robot_state.hl_state) + '\n'
+        s += 'Plan: ' + str(self.ml_robot_plan) + '\n'
+        s += 'Robot HL action,object: ' + str(self.robot_action_object) + '\n'
+        s += 'Robot goal: '+ str(self.robot_goal) + '\n'
+        s += 'Robot ML State: ' + str(self.env.robot_state.ml_state) + '\n'
+        f.write(s)
+        f.close()
 
     def stuck_handler(self):
 

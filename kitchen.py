@@ -39,6 +39,7 @@ class Kitchen():
         self.tile_location = {}
 
     def setup(self, filepath):
+        self.kitchen_name = filepath.split('/')[1].split('.')[0]
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
         self.map = orientation_map
         self.load_objects(obj_x_y, orientation_map)
