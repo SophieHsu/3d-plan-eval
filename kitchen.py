@@ -389,6 +389,18 @@ class Kitchen():
                                              1]).transpose()).transpose()
         translated_loc = translated_loc + np.array(loc)
         return translated_loc
+    
+    def where_grid_is(self, letter):
+        indexes = []
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[0])):
+                if self.grid[i][j] == letter:
+                    indexes.append((i,j))
+
+        return indexes
+    
+    def get_empty_squares(self):
+        return self.where_grid_is('X')
 
     def get_center(self):
         grid_center = (floor(len(self.grid) / 2), floor(len(self.grid[0]) / 2))

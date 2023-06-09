@@ -1,5 +1,6 @@
 # Human
 import argparse
+import random
 import time
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.utils.motion_planning_wrapper import MotionPlanningWrapper
@@ -39,14 +40,62 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-TIME_LIMIT_FAILURE = 300 # 5 mins
+TIME_LIMIT_FAILURE = 600 # 10 mins
 
+def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
+    #TODO consolidate config files
+    kitchen.read_from_grid_text(map_config["layout"])
+    
+    # if using script select random start
+    if args.kitchen != 'none':
+        open_squares = kitchen.get_empty_squares()
+        robot_start = random.choice(open_squares)
 
-def setup(igibson_env, kitchen, configs, args):
+        open_squares.remove(robot_start)
+        human_start = random.choice(open_squares)
+    else:
+        robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
+        human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
+        
+    r_x, r_y = robot_start
+    igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
+                                          [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
+    return robot_start, human_start
+
+def setup(args):
+    exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
+    configs = read_in_lsi_config('two_agent_mdp.tml')
+
+    igibson_env = iGibsonEnv(
+        config_file=exp_config['ig_config_file'],
+        mode=args.mode,
+        # action_timestep=1.0 / 15,
+        # physics_timestep=1.0 / 30,  #1.0 / 30,
+        action_timestep=1.0 / 30,
+        physics_timestep=1.0 / 120,  #1.0 / 30,
+        use_pb_gui=True)
+
+    # if not headless:
+    #     # Set a better viewing direction
+    #     igibson_env.simulator.viewer.initial_pos = [-0.3, -0.3, 1.1]
+    #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
+    #     igibson_env.simulator.viewer.reset_viewer()
+
+    kitchen = Kitchen(igibson_env)
+
+    robot_start, human_start = set_start_locations(args, map_config, exp_config, igibson_env, kitchen)
+
+    if args.kitchen != 'none':
+        kitchen.setup(args.kitchen)
+    else:
+        kitchen.setup(map_config["layout"])
+
+    print(map_config['layout'])
+    # _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
+
     exp_config, map_config = configs
     order_list = exp_config['order_list']
-    human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
-    robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
+    
     config = parse_config(exp_config['ig_config_file'])
     human_bot = BehaviorRobot(**config["human"])
     human_vr = True if args.mode == 'vr' else False
@@ -109,19 +158,16 @@ def setup(igibson_env, kitchen, configs, args):
 
     # TODO: Get rid of 4.5 offset
     h_x, h_y = human_start
-    r_x, r_y = robot_start
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[1],
                                           [h_x - 4.5, h_y - 4.5, 0.8],
                                           [0, 0, 0])
-    igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
-                                          [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
 
     # human_sim = iGibsonAgent(human_sim, human_start, 'S', "human_sim")
 
     # human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
     #                          kitchen.grid, hlp, env, tracking_env)
 
-    return robot_agent, human_agent, env
+    return robot_agent, human_agent, env, igibson_env, kitchen
 
 
 def environment_setup(args, headless=None):
@@ -143,10 +189,14 @@ def environment_setup(args, headless=None):
     #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
     #     igibson_env.simulator.viewer.reset_viewer()
 
+    
+
     kitchen = Kitchen(igibson_env)
 
-    kitchen.setup(args.kitchen)
-    # kitchen.setup(map_config["layout"])
+    if args.kitchen != 'none':
+        kitchen.setup(args.kitchen)
+    else:
+        kitchen.setup(map_config["layout"])
 
     print(map_config['layout'])
     _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
@@ -155,8 +205,8 @@ def environment_setup(args, headless=None):
 
 
 def main(args):
-    igibson_env, kitchen, configs = environment_setup(args)
-    robot_agent, human_agent, lsi_env = setup(igibson_env, kitchen, configs, args)
+    # igibson_env, kitchen, configs = environment_setup(args)
+    robot_agent, human_agent, lsi_env, igibson_env, kitchen = setup(args)
     human_agent.set_robot(igibson_env.robots[0])
     main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env)
 
@@ -174,7 +224,7 @@ def check_completion(lsi_env, start_time, kitchen):
     if elapsed > TIME_LIMIT_FAILURE:
         filename = 'lsi_3d/test_logs/' + kitchen.kitchen_name + '_log.txt'
         f = open(filename, 'a')
-        f.write("failure")
+        f.write("failure by timeout")
         f.close()
         return True
     
@@ -212,10 +262,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--kitchen",
         "-k",
-        default="kitchen0.txt",
+        default="none",
         help="filepath of kitchen layout",
     )
 
     args = parser.parse_args()
     print(args.kitchen)
     main(args)
+
+exit()

@@ -1,0 +1,5 @@
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (1, 7)
+Robot ML State: (6, 6, 'S')
