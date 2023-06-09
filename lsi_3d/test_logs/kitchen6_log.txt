@@ -448,4 +448,18 @@ Plan: [((6, 2, 'N'), 'N'), ((5, 2, 'N'), 'F'), ((4, 2, 'N'), 'F'), ((3, 2, 'N'),
 Robot HL action,object: ('deliver', 'soup')
 Robot goal: (2, 1)
 Robot ML State: (6, 3, 'W')
-failure
+failureQMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (3, 7)
+Robot ML State: (3, 3, 'N')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (3, 7)
+Robot ML State: (3, 3, 'N')
+QMDP Index: None_0_onion_onion
+Plan: [((6, 2, 'S'), 'F'), ((6, 2, 'E'), 'E'), ((6, 3, 'E'), 'F'), ((6, 4, 'E'), 'F'), ((6, 4, 'N'), 'N'), ((5, 4, 'N'), 'F'), ((4, 4, 'N'), 'F'), ((3, 4, 'N'), 'F'), ((3, 4, 'E'), 'E'), ((3, 5, 'E'), 'F'), ((3, 6, 'E'), 'F'), ((3, 7, None), 'I')]
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (3, 7)
+Robot ML State: (4, 2, 'S')

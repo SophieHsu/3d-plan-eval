@@ -568,3 +568,18 @@ Plan: [((7, 2, None), 'I')]
 Robot HL action,object: ('pickup', 'soup')
 Robot goal: (7, 2)
 Robot ML State: (6, 2, 'E')
+QMDP Index: None_0_onion_onion
+Plan: [((4, 1, 'S'), 'F'), ((5, 1, 'S'), 'F'), ((6, 1, 'S'), 'F'), ((6, 1, 'E'), 'E'), ((6, 2, 'E'), 'F'), ((6, 3, 'E'), 'F'), ((6, 4, 'E'), 'F'), ((6, 5, 'E'), 'F'), ((6, 5, 'S'), 'S'), ((7, 5, None), 'I')]
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (7, 5)
+Robot ML State: (2, 1, 'S')
+QMDP Index: None_0_onion_onion
+Plan: [((5, 1, 'S'), 'F'), ((6, 1, 'S'), 'F'), ((6, 1, 'E'), 'E'), ((6, 2, 'E'), 'F'), ((6, 3, 'E'), 'F'), ((6, 4, 'E'), 'F')]
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (7, 5)
+Robot ML State: (3, 1, 'S')
+QMDP Index: None_0_onion_onion
+Plan: [((6, 1, 'S'), 'F'), ((6, 1, 'E'), 'E'), ((6, 2, 'E'), 'F'), ((6, 3, 'E'), 'F'), ((6, 4, 'E'), 'F')]
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (7, 5)
+Robot ML State: (4, 1, 'S')

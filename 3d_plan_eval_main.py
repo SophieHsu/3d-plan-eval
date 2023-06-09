@@ -44,16 +44,18 @@ TIME_LIMIT_FAILURE = 600 # 10 mins
 
 def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
     #TODO consolidate config files
-    kitchen.read_from_grid_text(map_config["layout"])
+    
     
     # if using script select random start
     if args.kitchen != 'none':
+        kitchen.read_from_grid_text(args.kitchen)
         open_squares = kitchen.get_empty_squares()
         robot_start = random.choice(open_squares)
 
         open_squares.remove(robot_start)
         human_start = random.choice(open_squares)
     else:
+        kitchen.read_from_grid_text(map_config["layout"])
         robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
         human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
         

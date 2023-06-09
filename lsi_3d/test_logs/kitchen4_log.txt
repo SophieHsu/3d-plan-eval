@@ -5348,3 +5348,8 @@ Plan: []
 Robot HL action,object: ('pickup', 'soup')
 Robot goal: (2, 7)
 Robot ML State: (2, 6, 'E')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (5, 4)
+Robot ML State: (0, 5, 'S')
