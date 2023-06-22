@@ -24,7 +24,8 @@ class TrackingEnv():
             for o in self.kitchen.onions:
                 if o.states[object_states.Inside].get_value(b):
                     onions.append(o)
-            data[b] = onions
+            if len(onions) > 0:
+                data[b] = onions
         return data
 
     def items_in_bowl(self, bowl):
@@ -55,12 +56,9 @@ class TrackingEnv():
                     num_uncooked_onions += 1
         return (num_cooked_onions, num_uncooked_onions)
 
-    def is_item_on_table(self, items):
-        on_table_bool = []
-        for i in items:
-            val = i.states[object_states.OnTop].get_value(self.table)
-            on_table_bool.append(val)
-        return on_table_bool
+    def is_item_on_table(self, item):
+        val = item.states[object_states.OnTop].get_value(self.kitchen.table)
+        return val
 
     def obj_in_robot_hand(self):
         # return object in robot hand

@@ -1,3 +1,10 @@
+#!/bin/bash
+
+success_count=0
+total_files=0
+kill_requested=false
+python_pid=""
+
 cleanup() {
     # Kill the Python process if it is running
     if [ -n "$python_pid" ]; then
@@ -6,33 +13,37 @@ cleanup() {
         wait "$python_pid" 2>/dev/null
         python_pid=""
     fi
-    echo "Exiting..."
-    exit 1
+    kill_requested=false
 }
 
 trap 'cleanup' SIGINT
 
-for ((number=3; number<=60; number++))
+for ((number=8; number<=60; number++))
 do
     file_path="kitchen_layouts_grid_text/kitchen${number}.txt"
 
     if [ "$kill_requested" = true ]; then
         cleanup
+        continue
     fi
 
     # Run the Python command in the background and store the process ID
     python 3d_plan_eval_main.py -k "$file_path" &
     python_pid=$!
 
-    # Wait for user input to kill the process or exit
-    echo "Press X to kill the process, C to exit, or any other key to continue..."
+    # Wait for user input to kill the process
+    echo "Press X to kill the process or any other key to continue..."
     read -n 1 -s input
 
     if [ "$input" = "X" ] || [ "$input" = "x" ]; then
         kill_requested=true
         cleanup
-    elif [ "$input" = "C" ] || [ "$input" = "c" ]; then
-        cleanup
+        continue
+    fi
+
+    if [ "$input" = "C" ] || [ "$input" = "c" ]; then
+        echo "Exiting..."
+        exit 1
     fi
 
     # Check if the process is still running

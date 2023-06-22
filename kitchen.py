@@ -34,6 +34,7 @@ class Kitchen():
         self.food_obj = []
         self.static_objs = {}
         self.in_robot_hand = []
+        self.onions_for_soup = 2
 
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
         self.tile_location = {}
@@ -95,7 +96,7 @@ class Kitchen():
                 self.tile_location['S'] = (x, y)
             elif name == 'bowl':
                 self.tile_location['B'] = (x, y)
-            elif name == 'table_h':
+            elif name == 'table_h' or name == 'table_v':
                 self.tile_location['T'] = (x, y)
 
         self.orientation_map = orientation_map
@@ -290,9 +291,12 @@ class Kitchen():
                 self.onions.append(obj)
                 body_ids = obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.001)
-            if name == "table_h" or name == "table_v":
+            if name == "table_h":
                 self.table = obj
-                self.static_objs[obj] = (x, y)
+                self.static_objs[obj] = [(x, y), (x,y+1)]
+            if name == "table_v":
+                self.table = obj
+                self.static_objs[obj] = [(x, y), (x+1, y)]
 
         try:
             for obj in self.static_objs.keys():
@@ -401,6 +405,9 @@ class Kitchen():
     
     def get_empty_squares(self):
         return self.where_grid_is('X')
+    
+    def get_onion_station(self):
+        return self.where_grid_is('F')
 
     def get_center(self):
         grid_center = (floor(len(self.grid) / 2), floor(len(self.grid[0]) / 2))

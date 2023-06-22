@@ -30,8 +30,9 @@ class WorldState():
         # if action_object == ('pickup', 'soup') and self.in_pot == self.max_in_pot:
         #     self.in_pot = 0
         #     self.sim_in_pot = 0
-        if action_object == ('deliver', 'soup'):
-            self.orders = self.orders[:-1]
+        
+        # if action_object == ('deliver', 'soup'):
+        #     self.orders = self.orders[:-1]
 
     def from_string(self, state_str):
         holding, in_pot, *orders = state_str.split('_')

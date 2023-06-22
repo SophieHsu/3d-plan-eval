@@ -56,6 +56,14 @@ class LsiEnv(object):
 
         if self.world_state.in_pot > self.mdp.num_items_for_soup:
             self.world_state.in_pot = self.mdp.num_items_for_soup
+
+        # update orders left get number of bowls on table remove from original list
+        order_list = self.mdp.start_order_list.copy()
+        for b in self.kitchen.bowls:
+            if self.tracking_env.is_item_on_table(b):
+                order_list.pop()
+                
+        self.world_state.orders = order_list
         return
 
     def update_robot_hl_state(self, action_object):
@@ -144,7 +152,8 @@ class LsiEnv(object):
         location = None
         action, object = action_object
         if action == "pickup" and object == "onion":
-            location = self.tracking_env.get_closest_onion().get_position()
+            # location = self.tracking_env.get_closest_onion().get_position()
+            return self.kitchen.get_onion_station()[0]
         elif action == "drop" and object == "onion":
             pan_status = self.tracking_env.get_pan_status()
             min_onions_left = self.mdp.num_items_for_soup + 1 
@@ -157,7 +166,8 @@ class LsiEnv(object):
                     best_pan = pan
                     min_onions_left = onions_left
 
-            location = best_pan.get_position()
+            if best_pan is not None:
+                location = best_pan.get_position()
 
             # location = self.tracking_env.get_closest_pan().get_position()
         elif action == "pickup" and object == "dish":
@@ -169,8 +179,12 @@ class LsiEnv(object):
                     break
 
         elif action == "deliver" and object == "soup":
-            location = self.mdp.get_serving_locations()[0]
-            return location
+            serving_locations = self.mdp.get_serving_locations()
+            for bowl in self.kitchen.bowls:
+                bowl_location = real_to_grid_coord(bowl.get_position())
+                if bowl_location in serving_locations:
+                    serving_locations.remove(bowl_location)
+            return serving_locations[0]
         elif action == "pickup" and object == "soup":
             # gets pan closest to done
             for pan in self.kitchen.pans:

@@ -41,6 +41,8 @@ from tracking_env import TrackingEnv
 import numpy as np
 import time
 
+from igibson.utils.grasp_planning_utils import get_grasp_poses_for_object_sticky
+
 def main():
     config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
     kitchen_layout = "./kitchen_layouts_grid_text/kitchen.txt"
@@ -77,7 +79,9 @@ def main():
     # motion_controller_robot = MotionControllerRobot(robot, a_star_planner, occupancy_grid)
     # top_camera_view()
     done = False
-    time.sleep(5)
+    # time.sleep(5)
+    print(kitchen.onions[0])
+    val = get_grasp_poses_for_object_sticky(env.robots[0], kitchen.onions[0])
     while(True):
         # follow_entity_view(human)
         # action = np.zeros((28,))

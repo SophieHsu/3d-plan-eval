@@ -17,7 +17,7 @@ class LsiMdp(object):
         self.width = len(map[0])
 
     @staticmethod
-    def from_config(map_config, exp_config, grid):
+    def from_config(start_locations, exp_config, grid):
         #a1_loc = (agent_configs[1]['start_x'], agent_configs[1]['start_y'])
         #a2_loc = (agent_configs[0]['start_x'], agent_configs[0]['start_y'])
         # rows = map_config['rows']
@@ -33,7 +33,7 @@ class LsiMdp(object):
         
         hl_start_state = exp_config['hl_start_state']
         # start_locations = [(agent_config['start_x'], agent_config['start_y'], agent_config['start_direction']) for agent_config in agent_configs]
-        start_locations = [(exp_config['human_start_x'], exp_config['human_start_y'], 'S'), (exp_config['robot_start_x'], exp_config['robot_start_y'], 'S')]
+        # start_locations = [(exp_config['human_start_x'], exp_config['human_start_y'], 'S'), (exp_config['robot_start_x'], exp_config['robot_start_y'], 'S')]
         return LsiMdp(grid, start_locations, hl_start_state)
 
     def get_state_transition(self, state, joint_action):

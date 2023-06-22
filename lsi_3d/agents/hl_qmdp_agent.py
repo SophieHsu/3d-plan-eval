@@ -243,7 +243,7 @@ class HlQmdpPlanningAgent(Agent):
                 self.robot_goal,
                 self.human_ml_plan,
                 self.human_goal,
-                radius=0)
+                radius=2)
             if plan == []:
                 plan.append((self.env.robot_state.ml_state, 'D'))
             self.ml_robot_plan = plan

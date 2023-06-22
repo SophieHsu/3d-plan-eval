@@ -8,7 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/3d_plan_eval_main.py",
+            "program": "${workspaceFolder}/test.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }

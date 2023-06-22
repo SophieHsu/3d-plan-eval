@@ -49,6 +49,7 @@ def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
     # if using script select random start
     if args.kitchen != 'none':
         kitchen.read_from_grid_text(args.kitchen)
+        # kitchen.read_from_grid_text(map_config["layout"])
         open_squares = kitchen.get_empty_squares()
         robot_start = random.choice(open_squares)
 
@@ -105,8 +106,10 @@ def setup(args):
     # human_sim = BehaviorRobot()
     # igibson_env.simulator.import_object(human_sim)
     # igibson_env.set_pos_orn_with_z_offset(human_sim, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
-
-    mdp = LsiMdp.from_config(map_config, exp_config, kitchen.grid)
+    r_x,r_y = robot_start
+    h_x,h_y = human_start
+    start_locations = ((r_x,r_y,'S'), (h_x,h_y,'S'))
+    mdp = LsiMdp.from_config(start_locations, exp_config, kitchen.grid)
     hlp = HighLevelMdpPlanner(mdp)
     hlp.compute_mdp_policy(order_list)
 

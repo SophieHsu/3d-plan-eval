@@ -41,6 +41,8 @@ class HumanAgent():
         self.arrived = False
         self.step_index = 0
         self.avoiding_robot = False
+        self.next_hl_state = None
+        self.action_object = None
 
     def change_state(self):
         # pass
@@ -68,12 +70,17 @@ class HumanAgent():
             self.human.apply_action(actionStep)
         else:
             x, y, z = self.human.get_position()
-            end, next_hl_state, action_object = self.get_next_goal()
-            end, ori = self.transform_end_location(end)
+
             if self.arrived == False:
-                self.arrived = self._step(end, ori)
+                end = self.get_next_goal()
+
+                if end != None:
+                    end, ori = self.transform_end_location(end)
+                    self.interacting = False
+                    self.arrived = self._step(end, ori)
             else:
-                self._arrival_step(next_hl_state, action_object)
+                self._arrival_step()
+                self.interacting = True
             self.lsi_env.update_joint_ml_state()
 
     def _step(self, end, final_ori):
@@ -95,9 +102,11 @@ class HumanAgent():
         return self.motion_controller.step(self.human, self.robot, final_ori,
                                            path, is_new_end)
 
-    def _arrival_step(self, next_hl_state, action_object):
-        action = action_object[0]
-        object = action_object[1]
+    def _arrival_step(self):
+        next_hl_state = self.next_hl_state
+        action_object = self.action_object
+        action = self.action_object[0]
+        object = self.action_object[1]
         if action == "pickup" and object == "onion":
             if self.object_position is None:
                 self.object_position = self.tracking_env.get_closest_onion(
@@ -126,7 +135,7 @@ class HumanAgent():
             done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
             if done:
                 self.completed_goal(next_hl_state, action_object)
-        elif action == "pickup" and object == "soup":
+        elif (action == "pickup" and object == "soup") or self.step_index >= 1:
             if self.object_position is None:
                 pan = self.tracking_env.get_closest_pan()
                 self.object_position = pan.get_position()
@@ -145,34 +154,40 @@ class HumanAgent():
             elif self.step_index == 2:
                 done = self.drop(self.object_position, [0, -0.1, 0.3])
                 if done:
-                    self.step_index = self.step_index + 1
-                    self.object_position = self.tracking_env.get_closest_onion(
+                    num_item_in_bowl = len(self.tracking_env.get_bowl_status()[self.tracking_env.get_closest_bowl()])
+                    if num_item_in_bowl < self.tracking_env.kitchen.onions_for_soup:
+                        self.step_index = 1
+                        self.object_position = self.tracking_env.get_closest_onion(on_pan=True
                     ).get_position()
+                    else:
+                        self.step_index = 3
+                        self.object_position = self.tracking_env.get_closest_bowl(
+                    ).get_position()
+            # elif self.step_index == 3:
+            #     done = self.pick(self.object_position, [0, 0, 0.05])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_bowl(
+            #         ).get_position()
+            # elif self.step_index == 4:
+            #     done = self.drop(self.object_position, [0, -0.1, 0.3])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_onion(
+            #             on_pan=True).get_position()
+            # elif self.step_index == 5:
+            #     done = self.pick(self.object_position, [0, 0, 0.05])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_bowl(
+            #         ).get_position()
+            # elif self.step_index == 6:
+            #     done = self.drop(self.object_position, [0, -0.1, 0.3])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_bowl(
+            #         ).get_position()
             elif self.step_index == 3:
-                done = self.pick(self.object_position, [0, 0, 0.05])
-                if done:
-                    self.step_index = self.step_index + 1
-                    self.object_position = self.tracking_env.get_closest_bowl(
-                    ).get_position()
-            elif self.step_index == 4:
-                done = self.drop(self.object_position, [0, -0.1, 0.3])
-                if done:
-                    self.step_index = self.step_index + 1
-                    self.object_position = self.tracking_env.get_closest_onion(
-                        on_pan=True).get_position()
-            elif self.step_index == 5:
-                done = self.pick(self.object_position, [0, 0, 0.05])
-                if done:
-                    self.step_index = self.step_index + 1
-                    self.object_position = self.tracking_env.get_closest_bowl(
-                    ).get_position()
-            elif self.step_index == 6:
-                done = self.drop(self.object_position, [0, -0.1, 0.3])
-                if done:
-                    self.step_index = self.step_index + 1
-                    self.object_position = self.tracking_env.get_closest_bowl(
-                    ).get_position()
-            elif self.step_index == 7:
                 done = self.pick(self.object_position, [0, -0.3, 0.1])
                 if done:
                     self.step_index = self.step_index + 1
@@ -198,10 +213,10 @@ class HumanAgent():
         world_state = self.lsi_env.world_state
         action, object = 'stay', agent_state.holding
         if agent_state.holding == 'None':
-            if world_state.in_pot == 2 and self.lsi_env.robot_state.holding == 'onion':
+            if world_state.in_pot == self.tracking_env.kitchen.onions_for_soup - 1 and self.lsi_env.robot_state.holding == 'onion':
                 action, object = ('pickup', 'dish')
                 next_hl_state = f'dish_{world_state.in_pot}'
-            elif world_state.in_pot == 3 and self.lsi_env.robot_state.holding != 'dish':
+            elif world_state.in_pot >= self.tracking_env.kitchen.onions_for_soup and self.lsi_env.robot_state.holding != 'dish':
                 action, object = ('pickup', 'dish')
                 next_hl_state = f'dish_{world_state.in_pot}'
             else:
@@ -216,7 +231,7 @@ class HumanAgent():
             action, object = ('pickup', 'dish')
             next_hl_state = f'dish_{world_state.in_pot}'
             agent_state.next_holding = 'dish'
-        elif agent_state.holding == 'dish' and world_state.in_pot >= self.lsi_env.mdp.num_items_for_soup:
+        elif agent_state.holding == 'dish' and (world_state.in_pot >= self.lsi_env.mdp.num_items_for_soup or self.interacting == True):
             action, object = ('pickup', 'soup')
             # world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
@@ -229,10 +244,12 @@ class HumanAgent():
         for order in world_state.orders:
             next_hl_state += f'_{order}'
 
-        possible_motion_goals = self.hlp.map_action_to_location(
-            world_state, agent_state, (action, object))
-        goal = possible_motion_goals[0]
-        return goal, next_hl_state, (action, object)
+        possible_motion_goals = self.lsi_env.map_action_to_location(
+            (action, object))
+        goal = possible_motion_goals
+        self.next_hl_state = next_hl_state
+        self.action_object = (action, object)
+        return goal
 
     def transform_end_location(self, loc):
         # objects = self.igibson_env.simulator.scene.get_objects()
@@ -242,10 +259,15 @@ class HumanAgent():
             if type(o) != URDFObject:
                 continue
 
-            if objects[o] == loc:
+            if type(objects[o]) == list:
+                for o_loc in objects[o]:
+                    if o_loc == loc: selected_object = o
+                        # pos = grid_to_real_coord(loc)
+            elif objects[o] == loc:
                 selected_object = o
 
-        pos, ori = selected_object.get_position_orientation()
+        pos = list(grid_to_real_coord(loc))
+        _, ori = selected_object.get_position_orientation()
         ori = quat2euler(ori[0], ori[1], ori[2], ori[3])[2]
         # absolute transformation
         ori = normalize_radians(ori - 1.57)

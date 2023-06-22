@@ -8,6 +8,7 @@ from scipy.spatial.transform import Rotation
 from igibson.external.pybullet_tools.utils import get_joint_position
 from igibson.object_states.open import get_relevant_joints
 from igibson.objects.articulated_object import URDFObject
+from igibson.robots import behavior_robot
 
 ROTATION_ARC_SEGMENT_LENGTHS = 0.1
 REVOLUTE_JOINT_FRACTION_ACROSS_SURFACE_AXIS_BOUNDS = (0.4, 0.6)
@@ -419,3 +420,23 @@ def _draw_coordinate_system(system_to_world):
         local_direction = np.eye(3)[axis]
         pos = p.multiplyTransforms(*system_to_world, local_direction, [0, 0, 0, 1])[0]
         p.addUserDebugLine(system_to_world[0], pos, local_direction, 2, 0)
+
+def get_grasp_poses_for_object_sticky(robot, target_obj: URDFObject, force_allow_any_extent=True):
+    bbox_center_in_world, bbox_quat_in_world, bbox_extent_in_base_frame, _ = target_obj.get_base_aligned_bounding_box(
+        visual=False
+    )
+
+    grasp_center_pos = bbox_center_in_world + np.array([0, 0, np.max(bbox_extent_in_base_frame)])
+    towards_object_in_world_frame = bbox_center_in_world - grasp_center_pos
+    towards_object_in_world_frame /= np.linalg.norm(towards_object_in_world_frame)
+
+    # The default angle is hand-downwards. We can rotate this later if needed.
+    uncorrected_grasp_quat = behavior_robot.RIGHT_HAND_LOC_POSE_TRACKED[1]
+    corrected_grasp_quat = (
+        Rotation.from_quat(uncorrected_grasp_quat) * Rotation.from_euler("X", -GRASP_ANGLE)
+    ).as_quat()
+
+    grasp_pose = (grasp_center_pos, corrected_grasp_quat)
+    grasp_candidate = [(grasp_pose, towards_object_in_world_frame)]
+
+    return grasp_candidate
