@@ -10,6 +10,7 @@ from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplex
 from igibson.objects.articulated_object import URDFObject
 from igibson.objects.visual_marker import VisualMarker
 import pybullet as p
+from datetime import datetime
 
 
 class HumanAgent():
@@ -40,9 +41,9 @@ class HumanAgent():
         self.object_position = None
         self.arrived = False
         self.step_index = 0
-        self.avoiding_robot = False
         self.next_hl_state = None
         self.action_object = None
+        self.avoiding_start_time = None
 
     def change_state(self):
         # pass
@@ -87,11 +88,16 @@ class HumanAgent():
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         robot_x, robot_y, _ = self.robot.get_position()
-        if math.dist([x, y], [robot_x, robot_y]) < 0.8 or self.avoiding_robot:
-            self.avoiding_robot = True
-            end = self.loc_to_avoid_robot()
+        if math.dist([x, y], [robot_x, robot_y]) < 0.8 and self.avoiding_start_time is None:
+            self.avoiding_start_time = datetime.now()
         if math.dist([x, y], [robot_x, robot_y]) > 1.2:
-            self.avoiding_robot = False
+            self.avoiding_start_time = None
+        if self.avoiding_start_time is not None:
+            if (datetime.now() - self.avoiding_start_time) < 2.0:
+                return
+            else:
+                end = self.loc_to_avoid_robot()
+        
         path = self.planner.find_path((x, y), end, self.occupancy_grid)
 
         round_prev_end = [round(p, 3) for p in self.prev_end
