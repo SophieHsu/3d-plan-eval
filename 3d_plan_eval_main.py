@@ -231,6 +231,7 @@ def check_completion(lsi_env, start_time, kitchen):
         f = open(filename, 'a')
         f.write("failure by timeout")
         f.close()
+        print('timed out')
         return True
     
     return False

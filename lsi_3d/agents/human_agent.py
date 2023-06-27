@@ -93,7 +93,7 @@ class HumanAgent():
         if math.dist([x, y], [robot_x, robot_y]) > 1.2:
             self.avoiding_start_time = None
         if self.avoiding_start_time is not None:
-            if (datetime.now() - self.avoiding_start_time) < 2.0:
+            if (datetime.now() - self.avoiding_start_time).total_seconds() < 2.0:
                 return
             else:
                 end = self.loc_to_avoid_robot()

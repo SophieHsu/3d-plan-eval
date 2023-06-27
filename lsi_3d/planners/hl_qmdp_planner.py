@@ -735,6 +735,11 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
 
                     self.cost_matrix[action_idx][curr_state_idx][
                         next_state_idx] = 5
+                    
+    def get_action_obj_from_state(self, state_str):
+        split = state_str.split('_')
+        action_obj = split[-2:]
+        return f'{action_obj[0]}_{action_obj[1]}'
 
     def step(self,
              world_state,
@@ -796,7 +801,10 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                     # print('Action.ACTION_TO_INDEX[joint_action[agent_idx]] =', Action.ACTION_TO_INDEX[joint_action[agent_idx]])
                     if not low_level_action:
                         # action_idx: are subtask action dictionary index
-                        next_state_v[i, action_idx] += (
+                        human_action_obj = self.get_action_obj_from_state(mdp_state_key)
+                        human_action_idx = self.subtask_idx_dict[human_action_obj]
+
+                        next_state_v[human_action_idx, action_idx] += (
                             value_cost *
                             self.transition_matrix[action_idx, mdp_state_idx,
                                                    next_state_idx])
@@ -805,7 +813,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                         # normalized_cost =
 
                         ## compute one step cost with joint motion considered
-                        action_cost[i, action_idx] -= (
+                        action_cost[human_action_idx, action_idx] -= (
                             one_step_cost) * self.transition_matrix[
                                 action_idx, mdp_state_idx, next_state_idx]
                         # action_cost[i, action_idx] -= (1)*self.transition_matrix[action_idx, mdp_state_idx, next_state_idx]
@@ -961,8 +969,12 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                                                  policy_a)
                 state = self.get_key_from_value(self.state_idx_dict,
                                                 curr_state_idx)
-                # print(state)
-                action_cost = self.action_to_features(action)
+                human_action_obj = self.get_action_obj_from_state(state)
+                # take max of human action and robot action to upper bound cost
+                human_action_cost = self.action_to_features(human_action_obj)
+                robot_action_cost = self.action_to_features(action)
+                action_cost = max(human_action_cost, robot_action_cost)
+
                 possible_next_states = np.where(
                     self.transition_matrix[policy_a,
                                            curr_state_idx] > 0.000001)[0]
