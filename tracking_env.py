@@ -59,6 +59,13 @@ class TrackingEnv():
     def is_item_on_table(self, item):
         val = item.states[object_states.OnTop].get_value(self.kitchen.table)
         return val
+    
+    def is_item_on_counter(self, item):
+        for counter in self.kitchen.counters:
+            val = item.states[object_states.OnTop].get_value(counter)
+            if val:
+                return True
+        return False
 
     def obj_in_robot_hand(self):
         # return object in robot hand
@@ -104,7 +111,7 @@ class TrackingEnv():
         else:
             position = agent_pos
 
-    def get_closest_onion(self, agent_pos=None, on_pan=False, position=None):
+    def get_closest_onion(self, agent_pos=None, on_pan=False, position=None, on_table = False):
         closest_onion = None
         min_dist = 10000
         if agent_pos is None:
@@ -120,6 +127,7 @@ class TrackingEnv():
             onion_position = o.get_position()
             dist = math.dist(position, onion_position)
             if dist < min_dist:
+                if on_table and not self.is_item_on_table(o): continue
                 min_dist = dist
                 closest_onion = o
         return closest_onion

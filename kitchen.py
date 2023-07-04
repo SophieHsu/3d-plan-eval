@@ -29,6 +29,7 @@ class Kitchen():
         self.bowls = []
         self.pans = []
         self.onions = []
+        self.counters = []
         self.table = None
         self.fridges = []
         self.food_obj = []
@@ -297,6 +298,8 @@ class Kitchen():
             if name == "table_v":
                 self.table = obj
                 self.static_objs[obj] = [(x, y), (x+1, y)]
+            if name == "counter":
+                self.counters.append(obj)
 
         try:
             for obj in self.static_objs.keys():

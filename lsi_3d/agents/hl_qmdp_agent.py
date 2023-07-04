@@ -255,10 +255,8 @@ class HlQmdpPlanningAgent(Agent):
     def ml_robot_step(self):
         if self.take_ml_robot_step:
             # if human is directly in front of robot then just wait
-            if self.env.human_state.ml_state[:
-                                             2] in get_states_in_forward_radius(
-                                                 self.env.robot_state.ml_state,
-                                                 0):
+            if self.ml_robot_action and self.env.human_state.ml_state[:2] == grid_transition(self.ml_robot_action[1],
+                                                 self.env.robot_state.ml_state)[0:2]:
                 self.ml_robot_plan = [(None, 'D')]
 
             self.ml_robot_action = self.ml_robot_plan.pop(0)
@@ -310,6 +308,7 @@ class HlQmdpPlanningAgent(Agent):
         s += 'Robot HL action,object: ' + str(self.robot_action_object) + '\n'
         s += 'Robot goal: '+ str(self.robot_goal) + '\n'
         s += 'Robot ML State: ' + str(self.env.robot_state.ml_state) + '\n'
+        s += 'Human ML State: ' + str(self.env.human_state.ml_state) + '\n'
         f.write(s)
         f.close()
 

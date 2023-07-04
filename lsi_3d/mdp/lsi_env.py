@@ -174,7 +174,7 @@ class LsiEnv(object):
             # find empty bowl
             for bowl in self.kitchen.bowls:
                 items_in_bowl = self.tracking_env.items_in_bowl(bowl)
-                if len(items_in_bowl) == 0:
+                if len(items_in_bowl) == 0 and self.tracking_env.is_item_on_counter(bowl):
                     location = bowl.get_position()
                     break
 

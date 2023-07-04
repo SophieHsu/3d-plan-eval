@@ -94,7 +94,7 @@ class HumanAgent():
             self.avoiding_start_time = None
         if self.avoiding_start_time is not None:
             if (datetime.now() - self.avoiding_start_time).total_seconds() < 2.0:
-                return
+                return False
             else:
                 end = self.loc_to_avoid_robot()
         
@@ -132,8 +132,11 @@ class HumanAgent():
                 self.completed_goal(next_hl_state, action_object)
         elif action == "pickup" and object == "dish":
             if self.object_position is None:
-                self.object_position = self.tracking_env.get_closest_bowl(
-                ).get_position()
+                for bowl in self.tracking_env.kitchen.bowls:
+                    items_in_bowl = self.tracking_env.items_in_bowl(bowl)
+                    if len(items_in_bowl) == 0 and self.tracking_env.is_item_on_counter(bowl):
+                        self.object_position = bowl.get_position()
+                        # break
             done = self.pick(self.object_position, [0, -0.25, 0.1])
             if done:
                 self.completed_goal(next_hl_state, action_object)
