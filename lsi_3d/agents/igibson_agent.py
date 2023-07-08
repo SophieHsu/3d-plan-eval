@@ -54,6 +54,7 @@ class iGibsonAgent:
         self.grasping_delay = 10
         self.counters = [0, 0]
         self.prev_gripper_action = []
+        self.interact_obj = None
         if self.name == 'robot':
             self.arm_init()
 
@@ -383,9 +384,12 @@ class iGibsonAgent:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "pickup" and object == "soup":
+            
             if self.object_position is None:
                 pan = tracking_env.get_closest_pan(
                     agent_pos=self.object.get_eef_position())
+                tracking_env.kitchen.interact_objs[pan] = True
+                self.interact_obj = pan
                 self.object_position = pan.get_position()
             if self.interact_step_index == 0:
                 done, in_hand = self.drop(
@@ -501,6 +505,7 @@ class iGibsonAgent:
             else:
                 self.interact_step_index = -1
                 self.object_position = None
+                tracking_env.kitchen.interact_objs[self.interact_obj] = False
 
     def arm_init(self):
         body_ids = self.object.get_body_ids()

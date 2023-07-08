@@ -27,6 +27,12 @@ class TrackingEnv():
             if len(onions) > 0:
                 data[b] = onions
         return data
+    
+    def set_interact_obj(self,obj,is_interacting):
+        self.kitchen.interact_objs[obj] = is_interacting
+
+    def is_interact_obj(self, obj):
+        return self.kitchen.interact_objs[obj]
 
     def items_in_bowl(self, bowl):
         data = []
@@ -49,13 +55,14 @@ class TrackingEnv():
         status = self.get_pan_status()
         onions_in_pan = len(status[pan])
 
-        if onions_in_pan >= self.kitchen.onions_for_soup:
+        if self.kitchen.interact_objs[pan]:
+            return 3
+        elif onions_in_pan >= self.kitchen.onions_for_soup:
             return 2
         elif onions_in_pan == 0:
             return 1
         else:
             return 0
-
 
     def is_pan_cooked(self, pan):
         num_cooked_onions = 0

@@ -50,6 +50,7 @@ class HumanAgent():
         self.avoiding_start_time = None
         self.stuck_time = None
         self.stuck_ml_pos = None
+        self.interact_obj = None
 
     def change_state(self):
         # pass
@@ -152,6 +153,7 @@ class HumanAgent():
                                            path, is_new_end)
 
     def _arrival_step(self):
+
         next_hl_state = self.next_hl_state
         action_object = self.action_object
         action = self.action_object[0]
@@ -197,6 +199,8 @@ class HumanAgent():
         elif (action == "pickup" and object == "soup") or self.step_index >= 1:
             if self.object_position is None:
                 pan = self.tracking_env.get_closest_pan()
+                self.tracking_env.kitchen.interact_objs[pan] = True
+                self.interact_obj = pan
                 self.object_position = pan.get_position()
             if self.step_index == 0:
                 done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
@@ -258,6 +262,7 @@ class HumanAgent():
                     self.step_index = self.step_index + 1
             else:
                 self.completed_goal(next_hl_state, action_object)
+                self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
         # print(next_hl_state, action_object)
 
     def pick(self, loc, offset=[0, 0, 0]):

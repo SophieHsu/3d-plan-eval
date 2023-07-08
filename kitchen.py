@@ -1,3 +1,4 @@
+import copy
 from math import floor
 import numpy as np
 import os
@@ -45,6 +46,12 @@ class Kitchen():
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
         self.map = orientation_map
         self.load_objects(obj_x_y, orientation_map)
+        self.load_interact_objs()
+
+    def load_interact_objs(self):
+        self.interact_objs = {}
+        for pan in self.pans:
+            self.interact_objs[pan] = False
 
     def read_from_grid_text(self, filepath):
         obj_x_y = []

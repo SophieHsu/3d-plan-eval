@@ -46,12 +46,13 @@ class LsiEnv(object):
                                       self.mdp.start_locations[1])
         self.world_state = WorldState(mdp.hl_start_state)
         self.world_state.players = [self.robot_state, self.human_state]
+        self.is_interacting_with_pot = False
 
     def update_world(self):
         real_onions = max([len(i) for i in list(self.tracking_env.get_pan_status().values())])
-        self.world_state.in_pot
 
-        self.world_state.in_pot = real_onions # + self.world_state.sim_in_pot
+        if not any(list(self.tracking_env.kitchen.interact_objs.values())):
+            self.world_state.in_pot = real_onions # + self.world_state.sim_in_pot
 
         if self.world_state.in_pot > self.mdp.num_items_for_soup:
             self.world_state.in_pot = self.mdp.num_items_for_soup
