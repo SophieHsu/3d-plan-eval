@@ -1,13 +1,14 @@
 import math
 from igibson.envs.igibson_env import iGibsonEnv
+from igibson.objects.articulated_object import URDFObject
 from kitchen import Kitchen
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
-from lsi_3d.utils.functions import orn_to_cardinal, quat2euler
+from lsi_3d.utils.functions import find_nearby_open_spaces, norm_orn_to_cardinal, orn_to_cardinal, quat2euler
 from tracking_env import TrackingEnv
-from utils import real_to_grid_coord
+from utils import grid_to_real_coord, normalize_radians, real_to_grid_coord
 
 
 class LsiEnv(object):
@@ -47,9 +48,7 @@ class LsiEnv(object):
         self.world_state.players = [self.robot_state, self.human_state]
 
     def update_world(self):
-        pot_to_onion_dict = self.tracking_env.get_pan_status()
-        onions = pot_to_onion_dict[self.kitchen.pans[0]]
-        real_onions = len(onions)
+        real_onions = max([len(i) for i in list(self.tracking_env.get_pan_status().values())])
         self.world_state.in_pot
 
         self.world_state.in_pot = real_onions # + self.world_state.sim_in_pot
@@ -147,44 +146,91 @@ class LsiEnv(object):
             self.soup_states[0].onions_in_soup = self.in_pot
 
         return self
+    
+    def transform_end_location(self, loc):
+        # objects = self.igibson_env.simulator.scene.get_objects()
+        objects = self.tracking_env.kitchen.static_objs
+        selected_object = None
+        for o in objects.keys():
+            if type(o) != URDFObject:
+                continue
 
-    def map_action_to_location(self, action_object):
+            if type(objects[o]) == list:
+                for o_loc in objects[o]:
+                    if o_loc == loc: selected_object = o
+                        # pos = grid_to_real_coord(loc)
+            elif objects[o] == loc:
+                selected_object = o
+
+        pos = list(grid_to_real_coord(loc))
+        _, ori = selected_object.get_position_orientation()
+        ori = quat2euler(ori[0], ori[1], ori[2], ori[3])[2]
+        # absolute transformation
+        ori = normalize_radians(ori - 1.57)
+        pos[0] = pos[0] + math.cos(ori)
+        pos[1] = pos[1] + math.sin(ori)
+        opposite_facing = normalize_radians(ori + math.pi)
+        row,col = real_to_grid_coord(pos[0:2])
+        card_facing = norm_orn_to_cardinal(opposite_facing)
+
+        return (row, col, card_facing)
+    
+    def sort_locations(self, locations, agent_location):
+        # euclidean distance may not work for more complicated maps
+        return sorted(locations, key=lambda location: math.dist(location[0:2], agent_location))
+
+    def map_action_to_location(self, action_object, agent_location=None, is_human=False):
+        # return position and orientation given the agents location and the action object
+
         location = None
         action, object = action_object
         if action == "pickup" and object == "onion":
             # location = self.tracking_env.get_closest_onion().get_position()
-            return self.kitchen.get_onion_station()[0]
+            station_loc = self.kitchen.get_onion_station()[0]
+            arrival_loc = self.transform_end_location(station_loc)
+            return arrival_loc
         elif action == "drop" and object == "onion":
             pan_status = self.tracking_env.get_pan_status()
             min_onions_left = self.mdp.num_items_for_soup + 1 
-            best_pan = None
-            for pan in self.kitchen.pans:
-                onions = len(pan_status[pan])
-                onions_left = self.mdp.num_items_for_soup - onions
+            agent_location_real = grid_to_real_coord(agent_location)
+            pans_sorted = sorted(self.kitchen.pans, key=lambda pan: (self.tracking_env.get_pan_enum_status(pan), math.dist(pan.get_position()[0:2], agent_location_real)))
+            location = pans_sorted[0].get_position()
+            # for pan in self.kitchen.pans:
+            #     onions = len(pan_status[pan])
+            #     onions_left = self.mdp.num_items_for_soup - onions
 
-                if onions_left < min_onions_left and onions_left > 0:
-                    best_pan = pan
-                    min_onions_left = onions_left
+            #     if onions_left < min_onions_left and onions_left > 0:
+            #         best_pan = pan
+            #         min_onions_left = onions_left
 
-            if best_pan is not None:
-                location = best_pan.get_position()
+            # if best_pan is not None:
+            #     location = best_pan.get_position()
 
             # location = self.tracking_env.get_closest_pan().get_position()
         elif action == "pickup" and object == "dish":
             # find empty bowl
-            for bowl in self.kitchen.bowls:
+            bowls = self.tracking_env.get_bowls_dist_sort(is_human)
+            for bowl in bowls:
                 items_in_bowl = self.tracking_env.items_in_bowl(bowl)
                 if len(items_in_bowl) == 0 and self.tracking_env.is_item_on_counter(bowl):
                     location = bowl.get_position()
                     break
 
         elif action == "deliver" and object == "soup":
-            serving_locations = self.mdp.get_serving_locations()
+            # serving_locations = self.mdp.get_serving_locations()
+            serving_locations = self.tracking_env.get_table_locations()
             for bowl in self.kitchen.bowls:
                 bowl_location = real_to_grid_coord(bowl.get_position())
                 if bowl_location in serving_locations:
                     serving_locations.remove(bowl_location)
-            return serving_locations[0]
+
+            # sort serving locations by distance from robot
+            open_serving_locations = []
+            for serving_loc in serving_locations:
+                open_serving_locations += find_nearby_open_spaces(self.kitchen.grid, serving_loc)
+
+            sorted_serv_locations = self.sort_locations(open_serving_locations, agent_location)
+            return sorted_serv_locations[0]
         elif action == "pickup" and object == "soup":
             # gets pan closest to done
             for pan in self.kitchen.pans:
@@ -195,6 +241,7 @@ class LsiEnv(object):
                     break
 
         if location is not None:
-            location = real_to_grid_coord(location)
+            arrival_loc = real_to_grid_coord(location)
+            location = self.transform_end_location(arrival_loc)
 
         return location

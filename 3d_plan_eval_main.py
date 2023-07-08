@@ -65,6 +65,24 @@ def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
     return robot_start, human_start
 
+def print_grid(array):
+    grid_str = ""
+    for row in array:
+        for element in row:
+            grid_str+= element + ' '
+        grid_str += '\n'
+    
+    return grid_str
+
+def setup_log(kitchen, start_locations):
+    filename = 'lsi_3d/test_logs/' + kitchen.kitchen_name + '_log.txt'
+    f = open(filename, 'w')
+    f.write(f"Start Locations (robot, human): {start_locations}\n")
+    f.write("Kitchen Layout:\n")
+    f.write(print_grid(kitchen.grid))
+    f.close()
+    return True
+
 def setup(args):
     exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
     configs = read_in_lsi_config('two_agent_mdp.tml')
@@ -112,6 +130,7 @@ def setup(args):
     mdp = LsiMdp.from_config(start_locations, exp_config, kitchen.grid)
     hlp = HighLevelMdpPlanner(mdp)
     hlp.compute_mdp_policy(order_list)
+    setup_log(kitchen, start_locations)
 
     human = iGibsonAgent(human_bot, human_start, 'S', "human")
 
@@ -193,8 +212,6 @@ def environment_setup(args, headless=None):
     #     igibson_env.simulator.viewer.initial_pos = [-0.3, -0.3, 1.1]
     #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
     #     igibson_env.simulator.viewer.reset_viewer()
-
-    
 
     kitchen = Kitchen(igibson_env)
 

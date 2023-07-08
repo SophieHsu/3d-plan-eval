@@ -29,6 +29,30 @@ def orn_to_cardinal(angle):
 
     #return direction
 
+def norm_orn_to_cardinal(angle):
+
+    # converts an angle to whatever cardinal direction angle is closest to
+    rad_45 = 0.785
+    if angle >= rad_45 and angle < 3*rad_45:
+        return 'E'
+    if (angle >= 3*rad_45 and angle < 5*rad_45):
+        return 'N'
+    if angle >= 5*rad_45 and angle < 7*rad_45:
+        return 'W'
+    if (angle >= 7*rad_45 and angle < 2*math.pi) or (angle < rad_45 and angle >= 0):
+        return 'S'
+    
+def norm_cardinal_to_orn(dir):
+    rad_45 = 0.785
+    if dir is 'E':
+        return 2*rad_45
+    if dir is 'N':
+        return 4*rad_45
+    if dir is 'W':
+        return 6*rad_45
+    if dir is 'S':
+        return 0
+
 def quat2euler(x, y, z, w):
     """
     https://automaticaddison.com/how-to-convert-a-quaternion-into-euler-angles-in-python/
@@ -81,6 +105,29 @@ def find_nearby_open_space(grid, loc):
         if 0 <= newLocR < len(grid) and 0 <= newLocC < len(grid[0]) and grid[newLocR][newLocC] == 'X':
             return (newLocR, newLocC, dir)
     return None
+
+def opposite_dir(dir):
+    if dir is 'E':
+        return 'W'
+    if dir is 'W':
+        return 'E'
+    if dir is 'N':
+        return 'S'
+    if dir is 'S':
+        return 'N'
+
+def find_nearby_open_spaces(grid, loc):
+    open_spaces = []
+    locR, locC = loc
+    if grid[locR][locC] == 'X':
+        return (*loc, 'S')
+    for dir, diff in DIRE2POSDIFF.items():
+        diffR, diffC = diff
+        newLocR = locR + diffR
+        newLocC = locC + diffC
+        if 0 <= newLocR < len(grid) and 0 <= newLocC < len(grid[0]) and grid[newLocR][newLocC] == 'X':
+            open_spaces.append((newLocR, newLocC, opposite_dir(dir)))
+    return open_spaces
 
 def get_states_in_forward_radius(state, radius):
     y,x,f = state

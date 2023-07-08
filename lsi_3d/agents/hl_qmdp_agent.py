@@ -1,5 +1,7 @@
+import math
 from agent import FixedMediumPlan, FixedMediumSubPlan
 from igibson.external.pybullet_tools.utils import joints_from_names, set_joint_positions
+from igibson.objects.articulated_object import URDFObject
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.lsi_env import LsiEnv
@@ -10,8 +12,9 @@ import time
 from lsi_3d.utils.constants import DIRE2POSDIFF
 
 from lsi_3d.utils.enums import Mode
-from lsi_3d.utils.functions import grid_transition, get_states_in_forward_radius
+from lsi_3d.utils.functions import grid_transition, get_states_in_forward_radius, norm_orn_to_cardinal, orn_to_cardinal
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
+from utils import grid_to_real_coord, normalize_radians, quat2euler, real_to_grid_coord
 
 STUCK_TIME_LIMIT = 60
 
@@ -99,6 +102,35 @@ class HlQmdpPlanningAgent(Agent):
                 return key
         # if no matching key is found
         return None
+    
+    def transform_end_location(self, loc):
+        # objects = self.igibson_env.simulator.scene.get_objects()
+        objects = self.env.tracking_env.kitchen.static_objs
+        selected_object = None
+        for o in objects.keys():
+            if type(o) != URDFObject:
+                continue
+
+            if type(objects[o]) == list:
+                for o_loc in objects[o]:
+                    if o_loc == loc: selected_object = o
+                        # pos = grid_to_real_coord(loc)
+            elif objects[o] == loc:
+                selected_object = o
+
+        pos = list(grid_to_real_coord(loc))
+        _, ori = selected_object.get_position_orientation()
+        ori = quat2euler(ori[0], ori[1], ori[2], ori[3])[2]
+        # absolute transformation
+        ori = normalize_radians(ori - 1.57)
+        pos[0] = pos[0] + math.cos(ori)
+        pos[1] = pos[1] + math.sin(ori)
+        opposite_facing = normalize_radians(ori + math.pi)
+        row,col = real_to_grid_coord(pos[0:2])
+        card_facing = norm_orn_to_cardinal(opposite_facing)
+
+        return (row,col, card_facing)
+
 
     def action(self, world_state, robot_state, human_sim_state=None):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
@@ -144,7 +176,10 @@ class HlQmdpPlanningAgent(Agent):
             action_idx)]]
 
         # map back the medium level action to low level action
-        goal = self.env.map_action_to_location(action_object_pair)
+        goal = self.env.map_action_to_location(action_object_pair, robot_state.ml_state[0:2])
+
+        # if goal is not None:
+        #     goal = self.transform_end_location(goal)
 
         return (next_state, goal, tuple(action_object_pair))
 
@@ -353,7 +388,7 @@ class HlQmdpPlanningAgent(Agent):
         self.ml_human_action = self.ml_human_step()
         self.hl_robot_action = self.hl_robot_step()
         self.ml_robot_action = self.ml_robot_step()
-        # self.stuck_handler()
+        self.stuck_handler()
         self.ll_step()
 
     def step_old(self):

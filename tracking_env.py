@@ -44,6 +44,18 @@ class TrackingEnv():
                     onions.append(o)
             data[p] = onions
         return data
+    
+    def get_pan_enum_status(self, pan):
+        status = self.get_pan_status()
+        onions_in_pan = len(status[pan])
+
+        if onions_in_pan >= self.kitchen.onions_for_soup:
+            return 2
+        elif onions_in_pan == 0:
+            return 1
+        else:
+            return 0
+
 
     def is_pan_cooked(self, pan):
         num_cooked_onions = 0
@@ -70,6 +82,11 @@ class TrackingEnv():
     def obj_in_robot_hand(self):
         # return object in robot hand
         return self.kitchen.in_robot_hand
+    
+    def is_obj_in_human_hand(self, obj):
+        body_id = obj.get_body_ids()[0]
+        grasping = self.human.is_grasping_all_arms(body_id)
+        return IsGraspingState.TRUE in grasping
 
     def obj_in_human_hand(self):
         all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls
@@ -93,6 +110,9 @@ class TrackingEnv():
     def set_in_robot_hand(self, name, obj):
         self.kitchen.in_robot_hand.append([name, obj])
 
+    def get_table_locations(self):
+        return self.kitchen.static_objs[self.kitchen.table]
+
     def remove_in_robot_hand(self, item, pos=None, counter=0):
         self.kitchen.in_robot_hand.remove(item)
         ori_ori = item[1].get_orientation()
@@ -103,13 +123,26 @@ class TrackingEnv():
             item[1].set_position(pos)
             item[1].set_orientation([0, 0, 0, 1])
 
-    def get_closest_onion(self, agent_pos=None, on_pan=False):
-        closest_onion = None
-        min_dist = 10000
-        if agent_pos is None:
+    # def get_closest_onion(self, agent_pos=None, on_pan=False):
+    #     closest_onion = None
+    #     min_dist = 10000
+    #     if agent_pos is None:
+    #         position = self.human._parts["right_hand"].get_position()
+    #     else:
+    #         position = agent_pos
+
+    def distance_to_bowl(self, bowl, position):
+        bowl_position = bowl.get_position()
+        return math.dist(bowl_position, position)
+
+    def get_bowls_dist_sort(self, is_human=None):
+        if is_human is None or is_human is True:
             position = self.human._parts["right_hand"].get_position()
         else:
-            position = agent_pos
+            position = self.robot.object.get_position()
+
+        sorted_positions = sorted(self.kitchen.bowls, key=lambda bowl: self.distance_to_bowl(bowl, position))
+        return sorted_positions
 
     def get_closest_onion(self, agent_pos=None, on_pan=False, position=None, on_table = False):
         closest_onion = None
@@ -119,7 +152,7 @@ class TrackingEnv():
             ) if position is None else position
         else:
             position = agent_pos
-        closest_pan = self.get_closest_pan()
+        closest_pan = self.get_closest_pan(agent_pos)
         for o in self.kitchen.onions:
             if on_pan and not o.states[object_states.OnTop].get_value(
                     closest_pan):

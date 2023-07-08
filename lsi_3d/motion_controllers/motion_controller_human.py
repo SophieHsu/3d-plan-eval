@@ -51,10 +51,29 @@ class MotionControllerHuman():
                 y_diff = next_loc[1] - y
                 self.rotate_angle = math.atan2(y_diff, x_diff)
 
+            print("*******")
+            print(f"is new end: {is_new_end}")
+            print(f"next location: {next_loc}")
+            print(f'x,y: {x},{y}')
+            print(f"rotate angle: {self.rotate_angle}")
+            
+
+            # epsilon = 0.1
+            # if (self.rotate_angle < 3.14 + epsilon and self.rotate_angle > 3.14 - epsilon) \
+            #     or (self.rotate_angle > -3.14 - epsilon and self.rotate_angle < -3.14 + epsilon):
+            #     self.rotate = True
+
             if self.rotate:
                 vel = self.find_velocities_rotate(theta, self.rotate_angle)
                 if vel[0] == 0 and vel[1] == 0:
                     self.rotate = False
+
+                print(f'velocity: {vel}')
+                print(f'theta: {theta}')
+                print(f'rotate: {self.rotate}')
+            print("*******")
+
+            
 
             action = self.action(vel[0]/self.MAX_LIN_VEL, vel[1]/self.MAX_ANG_VEL, 0, 0, 0, 0)
             human.apply_action(action)
@@ -157,6 +176,7 @@ class MotionControllerHuman():
                 human._parts["right_hand"].set_orientation(p.getQuaternionFromEuler(self.reset_right_hand_orientation))
 
                 self.arrived_hand_step = 0
+                
                 return True
         return False
 
