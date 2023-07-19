@@ -350,9 +350,9 @@ class Kitchen():
                         return_str += "{} {} {}\n".format("stove", x, y)
                     if name == "stove":
                         return_str += "{} {} {}\n".format("pan", x, y)
-                        # return_str += "{} {} {}\n".format("vidalia_onion", x, y)
 
                     return_str += "{} {} {}\n".format(name, x, y)
+
         return return_str
 
     def sample_position(self, x, y, range):
