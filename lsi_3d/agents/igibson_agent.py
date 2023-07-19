@@ -17,7 +17,7 @@ from igibson.external.pybullet_tools.utils import (
     joints_from_names,
     set_joint_positions,
 )
-from utils import quat2euler, normalize_radians
+from utils import grid_to_real_coord, quat2euler, normalize_radians, real_to_grid_coord
 from numpy.linalg import inv
 import pybullet as p
 from igibson.utils.utils import l2_distance, parse_config, restoreState
@@ -118,16 +118,19 @@ class iGibsonAgent:
         #         self.target_direction = next_action
         return ready_for_next_action
 
-    def prepare_for_next_action(self, next_action):
+    def prepare_for_next_action(self, current_pos, next_action):
+        r, c, f = current_pos
+        x, y = grid_to_real_coord((r,c))
         if self.target_x == None or self.target_y == None:
-            x, y, z = self.object.get_position()
+            # x, y, z = self.object.get_position()
+            
             self.target_x = x
             self.target_y = y
 
         if next_action == 'F':
             diff_x, diff_y = DIRE2POSDIFF[self.direction]
-            self.target_x += diff_x
-            self.target_y += diff_y
+            self.target_x = diff_x + x
+            self.target_y = diff_y + y
         elif next_action in 'NESW':
             self.target_direction = next_action
             x, y, z = self.object.get_position()
@@ -168,6 +171,7 @@ class iGibsonAgent:
             self.agent_turn_one_step(env, action)
         elif action == 'F':
             cur_x, cur_y = self.object.get_position()[:2]
+            # cur_x, cur_y = real_to_grid_coord((cur_x,cur_y))
             goal_angle = math.atan2((self.target_y - cur_y),
                                     (self.target_x - cur_x))
             current_heading = self.get_current_orn_z()

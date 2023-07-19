@@ -49,7 +49,10 @@ class LsiEnv(object):
         self.is_interacting_with_pot = False
 
     def update_world(self):
-        real_onions = max([len(i) for i in list(self.tracking_env.get_pan_status().values())])
+        pans_status = self.tracking_env.get_pan_status().values()
+        real_onions = 0
+        if len(pans_status) > 0:
+            real_onions = max([len(i) for i in list(pans_status)])
 
         if not any(list(self.tracking_env.kitchen.interact_objs.values())):
             self.world_state.in_pot = real_onions # + self.world_state.sim_in_pot
@@ -111,7 +114,9 @@ class LsiEnv(object):
         return hl_state
 
     def update_joint_ml_state(self):
+        
         human_ml_state = self.get_ml_state(self.ig_human)
+        print('human ml state:', human_ml_state)
         robot_ml_state = self.get_ml_state(self.ig_robot)
         # human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
         self.robot_state.ml_state = robot_ml_state

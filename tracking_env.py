@@ -94,6 +94,12 @@ class TrackingEnv():
         body_id = obj.get_body_ids()[0]
         grasping = self.human.is_grasping_all_arms(body_id)
         return IsGraspingState.TRUE in grasping
+    
+    def is_human_holding_bowl(self):
+        for bowl in self.kitchen.bowls:
+            if self.is_obj_in_human_hand(bowl):
+                return True
+        return False
 
     def obj_in_human_hand(self):
         all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls

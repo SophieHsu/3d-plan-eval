@@ -8,8 +8,10 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/test.py",
+            // "cwd": "${workspaceFolder}\\3d-plan-eval",
+            "program": "${workspaceFolder}\\3d_plan_eval_main.py",
             "console": "integratedTerminal",
+            "args": ["-m", "vr"],
             "justMyCode": true
         }
     ]
