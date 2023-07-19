@@ -232,6 +232,11 @@ class HlQmdpPlanningAgent(Agent):
                 self.take_hl_robot_step = True
 
     def hl_human_step(self):
+
+        print("hl_human_step bool", not self.env.human_state.equal_hl(
+                self.human_sim_state.hl_state))
+        print('ml human check bool', not self.env.human_state.equal_ml(self.human_sim_state.ml_state,
+                                               facing=True))
         # take high level step when the human has completed an interact
         if not self.env.human_state.equal_hl(
                 self.human_sim_state.hl_state
@@ -244,11 +249,12 @@ class HlQmdpPlanningAgent(Agent):
             self.human_sim_state.hl_state = self.env.human_state.hl_state
             self.next_human_hl_state, self.human_goal, self.human_action_object = self.hl_human_action
             self.human_ml_plan = self.mlp.compute_single_agent_astar_path(
-                self.human_sim_state.ml_state, self.human_goal)
+                self.env.human_state.ml_state, self.human_goal)
 
             # if self.human_ml_plan != []:
             #     self.human_ml_plan.append((self.human_goal,'I'))
             self.ml_human_action = None
+        print('In hl_human_action:', self.hl_human_action)
         return self.hl_human_action
 
     def ml_human_step(self):
@@ -260,6 +266,8 @@ class HlQmdpPlanningAgent(Agent):
             self.human_sim_state.ml_state = self.env.human_state.ml_state
             if self.robot_delay:
                 self.robot_delay = False
+        print('In ml_human_action:', self.ml_human_action)
+        
         return self.ml_human_action
 
     def hl_robot_step(self):
@@ -284,6 +292,7 @@ class HlQmdpPlanningAgent(Agent):
             self.ml_robot_plan = plan
             self.take_ml_robot_step = True
             self.recalculate_ml_plan = False
+        print('In hl_robot_action:', self.hl_robot_action)
 
         return self.hl_robot_action
 
@@ -298,18 +307,20 @@ class HlQmdpPlanningAgent(Agent):
             self.take_ml_robot_step = False
 
             self.robot_delay = self.ml_robot_action[1] == 'D'
-            self.ig_robot.prepare_for_next_action(self.ml_robot_action[1])
+            
+            self.ig_robot.prepare_for_next_action(self.env.robot_state.ml_state, self.ml_robot_action[1])
 
             # log every ml step
             self.log_state()
-
+        print('In ml_robot_step:', self.ml_robot_action)
         return self.ml_robot_action
 
     def ll_step(self):
+        print('in ll_step')
         init_action = np.zeros(self.env.nav_env.action_space.shape)
         self.ig_robot.object.apply_action(init_action)
         # self._reset_arm_position(self.ig_robot)
-
+        print(self.robot_delay)
         if self.robot_delay:
             return
 
@@ -323,7 +334,13 @@ class HlQmdpPlanningAgent(Agent):
                 num_item_needed_in_dish=self.mdp_planner.mdp.num_items_for_soup
             )
         else:
-            self.ig_robot.agent_move_one_step(self.env.nav_env, ml_action)
+            # low level collision avoidance
+            h_x, h_y, h_z = self.env.ig_human.object.get_position()
+            r_x, r_y, _ = self.env.ig_robot.object.get_position()
+            collision_radius = 0.5
+            if math.dist([h_x, h_y], [r_x, r_y]) > collision_radius:
+                self.ig_robot.agent_move_one_step(self.env.nav_env, ml_action)
+
             self._reset_arm_position(self.ig_robot)
 
             if self.ig_robot.action_completed(ml_action) or ml_action == 'D':
@@ -455,7 +472,7 @@ class HlQmdpPlanningAgent(Agent):
                 self.robot_goal,
                 self.human_plan,
                 self.human_goal,
-                radius=2)
+                radius=1)
 
             print(
                 f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}'

@@ -117,13 +117,19 @@ class HumanAgent():
                 self.stuck_time = None
                 self._arrival_step()
                 self.interacting = True
-            self.lsi_env.update_joint_ml_state()
+        self.lsi_env.update_joint_ml_state()
 
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
         x, y, z = self.human.get_position()
         robot_x, robot_y, _ = self.robot.get_position()
-        if math.dist([x, y], [robot_x, robot_y]) < 0.8 and self.avoiding_start_time is None:
+
+        # check if holding bowl collision radius is larger
+        collision_radius = 0.8
+        if self.tracking_env.is_human_holding_bowl():
+            collision_radius = 1.05
+
+        if math.dist([x, y], [robot_x, robot_y]) < collision_radius and self.avoiding_start_time is None:
             self.avoiding_start_time = datetime.now()
         if math.dist([x, y], [robot_x, robot_y]) > 1.2:
             self.avoiding_start_time = None
@@ -168,9 +174,13 @@ class HumanAgent():
             # self.igibson_env.simulator.import_object(marker_2)
             # marker_2.set_position(self.object_position)
             is_holding_onion = self.tracking_env.is_obj_in_human_hand(self.target_object)
-            done = self.pick(self.object_position, [0, 0, 0.05]) and is_holding_onion
+            done = self.pick(self.object_position, [0, 0, 0.05])
+
             if done:
-                self.completed_goal(next_hl_state, action_object)
+                if is_holding_onion:
+                    self.completed_goal(next_hl_state, action_object)
+                else:
+                    self.object_position = None
         elif action == "drop" and object == "onion":
             if self.object_position is None:
                 self.object_position = self.tracking_env.get_closest_pan(

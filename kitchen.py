@@ -348,6 +348,8 @@ class Kitchen():
                         # return_str += "{} {} {}\n".format("vidalia_onion", x, y)
                     if name == "pan":
                         return_str += "{} {} {}\n".format("stove", x, y)
+                    if name == "stove":
+                        return_str += "{} {} {}\n".format("pan", x, y)
                         # return_str += "{} {} {}\n".format("vidalia_onion", x, y)
 
                     return_str += "{} {} {}\n".format(name, x, y)

@@ -136,3 +136,5 @@ dmypy.json
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+lsi_3d/test_logs/

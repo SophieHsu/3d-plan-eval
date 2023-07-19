@@ -262,6 +262,7 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
         robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
+        print('main_loop step')
         count += 1
 
         if check_completion(lsi_env, start_time, kitchen):
