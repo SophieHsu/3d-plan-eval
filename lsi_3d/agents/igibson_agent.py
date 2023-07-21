@@ -331,7 +331,7 @@ class iGibsonAgent:
         elif action == "drop" and object == "onion":
             # if self.object_position is None:
             self.object_position = tracking_env.get_closest_pan(
-                agent_pos=self.object.get_eef_position()).get_position()
+                agent_pos=self.object.get_position()).get_position()
             # self.object_position = self.object.get_eef_position()
             done, in_hand = self.drop(
                 self.object_position,
@@ -391,7 +391,7 @@ class iGibsonAgent:
             
             if self.object_position is None:
                 pan = tracking_env.get_closest_pan(
-                    agent_pos=self.object.get_eef_position())
+                    agent_pos=self.object.get_position())
                 tracking_env.kitchen.interact_objs[pan] = True
                 self.interact_obj = pan
                 self.object_position = pan.get_position()
@@ -400,13 +400,13 @@ class iGibsonAgent:
                     self.object_position,
                     tracking_env,
                     tracking_env.get_closest_pan(
-                        agent_pos=self.object.get_eef_position()),
+                        agent_pos=self.object.get_position()),
                     name='soup',
                     offset=[-0.6, 0, 0.2])
                 if done or in_hand:
                     self.interact_step_index = 1
                     self.object_position = tracking_env.get_closest_onion(
-                        agent_pos=self.object.get_eef_position(),
+                        agent_pos=self.object.get_position(),
                         on_pan=True).get_position()
                     self.item_in_bowl = 0
 
@@ -416,20 +416,20 @@ class iGibsonAgent:
                     self.object_position,
                     tracking_env,
                     tracking_env.get_closest_onion(
-                        agent_pos=self.object.get_eef_position()),
+                        agent_pos=self.object.get_position()),
                     name='soup',
                     offset=[0, -0.05, 0.05 + HEIGHT_OFFSET])
                 if done or in_hand:
                     self.interact_step_index = self.interact_step_index = 2
                     self.object_position = tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_eef_position()).get_position(
+                        agent_pos=self.object.get_position()).get_position(
                         )
             elif self.interact_step_index == 2:
                 done, in_hand = self.drop(
                     self.object_position,
                     tracking_env,
                     tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_eef_position()),
+                        agent_pos=self.object.get_position()),
                     name='soup',
                     offset=[0, -0.1, HEIGHT_OFFSET])
                 if done or in_hand:
@@ -437,7 +437,7 @@ class iGibsonAgent:
                     if self.item_in_bowl < num_item_needed_in_dish:
                         self.interact_step_index = self.interact_step_index = 1
                         self.object_position = tracking_env.get_closest_onion(
-                            agent_pos=self.object.get_eef_position(),
+                            agent_pos=self.object.get_position(),
                             on_pan=True).get_position()
                     else:
                         self.interact_step_index = self.interact_step_index = 3

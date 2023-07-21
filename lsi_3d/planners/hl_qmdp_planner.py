@@ -663,7 +663,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             new_human_pos[0], new_human_pos[1],
             new_world_state.players[1].ml_state[2])
 
-        total_cost = max([agent_cost, human_cost])  # in rss paper is max
+        total_cost = min([agent_cost, human_cost])  # in rss paper is max
         # f AI_WAIT or HUMAN_WAIT: # if wait, then cost is sum of current tasks cost and one player's next task cost (est. as half map area length)
         #     total_cost = agent_cost + human_cost + ((self.mdp.width-1)+(self.mdp.height-1))/2
 

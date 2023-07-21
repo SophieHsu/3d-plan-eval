@@ -189,7 +189,7 @@ def agent1_end_achieved_agent2_within_r(grid, end1, end2, goal1, goal2, gf2, rad
 
 
 
-def single_agent_astar(grid, start_state, end_state):
+def single_agent_astar(grid, start_state, end_state, end_facing = None):
     ex1, ey1 = end_state
     if grid[ex1][ey1] == 'X':
         print('Warning: End goal is open space so agent may spin in place')
@@ -207,7 +207,7 @@ def single_agent_astar(grid, start_state, end_state):
     while queue and not break_all:
         _, cur_g, cur_state = heappop(queue)
         cx1, cy1, cf1 = cur_state
-        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1):
+        if end_achieved(grid, cx1, cy1, ex1, ey1, cf1, ef=end_facing):
             last_state = cur_state
             break_all = True
             break
@@ -230,7 +230,7 @@ def single_agent_astar(grid, start_state, end_state):
                     
             # placed this inside conditional (valid) becuase invalid position was getting
             # pushed onto heap
-            if valid_one(grid, nx1, ny1) and end_achieved(grid, nx1, ny1, ex1, ey1, cf1):
+            if valid_one(grid, nx1, ny1) and end_achieved(grid, nx1, ny1, ex1, ey1, cf1, ef=end_facing):
                 path_prev[new_state] = (cur_state, action1)
                 heappush(queue, (cur_g+cost1+0, cur_g+cost1, new_state)) # heuristic=0
 

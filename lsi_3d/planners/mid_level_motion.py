@@ -44,6 +44,13 @@ class AStarMotionPlanner(object):
 
         if len(starts) == 1:
             return self.compute_single_agent_astar_path(starts[0], goals[0])
+        elif avoid_path == []:
+            path = self.compute_single_agent_astar_path(starts[1], goals[1][0:2], end_facing=goals[1][2])
+            if len(path) > 0:
+                path.append((path[-1][0], 'I'))
+            else:
+                path.append((None, 'I'))
+            return path
             
         r1,c1,d1 = starts[0]
         r2,c2,d2 = starts[1]
@@ -52,15 +59,15 @@ class AStarMotionPlanner(object):
 
         #goals = convert_mla_state_to_string(goals)
 
-        return run_astar_two_agent(self.map, starts, goals, avoid_path, radius)
+        return run_astar_two_agent(self.map, starts, goals, avoid_path, radius)[1]
 
-    def compute_single_agent_astar_path(self, start, goal):
+    def compute_single_agent_astar_path(self, start, goal, end_facing=None):
         if len(start) == 2:
             x,y = start
             start = x,y,'N'
 
         r1,c1,d1 = start
-        return single_agent_astar(self.map, (r1,c1,d1), goal)
+        return single_agent_astar(self.map, (r1,c1,d1), goal, end_facing=end_facing)
 
     def min_cost_to_feature(self, start, feature_locations):
         """Finds shortest distance to all features
