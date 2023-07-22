@@ -120,10 +120,10 @@ class iGibsonAgent:
 
     def prepare_for_next_action(self, current_pos, next_action):
         r, c, f = current_pos
-        x, y = grid_to_real_coord((r,c))
+        x, y = grid_to_real_coord((r, c))
         if self.target_x == None or self.target_y == None:
             # x, y, z = self.object.get_position()
-            
+
             self.target_x = x
             self.target_y = y
 
@@ -344,18 +344,32 @@ class iGibsonAgent:
                 self.interact_step_index = -1
                 self.object_position = None
 
+        # elif action == "drop" and object == "dish":
+        #     # if self.object_position is None:
+        #     self.object_position = tracking_env.get_closest_pan(
+        #         agent_pos=self.object.get_eef_position()).get_position()
+        #     # self.object_position = self.object.get_eef_position()
+        #     done, in_hand = self.drop(
+        #         self.object_position,
+        #         tracking_env,
+        #         tracking_env.get_closest_pan(
+        #             agent_pos=self.object.get_eef_position()),
+        #         name='dish',
+        #         offset=[-0.4, -0.25, 0.3 + HEIGHT_OFFSET])
+        #     if done or in_hand:
+        #         self.interact_step_index = -1
+        #         self.object_position = None
+
         elif action == "drop" and object == "dish":
-            # if self.object_position is None:
-            self.object_position = tracking_env.get_closest_pan(
-                agent_pos=self.object.get_eef_position()).get_position()
-            # self.object_position = self.object.get_eef_position()
+            if self.object_position is None:
+                self.object_position = self.object.get_position()
             done, in_hand = self.drop(
                 self.object_position,
                 tracking_env,
-                tracking_env.get_closest_pan(
+                tracking_env.get_closest_bowl(
                     agent_pos=self.object.get_eef_position()),
                 name='dish',
-                offset=[-0.4, -0.25, 0.3 + HEIGHT_OFFSET])
+                offset=[0, 1, 1.2 + HEIGHT_OFFSET])
             if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
@@ -388,7 +402,7 @@ class iGibsonAgent:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "pickup" and object == "soup":
-            
+
             if self.object_position is None:
                 pan = tracking_env.get_closest_pan(
                     agent_pos=self.object.get_position())
@@ -422,8 +436,7 @@ class iGibsonAgent:
                 if done or in_hand:
                     self.interact_step_index = self.interact_step_index = 2
                     self.object_position = tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_position()).get_position(
-                        )
+                        agent_pos=self.object.get_position()).get_position()
             elif self.interact_step_index == 2:
                 done, in_hand = self.drop(
                     self.object_position,
