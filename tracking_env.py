@@ -51,6 +51,27 @@ class TrackingEnv():
             data[p] = onions
         return data
     
+    def get_empty_counters(self):
+        empty_counters = []
+        for c in self.kitchen.counters:
+            is_empty = True
+            for o in self.kitchen.onions:
+                if o.states[object_states.OnTop].get_value(c):
+                    is_empty = False
+            
+            for b in self.kitchen.bowls:
+                if b.states[object_states.OnTop].get_value(c):
+                    is_empty = False
+
+            if is_empty: empty_counters.append(c)
+
+        return empty_counters
+
+    def dist_sort(self, objects, agent_pos):
+        # agent pos is real coordinate
+        sorted_positions = sorted(objects, key=lambda object: self.distance_to_bowl(object, agent_pos))
+        return sorted_positions
+    
     def get_pan_enum_status(self, pan):
         status = self.get_pan_status()
         onions_in_pan = len(status[pan])
@@ -145,7 +166,8 @@ class TrackingEnv():
     #         position = agent_pos
 
     def distance_to_bowl(self, bowl, position):
-        bowl_position = bowl.get_position()
+        bowl_position = bowl.get_position()[0:2]
+        position = position[0:2]
         return math.dist(bowl_position, position)
 
     def get_bowls_dist_sort(self, is_human=None):

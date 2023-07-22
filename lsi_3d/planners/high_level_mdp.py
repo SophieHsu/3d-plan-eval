@@ -315,9 +315,9 @@ class HighLevelMdpPlanner(object):
 
         return location
 
-    def get_mdp_key_from_state(self, world_state, robot_state, human_state):
-        key = f"{robot_state.holding}_{world_state.in_pot}"
-        for order in world_state.orders:
+    def get_mdp_key_from_state(self, env):
+        key = f"{env.robot_state.holding}_{env.world_state.in_pot}"
+        for order in env.world_state.orders:
             key += f'_{order}'
 
         return key

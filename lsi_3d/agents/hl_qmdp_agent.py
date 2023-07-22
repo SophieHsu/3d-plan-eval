@@ -39,20 +39,6 @@ class HlQmdpPlanningAgent(Agent):
                               dtype=float)
         self.prev_dist_to_feature = {}
 
-        # # Step function state vars
-        # self.a_h = None
-        # self.a_r = None
-        # self.next_human_hl_state = None
-        # self.human_plan = None
-        # self.human_goal = None
-        # self.human_action_object_pair = None
-        # self.human = None
-        # self.next_robot_hl_state = None
-        # self.robot_goal = None
-        # self.robot_action_object_pair = None
-        # self.robot = None
-        # self.idle_last_ml_location = None
-
         self.human_sim_state = AgentState(None, env.human_state.ml_state)
 
         # for new step function
@@ -132,18 +118,16 @@ class HlQmdpPlanningAgent(Agent):
         return (row,col, card_facing)
 
 
-    def action(self, world_state, robot_state, human_sim_state=None):
+    def action(self):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
 
-        robot_state_str = self.mdp_planner.get_mdp_key_from_state(
-            world_state, robot_state, human_sim_state)
+        robot_state_str = self.mdp_planner.get_mdp_key_from_state(self.env)
         human_holding = self.env.human_state.holding
 
         # update the belief in a state by the result of observations
         # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(state, state.players[0], num_item_in_pot, state.players[1], self.belief, self.prev_dist_to_feature, greedy=self.greedy_known)
         self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(
-            self.env.world_state, self.env.human_state, self.env.robot_state,
-            self.belief, self.prev_dist_to_feature)
+            self.env, self.belief, self.prev_dist_to_feature)
         print('belief: ', self.belief)
         print('prev_dist_to_feature ', self.prev_dist_to_feature)
         # map abstract to low-level state
@@ -152,7 +136,7 @@ class HlQmdpPlanningAgent(Agent):
             self.belief)
         # compute in low-level the action and cost
         action_idx, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(
-            self.env.world_state, mdp_state_keys, self.belief, 1)
+            self.env, mdp_state_keys, self.belief, 1)
 
         # TODO: state string is used for updating robot state, so pickup onion gets discarded, proper environment update will remove this code
         # state_str = f'{robot_state_str}_{human_holding}_pickup_onion'
@@ -176,7 +160,7 @@ class HlQmdpPlanningAgent(Agent):
             action_idx)]]
 
         # map back the medium level action to low level action
-        goal = self.env.map_action_to_location(action_object_pair, robot_state.ml_state[0:2])
+        goal = self.env.map_action_to_location(action_object_pair, self.env.robot_state.ml_state[0:2])
 
         # if goal is not None:
         #     goal = self.transform_end_location(goal)
@@ -266,9 +250,7 @@ class HlQmdpPlanningAgent(Agent):
     def hl_robot_step(self):
         # condition set during low level step
         if self.take_hl_robot_step:
-            self.hl_robot_action = self.action(self.env.world_state,
-                                               self.env.robot_state,
-                                               self.human_sim_state)
+            self.hl_robot_action = self.action()
             self.next_robot_hl_state, self.robot_goal, self.robot_action_object = self.hl_robot_action
             self.take_hl_robot_step = False
             self.recalculate_ml_plan = True
@@ -398,140 +380,6 @@ class HlQmdpPlanningAgent(Agent):
         self.ml_robot_action = self.ml_robot_step()
         self.stuck_handler()
         self.ll_step()
-
-    def step_old(self):
-        hl_robot_agent = self
-        init_action = np.zeros(self.env.nav_env.action_space.shape)
-        self.ig_robot.object.apply_action(init_action)
-
-        # update the belief in a state by the result of observations
-        # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(state, state.players[0], num_item_in_pot, state.players[1], self.belief, self.prev_dist_to_feature, greedy=self.greedy_known)
-        # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(self.env.world_state, self.env.human_state, self.env.robot_state, self.belief, self.prev_dist_to_feature)
-        # # map abstract to low-level state
-        # mdp_state_keys = self.mdp_planner.world_to_state_keys(self.env.world_state, self.env.robot_state, self.env.human_state, self.belief)
-        # # compute in low-level the action and cost
-        # action, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(self.env.world_state, mdp_state_keys, self.belief, 1)
-
-        if not self.env.human_state.equal_hl(self.human_sim_state.hl_state):
-            '''
-            human gets high level action and plans path to it. when human finishes path
-            it will re-enter this state
-            '''
-            self.next_human_hl_state, self.human_goal, self.human_action_object_pair = self.hl_human_agent.action(
-                self.env.world_state, self.env.human_state,
-                self.env.robot_state)
-            self.human_plan = self.mlp.compute_single_agent_astar_path(
-                self.env.human_state.ml_state, self.human_goal)
-            print(
-                f'Executing Human High Level Action: {self.human_action_object_pair[0]} {self.human_action_object_pair[1]}'
-            )
-            print(f'Path is: {self.human_plan}')
-            print(f'Human Holding {self.human_sim_state.holding}')
-            print(
-                f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}',
-            )
-            #human_plan.append('I')
-            if len(self.human_plan) > 0:
-                self.human = FixedMediumPlan(self.human_plan)
-                self.human_sim_state.mode = Mode.EXEC_ML_PATH
-                self.human_sim_state.hl_state = self.env.human_state.hl_state
-                pos_h, self.a_h = self.human.action()
-            # self.ig_human.prepare_for_next_action(self.a_h)
-
-        if not self.env.human_state.equal_ml(self.human_sim_state.ml_state):
-            self.human_sim_state.ml_state = self.env.human_state.ml_state
-            self.human_plan = self.mlp.compute_single_agent_astar_path(
-                self.env.human_state.ml_state, self.human_goal)
-            self.human = FixedMediumPlan(self.human_plan)
-            pos_h, self.a_h = self.human.action()
-
-            if self.env.robot_state.mode == Mode.IDLE:
-                self.env.robot_state.mode == Mode.CALC_HL_PATH
-
-        if self.env.robot_state.mode == Mode.CALC_HL_PATH:
-            '''
-            robot gets high level action and translates into mid-level path
-            when robot completes this path, it returns to this state
-            '''
-
-            self.next_robot_hl_state, self.robot_goal, self.robot_action_object_pair = hl_robot_agent.action(
-                self.env.world_state, self.env.robot_state,
-                self.human_sim_state)
-            # optimal_plan = hl_robot_agent.optimal_motion_plan(self.env.robot_state, self.robot_goal)
-            self.ml_plan = hl_robot_agent.avoidance_motion_plan(
-                (self.human_sim_state.ml_state, self.env.robot_state.ml_state),
-                self.robot_goal,
-                self.human_plan,
-                self.human_goal,
-                radius=1)
-
-            print(
-                f'Executing ROBOT High Level Action: {self.robot_action_object_pair[0]} {self.robot_action_object_pair[1]}'
-            )
-            print(f'Human Holding {self.env.robot_state.holding}')
-            print(
-                f'Current HL State: Onions in Pot = {self.env.world_state.in_pot}, Orders = {self.env.world_state.orders}'
-            )
-
-            # self.optimal_plan_goal = optimal_plan[len(optimal_plan)-1]
-
-            if self.infront_of_goal(self.env.robot_state.ml_state,
-                                    self.robot_goal):
-                # could not find path to goal, so idle 1 step and then recalculate
-                self.ml_plan.append((self.robot_goal, 'I'))
-
-            self.robot_plan = FixedMediumPlan(self.ml_plan)
-            self.env.robot_state.mode = Mode.EXEC_ML_PATH
-            self.a_r = None
-
-            self.env.robot_state.mode = Mode.EXEC_ML_PATH
-
-        if self.env.robot_state.mode == Mode.EXEC_ML_PATH:
-
-            self.ig_robot.agent_move_one_step(self.env.nav_env, self.a_r)
-
-            if self.ig_robot.action_completed(self.a_r) or self.a_r == 'D':
-                self.env.update_joint_ml_state()
-                if (
-                        self.robot_plan.i == len(self.robot_plan.plan)
-                        or self.robot_plan.i == 1 or
-                    (self.robot_plan.i % self.recalc_res) == 0
-                ) and self.a_r != None:  #recalc_res: #or a_r == MLAction.STAY:
-                    self.env.robot_state.mode = Mode.CALC_HL_PATH
-                else:
-                    pos_r, self.a_r = self.robot_plan.action()
-
-                    self.env.update_joint_ml_state()
-                    self.ig_robot.prepare_for_next_action(self.a_r)
-
-                    self._reset_arm_position(self.ig_robot)
-
-                    if self.a_r == 'D' and self.env.robot_state.mode != Mode.IDLE:
-                        self.idle_last_ml_location = self.env.human_state.ml_state
-                        self.env.robot_state.mode = Mode.IDLE
-
-                    if self.a_r == 'I':  #and env.robot_state == robot_goal:
-                        self.env.robot_state.mode = Mode.INTERACT
-
-                    if self.human_sim_state.mode == Mode.IDLE:
-                        self.env.human_sim_state.mode = Mode.EXEC_ML_PATH
-
-        if self.env.robot_state.mode == Mode.IDLE:
-            h_x, h_y, h_f = self.env.human_state.ml_state
-            r_x, r_y, r_f = self.env.robot_state.ml_state
-            if (h_x, h_y) != (r_x, r_y):
-                self.env.robot_state.mode = Mode.CALC_HL_PATH
-        self.env.nav_env.simulator.step()
-
-        if self.env.robot_state.mode == Mode.INTERACT:
-
-            self.env.update_robot_hl_state(self.next_robot_hl_state,
-                                           self.robot_action_object_pair)
-            self.env.robot_state.mode = Mode.CALC_HL_PATH
-
-        if not self.env.world_state.orders:
-            print('orders complete')
-            exit()
 
     def _get_human_sub_path(self, path, current_index, human_ml_state):
         sub_path = []

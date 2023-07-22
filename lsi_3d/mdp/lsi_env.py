@@ -182,6 +182,8 @@ class LsiEnv(object):
         return (row, col, card_facing)
     
     def sort_locations(self, locations, agent_location):
+        if len(agent_location) == 3:
+            agent_location = agent_location[0:2]
         # euclidean distance may not work for more complicated maps
         return sorted(locations, key=lambda location: math.dist(location[0:2], agent_location))
 
@@ -236,7 +238,7 @@ class LsiEnv(object):
                 open_serving_locations += find_nearby_open_spaces(self.kitchen.grid, serving_loc)
 
             sorted_serv_locations = self.sort_locations(open_serving_locations, agent_location)
-            return sorted_serv_locations[0]
+            return sorted_serv_locations[0] if len(sorted_serv_locations) > 0 else None
         elif action == "pickup" and object == "soup":
             # gets pan closest to done
             for pan in self.kitchen.pans:
@@ -245,6 +247,11 @@ class LsiEnv(object):
                 if total_onions >= self.mdp.num_items_for_soup:
                     location = pan.get_position()
                     break
+        elif action == "drop" and object == "dish":
+            empty_counters = self.tracking_env.get_empty_counters()
+            sorted_counters = self.tracking_env.dist_sort(empty_counters, grid_to_real_coord(agent_location))
+            closest_empty_counter = sorted_counters[0]
+            location = closest_empty_counter.get_position()
 
         if location is not None:
             arrival_loc = real_to_grid_coord(location)

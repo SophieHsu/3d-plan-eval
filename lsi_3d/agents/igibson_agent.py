@@ -416,7 +416,7 @@ class iGibsonAgent:
                     self.object_position,
                     tracking_env,
                     tracking_env.get_closest_onion(
-                        agent_pos=self.object.get_position()),
+                        agent_pos=self.object.get_position(), on_pan=True),
                     name='soup',
                     offset=[0, -0.05, 0.05 + HEIGHT_OFFSET])
                 if done or in_hand:

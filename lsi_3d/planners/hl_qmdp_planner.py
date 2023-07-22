@@ -4,6 +4,7 @@ import time
 
 import numpy as np
 from lsi_3d.mdp.action import Action
+from lsi_3d.mdp.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.mdp.hl_state import AgentState, WorldState
@@ -605,37 +606,54 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
     def mdp_action_state_to_world_state(self,
                                         action_idx,
                                         ori_state_idx,
-                                        ori_world_state,
+                                        env:LsiEnv,
                                         with_argmin=False):
+        ori_world_state = env.world_state
         new_world_state = copy.deepcopy(ori_world_state)
         ori_mdp_state_key = self.get_key_from_value(self.state_idx_dict,
                                                     ori_state_idx)
         mdp_state_obj = self.state_dict[ori_mdp_state_key]
         action = self.get_key_from_value(self.action_idx_dict, action_idx)
 
-        possible_agent_motion_goals = self.map_action_to_location(
-            ori_world_state,
-            ori_mdp_state_key,
+        agent_motion_goal = env.map_action_to_location(
             self.action_dict[action],
-            p0_obj=mdp_state_obj[0]
+            env.robot_state.ml_state
         )  # [0], self.action_dict[action][1])# , player_idx=0)
-        possible_human_motion_goals = self.map_action_to_location(
-            ori_world_state,
-            ori_mdp_state_key,
+        human_motion_goal = env.map_action_to_location(
             self.action_dict[mdp_state_obj[-1]],
-            p0_obj=mdp_state_obj[-2]
-        )  #, player_idx=1) # get next world state from human subtask info (aka. mdp action translate into medium level goal position)
+            env.human_state.ml_state
+        )
+
+        # possible_agent_motion_goals = self.map_action_to_location(
+        #     ori_world_state,
+        #     ori_mdp_state_key,
+        #     self.action_dict[action],
+        #     p0_obj=mdp_state_obj[0]
+        # )  # [0], self.action_dict[action][1])# , player_idx=0)
+        # possible_human_motion_goals = self.map_action_to_location(
+        #     ori_world_state,
+        #     ori_mdp_state_key,
+        #     self.action_dict[mdp_state_obj[-1]],
+        #     p0_obj=mdp_state_obj[-2]
+        # )  #, player_idx=1) # get next world state from human subtask info (aka. mdp action translate into medium level goal position)
 
         # get next position for AI agent
         # agent_cost, agent_feature_pos = self.mp.min_cost_to_feature(ori_world_state.players[0].pos_and_or, possible_agent_motion_goals, with_motion_goal=True) # select the feature position that is closest to current player's position in world state
-        agent_cost, agent_feature_pos = self.mlp.min_cost_to_feature(
-            ori_world_state.players[0].ml_state, possible_agent_motion_goals)
-        new_agent_pos = agent_feature_pos if agent_feature_pos is not None else new_world_state.players[
-            0].get_pos_and_or()
-        human_cost, human_feature_pos = self.mlp.min_cost_to_feature(
-            ori_world_state.players[1].ml_state, possible_human_motion_goals)
-        new_human_pos = human_feature_pos if human_feature_pos is not None else new_world_state.players[
-            1].get_pos_and_or()
+        new_agent_pos = agent_motion_goal if agent_motion_goal is not None else env.robot_state.ml_state
+        agent_cost = len(self.mlp.compute_single_agent_astar_path(env.robot_state.ml_state, new_agent_pos[0:2], end_facing=new_agent_pos[2]))
+
+        new_human_pos = human_motion_goal if human_motion_goal is not None else env.human_state.ml_state
+        human_cost = len(self.mlp.compute_single_agent_astar_path(env.human_state.ml_state, new_human_pos[0:2], end_facing=new_human_pos[2]))
+
+        
+        # agent_cost, agent_feature_pos = self.mlp.min_cost_to_feature(
+        #     ori_world_state.players[0].ml_state, possible_agent_motion_goals)
+        # new_agent_pos = agent_feature_pos if agent_feature_pos is not None else new_world_state.players[
+        #     0].get_pos_and_or()
+        # human_cost, human_feature_pos = self.mlp.min_cost_to_feature(
+        #     ori_world_state.players[1].ml_state, possible_human_motion_goals)
+        # new_human_pos = human_feature_pos if human_feature_pos is not None else new_world_state.players[
+        #     1].get_pos_and_or()
         # print(new_agent_pos, new_human_pos)
 
         # TODO: update this
@@ -742,7 +760,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         return f'{action_obj[0]}_{action_obj[1]}'
 
     def step(self,
-             world_state,
+             env,
              mdp_state_keys,
              belief,
              agent_idx,
@@ -785,7 +803,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                     after_action_world_state, cost, goals_pos = self.mdp_action_state_to_world_state(
                         action_idx,
                         mdp_state_idx,
-                        world_state,
+                        env,
                         with_argmin=True)
 
                     # calculate value cost from astar rollout of policy
@@ -847,9 +865,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             self.action_idx_dict, action_idx)], low_level_action
 
     def belief_update(self,
-                      world_state,
-                      human_state,
-                      robot_state,
+                      env:LsiEnv,
                       belief_vector,
                       prev_dist_to_feature,
                       greedy=False):
@@ -866,8 +882,8 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
 
         distance_trans_belief = np.zeros(
             (len(belief_vector), len(belief_vector)), dtype=float)
-        human_pos_and_or = human_state.ml_state
-        agent_pos_and_or = robot_state.ml_state
+        human_pos_and_or = env.human_state.ml_state
+        agent_pos_and_or = env.robot_state.ml_state
 
         subtask_key = np.array([
             self.get_key_from_value(self.subtask_idx_dict, i)
@@ -875,26 +891,28 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         ])
 
         # get next position for human
-        human_obj = human_state.holding if human_state.holding is not None else 'None'
+        human_obj = env.human_state.holding if env.human_state.holding is not None else 'None'
         game_logic_prob = np.zeros((len(belief_vector)), dtype=float)
         dist_belief_prob = np.zeros((len(belief_vector)), dtype=float)
         for i, belief in enumerate(belief_vector):
             ## estimating next subtask based on game logic
             game_logic_prob[i] = self._is_valid_object_subtask_pair(
-                human_obj, subtask_key[i], world_state.in_pot,
+                human_obj, subtask_key[i], env.world_state.in_pot,
                 greedy=greedy) * 1.0
 
             if game_logic_prob[i] < 0.00001:
                 continue
 
             ## tune subtask estimation based on current human's position and action (use minimum distance between features)
-            possible_motion_goals = self.map_action_to_location(
-                world_state, human_state, self.subtask_dict[subtask_key[i]],
-                human_state.holding)
+            motion_goal = env.map_action_to_location(
+                self.subtask_dict[subtask_key[i]],
+                env.human_state.ml_state)
             # get next world state from human subtask info (aka. mdp action translate into medium level goal position)
-            human_dist_cost, feature_pos = self.mlp.min_cost_to_feature(
-                human_pos_and_or, possible_motion_goals
-            )  # select the feature position that is closest to current player's position in world state
+            feature_pos = motion_goal if motion_goal is not None else env.human_state.ml_state
+            human_dist_cost = len(self.mlp.compute_single_agent_astar_path(env.human_state.ml_state, feature_pos[0:2], end_facing=feature_pos[2]))
+            # human_dist_cost, feature_pos = self.mlp.min_cost_to_feature(
+            #     human_pos_and_or, motion_goal
+            # )  # select the feature position that is closest to current player's position in world state
 
             if str(feature_pos) not in prev_dist_to_feature:
                 prev_dist_to_feature[str(feature_pos)] = human_dist_cost
@@ -906,10 +924,6 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             # update distance to feature
             prev_dist_to_feature[str(feature_pos)] = human_dist_cost
 
-        # print('dist_belief_prob =', dist_belief_prob)
-        # print('prev_dist_to_feature =', prev_dist_to_feature)
-        # print('human_dist_cost =', human_dist_cost)
-
         game_logic_prob /= game_logic_prob.sum()
         dist_belief_prob /= dist_belief_prob.sum()
 
@@ -920,7 +934,6 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         new_belief = new_belief * 0.7 * dist_belief_prob * 0.3
 
         new_belief /= new_belief.sum()
-        # print("It took {} seconds for belief update".format(time.time() - start_time))
 
         return new_belief, prev_dist_to_feature
 
