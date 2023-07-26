@@ -50,12 +50,6 @@ class MotionControllerHuman():
                 x_diff = next_loc[0] - x
                 y_diff = next_loc[1] - y
                 self.rotate_angle = math.atan2(y_diff, x_diff)
-
-            print("*******")
-            print(f"is new end: {is_new_end}")
-            print(f"next location: {next_loc}")
-            print(f'x,y: {x},{y}')
-            print(f"rotate angle: {self.rotate_angle}")
             
 
             # epsilon = 0.1
@@ -68,10 +62,9 @@ class MotionControllerHuman():
                 if vel[0] == 0 and vel[1] == 0:
                     self.rotate = False
 
-                print(f'velocity: {vel}')
-                print(f'theta: {theta}')
-                print(f'rotate: {self.rotate}')
-            print("*******")
+                # print(f'velocity: {vel}')
+                # print(f'theta: {theta}')
+                # print(f'rotate: {self.rotate}')
 
             
 

@@ -392,6 +392,7 @@ def astar_avoid_path_forward_radius(grid, start_state, ex1, ey1, ex2, ey2, avoid
     avoid_path_queue = avoid_path
     # if grid[ex1][ey1] == 'X' or grid[ex2][ey2] == 'X':
     #    print('Warning: End goal is open space so agent may spin in place')
+    start_state = (*start_state[0], *start_state[1])
     
     actions = ["E", "W", "S", "N", "I", "F", "D"]
     visited = set()

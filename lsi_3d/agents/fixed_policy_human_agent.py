@@ -80,7 +80,7 @@ class FixedPolicyAgent(Agent):
             action,object = ('pickup','dish')
             next_hl_state = f'dish_{world_state.in_pot}'
             agent_state.next_holding = 'dish'
-        elif agent_state.holding == 'dish' and (world_state.in_pot == self.onions_for_soup or robot_state.holding == 'onion'):
+        elif agent_state.holding == 'dish' and (world_state.in_pot >= self.onions_for_soup-1 or robot_state.holding == 'onion'):
             action,object = ('pickup','soup')
             #world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'

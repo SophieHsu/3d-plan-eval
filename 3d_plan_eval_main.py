@@ -3,6 +3,8 @@ import argparse
 import random
 import time
 from igibson.envs.igibson_env import iGibsonEnv
+from igibson.scenes.empty_scene import EmptyScene
+from igibson.scenes.stadium_scene import StadiumScene
 from igibson.utils.motion_planning_wrapper import MotionPlanningWrapper
 from igibson.robots.behavior_robot import BehaviorRobot
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
@@ -40,7 +42,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-TIME_LIMIT_FAILURE = 600 # 10 mins
+TIME_LIMIT_FAILURE = 900 # 15 mins
 
 def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
     #TODO consolidate config files
@@ -101,6 +103,9 @@ def setup(args):
     #     igibson_env.simulator.viewer.initial_pos = [-0.3, -0.3, 1.1]
     #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
     #     igibson_env.simulator.viewer.reset_viewer()
+
+    scene = EmptyScene()
+    # igibson_env.simulator.import_scene(scene)
 
     kitchen = Kitchen(igibson_env)
 
@@ -262,12 +267,10 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
         robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
-        print('main_loop step')
         count += 1
 
         if check_completion(lsi_env, start_time, kitchen):
             break 
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

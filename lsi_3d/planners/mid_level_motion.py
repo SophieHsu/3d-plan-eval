@@ -44,18 +44,19 @@ class AStarMotionPlanner(object):
 
         if len(starts) == 1:
             return self.compute_single_agent_astar_path(starts[0], goals[0])
-        elif avoid_path == []:
-            path = self.compute_single_agent_astar_path(starts[1], goals[1][0:2], end_facing=goals[1][2])
-            if len(path) > 0:
-                path.append((path[-1][0], 'I'))
-            else:
-                path.append((None, 'I'))
-            return path
+        # elif avoid_path == []:
+        #     # path = self.compute_single_agent_astar_path(starts[1], goals[1][0:2], end_facing=goals[1][2])
+        #     # if len(path) > 0:
+        #     #     path.append((path[-1][0], 'I'))
+        #     # else:
+        #     #     path.append((None, 'I'))
+        #     # return path
+        #     return run_astar_two_agent(self.map, starts, goals, avoid_path, radius)[1]
             
-        r1,c1,d1 = starts[0]
-        r2,c2,d2 = starts[1]
-        #starts = (r1,c1,MLA.to_string(d1),r2,c2,MLA.to_string(d2))
-        starts = (r1,c1,d1,r2,c2,d2)
+        # r1,c1,d1 = starts[0]
+        # r2,c2,d2 = starts[1]
+        # #starts = (r1,c1,MLA.to_string(d1),r2,c2,MLA.to_string(d2))
+        # starts = (r1,c1,d1,r2,c2,d2)
 
         #goals = convert_mla_state_to_string(goals)
 

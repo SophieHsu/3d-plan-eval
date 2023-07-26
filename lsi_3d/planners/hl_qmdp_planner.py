@@ -690,9 +690,9 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
 
         return new_world_state, total_cost
 
-    def world_to_state_keys(self, world_state, player, other_player, belief):
+    def world_to_state_keys(self, world_state, player, other_player):
         mdp_state_keys = []
-        for i, b in enumerate(belief):
+        for i, b in enumerate(self.subtask_dict):
             mdp_state_key = self.world_state_to_mdp_state_key(
                 world_state, player, other_player,
                 self.get_key_from_value(self.subtask_idx_dict, i))
@@ -893,7 +893,8 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         # get next position for human
         human_obj = env.human_state.holding if env.human_state.holding is not None else 'None'
         game_logic_prob = np.zeros((len(belief_vector)), dtype=float)
-        dist_belief_prob = np.zeros((len(belief_vector)), dtype=float)
+        dist_belief_prob = np.full((len(belief_vector)), (self.mdp.height + self.mdp.width)/2, dtype=float)
+        
         for i, belief in enumerate(belief_vector):
             ## estimating next subtask based on game logic
             game_logic_prob[i] = self._is_valid_object_subtask_pair(
@@ -906,7 +907,8 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             ## tune subtask estimation based on current human's position and action (use minimum distance between features)
             motion_goal = env.map_action_to_location(
                 self.subtask_dict[subtask_key[i]],
-                env.human_state.ml_state)
+                env.human_state.ml_state,
+                is_human=True)
             # get next world state from human subtask info (aka. mdp action translate into medium level goal position)
             feature_pos = motion_goal if motion_goal is not None else env.human_state.ml_state
             human_dist_cost = len(self.mlp.compute_single_agent_astar_path(env.human_state.ml_state, feature_pos[0:2], end_facing=feature_pos[2]))
@@ -917,8 +919,7 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             if str(feature_pos) not in prev_dist_to_feature:
                 prev_dist_to_feature[str(feature_pos)] = human_dist_cost
 
-            dist_belief_prob[i] = (self.mdp.height + self.mdp.width) + (
-                prev_dist_to_feature[str(feature_pos)] - human_dist_cost)
+            dist_belief_prob[i] += prev_dist_to_feature[str(feature_pos)] - human_dist_cost
             # dist_belief_prob[i] = (self.mdp.height+self.mdp.width) - human_dist_cost if human_dist_cost < np.inf else (self.mdp.height + self.mdp.width)
 
             # update distance to feature
@@ -927,11 +928,11 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         game_logic_prob /= game_logic_prob.sum()
         dist_belief_prob /= dist_belief_prob.sum()
 
-        game_logic_prob[game_logic_prob == 0.0] = 0.000001
-        dist_belief_prob[dist_belief_prob == 0.0] = 0.000001
+        game_logic_prob[game_logic_prob < 0.000001] = 0.000001
+        dist_belief_prob[dist_belief_prob < 0.000001] = 0.000001
 
-        new_belief = belief * game_logic_prob
-        new_belief = new_belief * 0.7 * dist_belief_prob * 0.3
+        new_belief = belief_vector * game_logic_prob
+        new_belief = new_belief * 0.5 * dist_belief_prob * 0.5
 
         new_belief /= new_belief.sum()
 

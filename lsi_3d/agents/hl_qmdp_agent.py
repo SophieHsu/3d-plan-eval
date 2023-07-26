@@ -51,6 +51,7 @@ class HlQmdpPlanningAgent(Agent):
         self.robot_delay = False
         self.stuck_time = None
         self.stuck_ml_pos = None
+        self.prev_world_string = None
 
     def get_pot_status(self, state):
         pot_states = self.mdp_planner.mdp.get_pot_states(state)
@@ -123,7 +124,13 @@ class HlQmdpPlanningAgent(Agent):
 
         robot_state_str = self.mdp_planner.get_mdp_key_from_state(self.env)
         human_holding = self.env.human_state.holding
+        world_state_string =  robot_state_str + '_' + human_holding
 
+        if self.prev_world_string != world_state_string:
+            self.belief = np.full(len(self.belief), 1/len(self.belief))
+
+        mdp_state_keys = self.mdp_planner.world_to_state_keys(
+            self.env.world_state, self.env.robot_state, self.env.human_state)
         # update the belief in a state by the result of observations
         # self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(state, state.players[0], num_item_in_pot, state.players[1], self.belief, self.prev_dist_to_feature, greedy=self.greedy_known)
         self.belief, self.prev_dist_to_feature = self.mdp_planner.belief_update(
@@ -131,9 +138,7 @@ class HlQmdpPlanningAgent(Agent):
         print('belief: ', self.belief)
         print('prev_dist_to_feature ', self.prev_dist_to_feature)
         # map abstract to low-level state
-        mdp_state_keys = self.mdp_planner.world_to_state_keys(
-            self.env.world_state, self.env.robot_state, self.env.human_state,
-            self.belief)
+        
         # compute in low-level the action and cost
         action_idx, action_object_pair, LOW_LEVEL_ACTION = self.mdp_planner.step(
             self.env, mdp_state_keys, self.belief, 1)
@@ -164,7 +169,8 @@ class HlQmdpPlanningAgent(Agent):
 
         # if goal is not None:
         #     goal = self.transform_end_location(goal)
-
+        
+        self.prev_world_string = world_state_string
         return (next_state, goal, tuple(action_object_pair))
 
     def action_given_parter_current_action(self, world_state, agent_state,
@@ -273,12 +279,14 @@ class HlQmdpPlanningAgent(Agent):
     def ml_robot_step(self):
         if self.take_ml_robot_step:
             # if human is directly in front of robot then just wait
-            if self.ml_robot_action and self.env.human_state.ml_state[:2] == grid_transition(self.ml_robot_action[1],
-                                                 self.env.robot_state.ml_state)[0:2]:
-                self.ml_robot_plan = [(None, 'D')]
+            
 
             self.ml_robot_action = self.ml_robot_plan.pop(0)
             self.take_ml_robot_step = False
+            
+            if self.ml_robot_action and self.env.human_state.ml_state[:2] == grid_transition(self.ml_robot_action[1],
+                                                 self.env.robot_state.ml_state)[0:2]:
+                self.ml_robot_plan = [(None, 'D')]
 
             self.robot_delay = self.ml_robot_action[1] == 'D'
             
@@ -293,7 +301,6 @@ class HlQmdpPlanningAgent(Agent):
         init_action = np.zeros(self.env.nav_env.action_space.shape)
         self.ig_robot.object.apply_action(init_action)
         # self._reset_arm_position(self.ig_robot)
-        print(self.robot_delay)
         if self.robot_delay:
             return
 
@@ -310,7 +317,7 @@ class HlQmdpPlanningAgent(Agent):
             # low level collision avoidance
             h_x, h_y, h_z = self.env.ig_human.object.get_position()
             r_x, r_y, _ = self.env.ig_robot.object.get_position()
-            collision_radius = 0.6
+            collision_radius = 0.75
             if math.dist([h_x, h_y], [r_x, r_y]) > collision_radius:
                 self.ig_robot.agent_move_one_step(self.env.nav_env, ml_action)
 

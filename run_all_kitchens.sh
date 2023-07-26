@@ -18,7 +18,7 @@ cleanup() {
 
 trap 'cleanup' SIGINT
 
-for ((number=10; number<=60; number++))
+for ((number=30; number<=60; number++))
 do
     file_path="kitchen_layouts_grid_text/kitchen${number}.txt"
 
@@ -28,8 +28,8 @@ do
     fi
 
     # Run the Python command in the background and store the process ID
-    # python 3d_plan_eval_main.py -m "vr" -k "$file_path" &
-    python 3d_plan_eval_main.py -k "$file_path" &
+    python 3d_plan_eval_main.py -m "vr" -k "$file_path" &
+    # python 3d_plan_eval_main.py -k "$file_path" &
     python_pid=$!
 
     # Continuously monitor the process status

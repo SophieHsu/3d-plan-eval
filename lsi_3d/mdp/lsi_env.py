@@ -67,7 +67,18 @@ class LsiEnv(object):
                 order_list.pop()
                 
         self.world_state.orders = order_list
+
+        # update holding
+        if len(self.tracking_env.obj_in_robot_hand()) > 0:
+            self.robot_state.holding = self.tracking_env.obj_in_robot_hand()[0][0]
+        else:
+            self.robot_state.holding = 'None'
+
         return
+    
+    def update_human_world_state(self):
+        self.update_joint_ml_state()
+        self.human_state.holding = self.tracking_env.get_human_holding()
 
     def update_robot_hl_state(self, action_object):
         '''
@@ -116,12 +127,13 @@ class LsiEnv(object):
     def update_joint_ml_state(self):
         
         human_ml_state = self.get_ml_state(self.ig_human)
-        print('human ml state:', human_ml_state)
+        # print('human ml state:', human_ml_state)
         robot_ml_state = self.get_ml_state(self.ig_robot)
         # human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
         self.robot_state.ml_state = robot_ml_state
         self.human_state.ml_state = human_ml_state
         # self.human_sim_state.ml_state = human_sim_ml_state
+
         return (human_ml_state, robot_ml_state)
 
     def get_ml_state(self, agent: iGibsonAgent):

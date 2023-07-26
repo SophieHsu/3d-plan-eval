@@ -147,6 +147,7 @@ class Kitchen():
             os.path.join(
                 igibson.ig_dataset_path,
                 "objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf"
+                # "objects/bowl/260545503087dc5186810055962d0a91/260545503087dc5186810055962d0a91.urdf"
             ),
             "pan":
             os.path.join(igibson.ig_dataset_path,

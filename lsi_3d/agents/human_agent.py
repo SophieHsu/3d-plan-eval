@@ -100,6 +100,7 @@ class HumanAgent():
             self.igibson_env.simulator.switch_main_vr_robot(self.human)
             actionStep = self.igibson_env.simulator.gen_vr_robot_action()
             self.human.apply_action(actionStep)
+            self.lsi_env.update_human_world_state()
         else:
             x, y, z = self.human.get_position()
 
@@ -113,11 +114,12 @@ class HumanAgent():
                     self.interacting = False
                     orn = norm_cardinal_to_orn(f)
                     self.arrived = self._step(end, orn)
+                    self.lsi_env.update_human_world_state()
+                    
             else:
                 self.stuck_time = None
                 self._arrival_step()
                 self.interacting = True
-        self.lsi_env.update_joint_ml_state()
 
     def _step(self, end, final_ori):
         self.update_occupancy_grid()
@@ -150,7 +152,6 @@ class HumanAgent():
                           ] if self.prev_end is not None else self.prev_end
         round_end = [round(e, 3) for e in end] if end is not None else end
 
-        print(f' round_prev, round_end, end: {round_prev_end},{round_end},{end}')
         is_new_end = True if round_prev_end != round_end else False
 
         if len(path) > 0:

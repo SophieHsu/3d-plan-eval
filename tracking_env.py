@@ -129,6 +129,27 @@ class TrackingEnv():
             grasping = self.human.is_grasping_all_arms(body_id)
             if IsGraspingState.TRUE in grasping:
                 return obj
+        return None
+        # return self.kitchen.in_human_hand
+
+    def get_human_holding(self):
+        for obj in self.kitchen.onions:
+            body_id = obj.get_body_ids()[0]
+            grasping = self.human.is_grasping_all_arms(body_id)
+            if IsGraspingState.TRUE in grasping:
+                return 'onion'
+        
+        for obj in self.kitchen.bowls:
+            body_id = obj.get_body_ids()[0]
+            grasping = self.human.is_grasping_all_arms(body_id)
+            bowl_status = self.get_bowl_status()
+            if IsGraspingState.TRUE in grasping:
+                if obj in bowl_status.keys() and len(bowl_status[obj]) >= self.kitchen.onions_for_soup-1:
+                    return 'soup'
+                else:
+                    return 'dish'
+            
+        return 'None'
 
     def clear_pot(self):
         pan = self.kitchen.pans[0]
