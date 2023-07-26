@@ -788,7 +788,7 @@ class iGibsonAgent:
             ori_pos[0] + x_diff, ori_pos[1] + y_diff, ori_pos[2] + z_diff
         ]
         threshold = 0.03  #0.05
-        max_iter = 100
+        max_iter = 10
 
         joint_pos = self.accurate_calculate_inverse_kinematics(
             self.robot_id,
