@@ -18,7 +18,7 @@ cleanup() {
 
 trap 'cleanup' SIGINT
 
-for ((number=30; number<=60; number++))
+for ((number=0; number<=60; number++))
 do
     file_path="kitchen_layouts_grid_text/kitchen${number}.txt"
 

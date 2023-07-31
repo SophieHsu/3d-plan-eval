@@ -51,6 +51,7 @@ class HumanAgent():
         self.stuck_time = None
         self.stuck_ml_pos = None
         self.interact_obj = None
+        self.ingredients = []
 
     def change_state(self):
         # pass
@@ -88,8 +89,6 @@ class HumanAgent():
             # self.stuck_time = time.time()
             end = self.loc_to_avoid_robot()
 
-        
-
         return end
 
     def set_robot(self, robot):
@@ -100,6 +99,7 @@ class HumanAgent():
             self.igibson_env.simulator.switch_main_vr_robot(self.human)
             actionStep = self.igibson_env.simulator.gen_vr_robot_action()
             self.human.apply_action(actionStep)
+            self.check_interact_objects()
             self.lsi_env.update_human_world_state()
         else:
             x, y, z = self.human.get_position()
@@ -331,6 +331,29 @@ class HumanAgent():
         self.next_hl_state = next_hl_state
         self.action_object = (action, object)
         return goal
+    
+    def check_interact_objects(self):
+        human_holding = self.tracking_env.get_human_holding()
+        if human_holding == 'soup':
+            onions = self.tracking_env.get_onions_in_human_soup()
+            if self.ingredients == []:
+                self.ingredients = onions
+                print(len(self.ingredients))
+        elif human_holding == 'None':
+            self.ingredients = []
+            print('delivered soup')
+            # make sure onions are in bowl since they sometimes bounce out
+
+        
+
+        for onion in self.ingredients:
+            bowl = self.tracking_env.obj_in_human_hand()
+            bowl_loc = bowl.get_position()
+            if not self.tracking_env.is_item_in_object(onion, bowl):
+                # spawn onion back into bowl
+                x,y,z = bowl_loc
+                onion.set_position([x,y,z+0.05])
+                # self.tracking_env.set_item_in_object(onion, bowl)
 
     def transform_end_location(self, loc):
         # objects = self.igibson_env.simulator.scene.get_objects()

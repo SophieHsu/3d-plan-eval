@@ -28,6 +28,15 @@ class TrackingEnv():
                 data[b] = onions
         return data
     
+    def is_item_in_object(self, item, object):
+        if item.states[object_states.Inside].get_value(object):
+            return True
+        else:
+            return False
+        
+    def set_item_in_object(self, item, object):
+        item.states[object_states.Inside].set_value(object, True)
+    
     def set_interact_obj(self,obj,is_interacting):
         self.kitchen.interact_objs[obj] = is_interacting
 
@@ -121,6 +130,13 @@ class TrackingEnv():
             if self.is_obj_in_human_hand(bowl):
                 return True
         return False
+    
+    def get_onions_in_human_soup(self):
+        for bowl in self.kitchen.bowls:
+            if self.is_obj_in_human_hand(bowl):
+                ingredients = self.items_in_bowl(bowl)
+                return ingredients
+        return []
 
     def obj_in_human_hand(self):
         all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls

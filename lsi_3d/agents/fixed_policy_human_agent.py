@@ -90,6 +90,11 @@ class FixedPolicyAgent(Agent):
             next_hl_state = f'None_{world_state.in_pot}'
             agent_state.next_holding = 'None'
 
+        # hack because sometimes when onions are out of bowl the system returns dish
+        elif agent_state.holding == 'dish' and world_state.in_pot == 0:
+            action,object = ('deliver','soup')
+            next_hl_state = f'None_{world_state.in_pot}'
+            agent_state.next_holding = 'None'
         
         for order in world_state.orders:
             next_hl_state += f'_{order}'

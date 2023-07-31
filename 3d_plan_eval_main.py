@@ -58,7 +58,7 @@ def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
         open_squares.remove(robot_start)
         human_start = random.choice(open_squares)
     else:
-        kitchen.read_from_grid_text(map_config["layout"])
+        kitchen.read_from_grid_text(exp_config["layout"])
         robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
         human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
         
@@ -104,10 +104,11 @@ def setup(args):
     #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
     #     igibson_env.simulator.viewer.reset_viewer()
 
-    scene = EmptyScene()
+    # scene = EmptyScene()
     # igibson_env.simulator.import_scene(scene)
 
     kitchen = Kitchen(igibson_env)
+    igibson_env.simulator.scene.floor_plane_rgba = [.5,.5,.5,1]
 
     robot_start, human_start = set_start_locations(args, map_config, exp_config, igibson_env, kitchen)
 
@@ -291,6 +292,13 @@ if __name__ == "__main__":
         "-k",
         default="none",
         help="filepath of kitchen layout",
+    )
+
+    parser.add_argument(
+        "--config",
+        "-c",
+        default="none",
+        help="name of config file",
     )
 
     args = parser.parse_args()
