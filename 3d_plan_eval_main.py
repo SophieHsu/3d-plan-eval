@@ -86,8 +86,11 @@ def setup_log(kitchen, start_locations):
     return True
 
 def setup(args):
-    exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
-    configs = read_in_lsi_config('two_agent_mdp.tml')
+
+    if args.config != 'none':
+        exp_config, map_config  = read_in_lsi_config(args.config)
+    else:
+        exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],
@@ -115,12 +118,11 @@ def setup(args):
     if args.kitchen != 'none':
         kitchen.setup(args.kitchen)
     else:
-        kitchen.setup(map_config["layout"])
+        kitchen.setup(exp_config["layout"])
 
-    print(map_config['layout'])
+    print(exp_config['layout'])
     # _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
 
-    exp_config, map_config = configs
     order_list = exp_config['order_list']
     
     config = parse_config(exp_config['ig_config_file'])
@@ -247,6 +249,8 @@ def check_completion(lsi_env, start_time, kitchen):
         f.write("success")
         f.close()
         return True
+    
+    
 
     elapsed = time.time() - start_time
     if elapsed > TIME_LIMIT_FAILURE:

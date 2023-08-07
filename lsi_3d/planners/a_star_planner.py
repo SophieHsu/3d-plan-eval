@@ -10,7 +10,7 @@ class AStarPlanner():
     def __init__(self, env):
         self.env = env
         self.markers = []
-        self.initialize_markers()
+        # self.initialize_markers()
 
     def initialize_markers(self):
         for i in range (30):

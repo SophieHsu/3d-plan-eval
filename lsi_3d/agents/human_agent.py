@@ -341,7 +341,6 @@ class HumanAgent():
                 print(len(self.ingredients))
         elif human_holding == 'None':
             self.ingredients = []
-            print('delivered soup')
             # make sure onions are in bowl since they sometimes bounce out
 
         

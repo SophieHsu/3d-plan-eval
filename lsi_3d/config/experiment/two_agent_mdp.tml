@@ -14,4 +14,4 @@ robot_start_y=2
 
 ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
 
-layout="""kitchen_layouts_grid_text/kitchen13.txt"""
+layout="""kitchen_layouts_grid_text/kitchen1.txt"""
