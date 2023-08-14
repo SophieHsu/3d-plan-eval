@@ -2,9 +2,9 @@ from agent import FixedMediumPlan, FixedMediumSubPlan
 from igibson.external.pybullet_tools.utils import joints_from_names, set_joint_positions
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
-from lsi_3d.mdp.lsi_env import AgentState
+from lsi_3d.environment.lsi_env import AgentState
 import numpy as np
 
 from lsi_3d.utils.enums import Mode

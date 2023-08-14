@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 from lsi_3d.mdp.action import Action
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.mdp.hl_state import AgentState, WorldState

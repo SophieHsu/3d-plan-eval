@@ -7,7 +7,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import find_nearby_open_spaces, norm_orn_to_cardinal, orn_to_cardinal, quat2euler
-from tracking_env import TrackingEnv
+from lsi_3d.environment.tracking_env import TrackingEnv
 from utils import grid_to_real_coord, normalize_radians, real_to_grid_coord
 
 
@@ -67,6 +67,8 @@ class LsiEnv(object):
                 order_list.pop()
                 
         self.world_state.orders = order_list
+
+        self.update_joint_ml_state()
 
         # update holding
         if len(self.tracking_env.obj_in_robot_hand()) > 0:
@@ -253,7 +255,7 @@ class LsiEnv(object):
             return sorted_serv_locations[0] if len(sorted_serv_locations) > 0 else None
         elif action == "pickup" and object == "soup":
             # gets pan closest to done
-            for pan in self.kitchen.pans:
+            for pan in self.tracking_env.dist_sort(self.kitchen.pans, agent_location):
                 cooked_onions, uncooked_onions = self.tracking_env.is_pan_cooked(pan)
                 total_onions = cooked_onions + uncooked_onions
                 if total_onions >= self.mdp.num_items_for_soup:

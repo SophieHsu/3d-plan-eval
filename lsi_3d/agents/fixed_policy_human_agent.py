@@ -29,7 +29,7 @@
 
             
 from agent import Agent
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
 
 class FixedPolicyAgent(Agent):

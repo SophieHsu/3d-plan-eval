@@ -230,11 +230,12 @@ class Kitchen():
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
             if name == "fridge":
                 # obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="fridge")
-                obj = URDFObject(name2path["counter"],
+                obj = URDFObject(name2path["counter"], avg_obj_dims={'density': 10000},
                                  scale=name2scale_map["counter"] / 1.15,
                                  model_path="/".join(
                                      name2path["counter"].split("/")[:-1]),
-                                 category="counter")
+                                 category="counter", fixed_base=True)
+                
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 # obj.states[object_states.Open].set_value(True)
@@ -282,6 +283,7 @@ class Kitchen():
                                  name=name,
                                  category=name,
                                  scale=name2scale_map[name] / 1.15,
+                                 avg_obj_dims={'density': 10000},
                                  model_path="/".join(
                                      name2path[name].split("/")[:-1]))
                 self.env.simulator.import_object(obj)

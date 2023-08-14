@@ -19,191 +19,46 @@ Plan: [((4, 3, 'N'), 'N'), ((3, 3, 'N'), 'F'), ((2, 3, 'N'), 'F'), ((2, 3, 'E'),
 Robot HL action,object: ('pickup', 'onion')
 Robot goal: (2, 5, 'E')
 Robot ML State: (4, 4, 'W')
-Human ML State: (4, 2, 'S')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 3, 'E')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 4, 'E')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 5, 'E')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 5, 'N')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 4, 'N')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 4, 'W')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 4, 'N')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'onion')
-Robot goal: (2, 5, 'E')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 4, 'E')
-QMDP Index: None_0_onion_onion
-Plan: [((4, 1, 'W'), 'F'), ((4, 1, 'W'), 'I')]
-Robot HL action,object: ('pickup', 'dish')
-Robot goal: (4, 1, 'W')
-Robot ML State: (4, 3, 'W')
-Human ML State: (2, 5, 'E')
-QMDP Index: None_0_onion_onion
-Plan: [((4, 1, 'W'), 'I')]
-Robot HL action,object: ('pickup', 'dish')
-Robot goal: (4, 1, 'W')
-Robot ML State: (4, 2, 'W')
-Human ML State: (2, 5, 'E')
-QMDP Index: None_0_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'dish')
-Robot goal: (4, 1, 'W')
-Robot ML State: (4, 1, 'W')
-Human ML State: (2, 3, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (4, 1, 'W')
-Human ML State: (2, 3, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: [((4, 2, 'E'), 'F'), ((4, 3, 'E'), 'F'), ((4, 3, 'N'), 'N'), ((3, 3, 'N'), 'F'), ((2, 3, 'N'), 'F'), ((2, 3, 'N'), 'I')]
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (4, 1, 'W')
-Human ML State: (2, 3, 'E')
-QMDP Index: dish_2_onion_onion
-Plan: [((4, 3, 'E'), 'F'), ((4, 3, 'N'), 'N'), ((3, 3, 'N'), 'F'), ((2, 3, 'N'), 'F'), ((2, 3, 'N'), 'I')]
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (4, 1, 'E')
-Human ML State: (2, 5, 'E')
-QMDP Index: dish_2_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (4, 2, 'E')
-Human ML State: (2, 3, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: [((4, 3, 'N'), 'N'), ((3, 3, 'N'), 'F'), ((2, 3, 'N'), 'F'), ((2, 3, 'N'), 'I')]
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (4, 2, 'E')
-Human ML State: (2, 2, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: [((3, 3, 'N'), 'F'), ((2, 3, 'N'), 'F'), ((2, 3, 'E'), 'E'), ((2, 4, 'E'), 'F'), ((2, 4, 'S'), 'S'), ((2, 4, 'S'), 'I')]
-Robot HL action,object: ('drop', 'dish')
-Robot goal: (2, 4, 'S')
-Robot ML State: (4, 3, 'E')
-Human ML State: (2, 1, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: [((2, 3, 'N'), 'F'), ((2, 3, 'N'), 'I')]
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (4, 3, 'N')
-Human ML State: (2, 2, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: [((2, 3, 'N'), 'I')]
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (3, 3, 'N')
-Human ML State: (2, 2, 'N')
-QMDP Index: dish_2_onion_onion
-Plan: []
-Robot HL action,object: ('pickup', 'soup')
-Robot goal: (2, 3, 'N')
-Robot ML State: (2, 3, 'N')
 Human ML State: (4, 2, 'E')
-QMDP Index: soup_0_onion
-Plan: [((3, 3, 'S'), 'F'), ((4, 3, 'S'), 'F'), ((4, 3, 'E'), 'E'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (2, 3, 'N')
-Human ML State: (5, 2, 'N')
-QMDP Index: soup_0_onion
-Plan: [((4, 3, 'S'), 'F'), ((4, 3, 'E'), 'E'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (2, 3, 'S')
-Human ML State: (4, 1, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 3, 'S'), 'D'), ((4, 3, 'E'), 'E'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (3, 3, 'S')
-Human ML State: (4, 1, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 3, 'E'), 'D'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 3, 'S')
-Human ML State: (4, 1, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 3, 'E'), 'D'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 3, 'E')
-Human ML State: (4, 1, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 3, 'E'), 'D'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 3, 'E')
-Human ML State: (5, 1, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 3, 'E'), 'D'), ((4, 3, 'E'), 'D'), ((4, 4, 'E'), 'F'), ((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 3, 'E')
-Human ML State: (5, 0, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 4, 'S'), 'S'), ((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 3, 'E')
-Human ML State: (6, 0, 'E')
-QMDP Index: soup_0_onion
-Plan: [((4, 4, 'S'), 'I')]
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 4, 'E')
-Human ML State: (6, 0, 'E')
-QMDP Index: soup_0_onion
+QMDP Index: None_0_onion_onion
 Plan: []
-Robot HL action,object: ('deliver', 'soup')
-Robot goal: (4, 4, 'S')
-Robot ML State: (4, 4, 'S')
-Human ML State: (6, 1, 'E')
-QMDP Index: None_0_onion
-Plan: [((4, 3, 'W'), 'F'), ((4, 3, 'N'), 'N'), ((3, 3, 'N'), 'F'), ((2, 3, 'N'), 'F'), ((2, 3, 'E'), 'E'), ((2, 4, 'E'), 'F'), ((2, 5, 'E'), 'F'), ((2, 5, 'E'), 'I')]
 Robot HL action,object: ('pickup', 'onion')
 Robot goal: (2, 5, 'E')
-Robot ML State: (4, 4, 'S')
-Human ML State: (7, 1, 'E')
-success
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 3, 'N')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (2, 5, 'E')
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 3, 'E')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (2, 5, 'E')
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 4, 'E')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (2, 5, 'E')
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 5, 'E')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (2, 5, 'E')
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 5, 'E')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (2, 5, 'E')
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 5, 'S')
+QMDP Index: None_0_onion_onion
+Plan: []
+Robot HL action,object: ('pickup', 'onion')
+Robot goal: (2, 5, 'E')
+Robot ML State: (4, 3, 'W')
+Human ML State: (2, 5, 'W')

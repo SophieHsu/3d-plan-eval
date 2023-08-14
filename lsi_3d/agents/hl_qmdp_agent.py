@@ -4,9 +4,9 @@ from igibson.external.pybullet_tools.utils import joints_from_names, set_joint_p
 from igibson.objects.articulated_object import URDFObject
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
-from lsi_3d.mdp.lsi_env import AgentState
+from lsi_3d.environment.lsi_env import AgentState
 import numpy as np
 import time
 from lsi_3d.utils.constants import DIRE2POSDIFF
@@ -17,7 +17,7 @@ from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from utils import grid_to_real_coord, normalize_radians, quat2euler, real_to_grid_coord
 
 STUCK_TIME_LIMIT = 60
-
+MAX_DELAY_TIME = 5
 
 class HlQmdpPlanningAgent(Agent):
 
@@ -52,6 +52,7 @@ class HlQmdpPlanningAgent(Agent):
         self.stuck_time = None
         self.stuck_ml_pos = None
         self.prev_world_string = None
+        self.delay_time = 0
 
     def get_pot_status(self, state):
         pot_states = self.mdp_planner.mdp.get_pot_states(state)
@@ -280,7 +281,6 @@ class HlQmdpPlanningAgent(Agent):
         if self.take_ml_robot_step:
             # if human is directly in front of robot then just wait
             
-
             self.ml_robot_action = self.ml_robot_plan.pop(0)
             self.take_ml_robot_step = False
             
@@ -289,6 +289,8 @@ class HlQmdpPlanningAgent(Agent):
                 self.ml_robot_plan = [(None, 'D')]
 
             self.robot_delay = self.ml_robot_action[1] == 'D'
+            if self.ml_robot_action[1] == 'D':
+                self.delay_time = time.time()
             
             self.ig_robot.prepare_for_next_action(self.env.robot_state.ml_state, self.ml_robot_action[1])
 
@@ -302,7 +304,12 @@ class HlQmdpPlanningAgent(Agent):
         self.ig_robot.object.apply_action(init_action)
         # self._reset_arm_position(self.ig_robot)
         if self.robot_delay:
-            return
+            if time.time() - self.delay_time > MAX_DELAY_TIME:
+                self.take_hl_robot_step = True
+                self.robot_delay = False
+                return
+            else:
+                return
 
         if self.ml_robot_action == None:
             return

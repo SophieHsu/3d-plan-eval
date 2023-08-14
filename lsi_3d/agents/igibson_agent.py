@@ -318,6 +318,8 @@ class iGibsonAgent:
                 # self.igibson_env.simulator.import_object(marker_2)
                 # marker_2.set_position(self.object_position)
                 self.object_position = self.object.get_position().copy()
+
+            # check if on counter
             done, in_hand = self.pick(
                 self.object_position,
                 tracking_env,

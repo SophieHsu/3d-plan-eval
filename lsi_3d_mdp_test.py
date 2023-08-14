@@ -15,7 +15,7 @@ from igibson.objects.ycb_object import YCBObject
 from igibson.objects.articulated_object import URDFObject, URDFObject
 from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.greedy_human_planner import HLGreedyHumanPlanner
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner

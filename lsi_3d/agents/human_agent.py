@@ -4,7 +4,7 @@ import numpy as np
 from lsi_3d.utils.functions import norm_cardinal_to_orn
 from utils import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_radians
 from agent import Agent
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.mdp.hl_state import AgentState, WorldState
 import time
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer

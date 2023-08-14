@@ -13,7 +13,7 @@ from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
 from lsi_3d.agents.human_agent import HumanAgent
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
-from tracking_env import TrackingEnv
+from lsi_3d.environment.tracking_env import TrackingEnv
 from utils import real_to_grid_coord, grid_to_real_coord
 
 from kitchen import Kitchen
@@ -27,7 +27,7 @@ import pybullet as p
 from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.agents.hl_qmdp_agent import HlQmdpPlanningAgent
-from lsi_3d.mdp.lsi_env import LsiEnv
+from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner
 from lsi_3d.planners.hl_human_planner import HLHumanPlanner
@@ -37,7 +37,7 @@ import logging
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 
-from tracking_env import TrackingEnv
+from lsi_3d.environment.tracking_env import TrackingEnv
 import numpy as np
 import time
 

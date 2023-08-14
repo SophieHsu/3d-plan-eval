@@ -78,7 +78,7 @@ class TrackingEnv():
 
     def dist_sort(self, objects, agent_pos):
         # agent pos is real coordinate
-        sorted_positions = sorted(objects, key=lambda object: self.distance_to_bowl(object, agent_pos))
+        sorted_positions = sorted(objects, key=lambda object: self.distance_to_object(object, agent_pos))
         return sorted_positions
     
     def get_pan_enum_status(self, pan):
@@ -202,10 +202,10 @@ class TrackingEnv():
     #     else:
     #         position = agent_pos
 
-    def distance_to_bowl(self, bowl, position):
-        bowl_position = bowl.get_position()[0:2]
+    def distance_to_object(self, object, position):
+        object_position = object.get_position()[0:2]
         position = position[0:2]
-        return math.dist(bowl_position, position)
+        return math.dist(object_position, position)
 
     def get_bowls_dist_sort(self, is_human=None):
         if is_human is None or is_human is True:
@@ -213,7 +213,7 @@ class TrackingEnv():
         else:
             position = self.robot.object.get_position()
 
-        sorted_positions = sorted(self.kitchen.bowls, key=lambda bowl: self.distance_to_bowl(bowl, position))
+        sorted_positions = sorted(self.kitchen.bowls, key=lambda bowl: self.distance_to_object(bowl, position))
         return sorted_positions
 
     def get_closest_onion(self, agent_pos=None, on_pan=False, position=None, on_table = False):
