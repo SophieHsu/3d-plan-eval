@@ -1,5 +1,5 @@
 import math
-from kitchen import Kitchen
+from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.planners.two_agent_astar import run_astar_two_agent, single_agent_astar
 
 

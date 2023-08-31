@@ -1,7 +1,7 @@
 import math
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.objects.articulated_object import URDFObject
-from kitchen import Kitchen
+from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState

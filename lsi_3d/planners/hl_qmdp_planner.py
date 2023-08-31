@@ -901,8 +901,6 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
                 human_obj, subtask_key[i], env.world_state.in_pot,
                 greedy=greedy) * 1.0
 
-            if game_logic_prob[i] < 0.00001:
-                continue
 
             ## tune subtask estimation based on current human's position and action (use minimum distance between features)
             motion_goal = env.map_action_to_location(
@@ -925,6 +923,9 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
             # update distance to feature
             prev_dist_to_feature[str(feature_pos)] = human_dist_cost
 
+            if game_logic_prob[i] < 0.00001:
+                continue
+
         game_logic_prob /= game_logic_prob.sum()
         dist_belief_prob /= dist_belief_prob.sum()
 
@@ -932,7 +933,9 @@ class HumanSubtaskQMDPPlanner(HighLevelMdpPlanner):
         dist_belief_prob[dist_belief_prob < 0.000001] = 0.000001
 
         new_belief = belief_vector * game_logic_prob
-        new_belief = new_belief * 0.5 * dist_belief_prob * 0.5
+
+        # preference for old belief vs moving towards new goal
+        new_belief = new_belief * 0.4 * dist_belief_prob * 0.6
 
         new_belief /= new_belief.sum()
 

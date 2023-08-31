@@ -16,7 +16,7 @@ from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.environment.tracking_env import TrackingEnv
 from utils import real_to_grid_coord, grid_to_real_coord
 
-from kitchen import Kitchen
+from lsi_3d.environment.kitchen import Kitchen
 from igibson import object_states
 
 # Robot

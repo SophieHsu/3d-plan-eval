@@ -1,6 +1,3 @@
-from lsi_3d.utils.enums import Mode
-
-
 class WorldState():
     """Keeps track of items in the world that are shared accross agents
     i.e. items in pot, and orders left
@@ -56,7 +53,6 @@ class AgentState():
         self.hl_state = hl_state
         self.ml_state = ml_state
         self.ll_state = ll_state
-        self.mode = Mode.CALC_HL_PATH
 
         self.start_state = hl_state
 
