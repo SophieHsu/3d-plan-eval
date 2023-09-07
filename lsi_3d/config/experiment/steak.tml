@@ -1,7 +1,7 @@
 map_config = 'layout_2.tml'
 agent_config = ['human_agent.tml','robot_agent.tml']
 algorithm_config = 'a_star_two_agent.tml'
-order_list = ['onion','onion']
+order_list = ['steak','steak']
 hl_start_state = 'None_0_onion_onion'
 recalculation_resolution = 15
 avoid_radius = 1
@@ -14,4 +14,4 @@ robot_start_y=4
 
 ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
 
-layout="""kitchen_layouts_grid_text/kitchen4.txt"""
+layout="""kitchen_layouts_grid_text/steak_kitchen1.txt"""

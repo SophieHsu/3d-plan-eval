@@ -12,6 +12,8 @@ import logging
 from igibson.utils.utils import quatToXYZW, parse_config
 from transforms3d.euler import euler2quat
 import pybullet as p
+from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
+from lsi_3d.environment.vision_limit_env import VisionLimitEnv
 
 from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
@@ -90,6 +92,7 @@ def setup(args):
     if args.config != 'none':
         exp_config, map_config  = read_in_lsi_config(args.config)
     else:
+        # exp_config, map_config = read_in_lsi_config('steak.tml')
         exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
@@ -118,7 +121,7 @@ def setup(args):
     if args.kitchen != 'none':
         kitchen.setup(args.kitchen)
     else:
-        kitchen.setup(exp_config["layout"])
+        kitchen.setup(exp_config["layout"], exp_config["order_list"])
 
     print(exp_config['layout'])
     # _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
@@ -182,6 +185,17 @@ def setup(args):
         # ai_agent = agent.MediumQMdpPlanningAgent(mdp_planner, greedy=False, auto_unstuck=True)
 
         #hlp = HighLevelMdpPlanner(mdp)
+        robot_hlp.compute_mdp(order_list)
+        robot_hlp.post_mdp_setup()
+        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
+        robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
+                                          robot)
+    elif planner_config == 3:
+        env = VisionLimitEnv(mdp, igibson_env, tracking_env, human, robot, kitchen)
+        human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
+                             kitchen.grid, hlp, env, tracking_env, human_vr)
+
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         robot_hlp.compute_mdp(order_list)
         robot_hlp.post_mdp_setup()
         human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
@@ -264,17 +278,18 @@ def check_completion(lsi_env, start_time, kitchen):
     return False
 
 
-def main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env):
+def main_loop(igibson_env, robot_agent, human_agent, kitchen, env:LsiEnv):
     start_time = time.time()
     count = 0
     while True:
+        env.update_world()
         human_agent.step()
-        robot_agent.step()
+        # robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1
 
-        if check_completion(lsi_env, start_time, kitchen):
+        if check_completion(env, start_time, kitchen):
             break 
 
 if __name__ == "__main__":

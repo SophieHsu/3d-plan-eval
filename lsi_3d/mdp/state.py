@@ -3,13 +3,18 @@ class WorldState():
     i.e. items in pot, and orders left
     """
 
-    def __init__(self, start_hl_state=None):
-        in_pot, orders = self.parse_hl_state(start_hl_state)
-        self.in_pot = in_pot
-        self.sim_in_pot = in_pot
-        self.orders = orders
-        self.players = []
-        self.max_in_pot = 2
+    def __init__(self, start_hl_state=None, orders = None):
+        if start_hl_state != None:
+            in_pot, orders = self.parse_hl_state(start_hl_state)
+            self.in_pot = in_pot
+            self.sim_in_pot = in_pot
+            self.orders = orders
+        else:
+            self.init_orders = orders
+            self.orders = orders.copy()
+            self.players = []
+            self.max_in_pot = 2
+            self.state_dict = {}
 
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
@@ -58,6 +63,7 @@ class AgentState():
 
         self.holding = 'None'
         self.next_holding = 'None'
+        self.state_dict = {}
 
     def parse_hl_state(self, hl_state, world_state: WorldState):
         parsed = hl_state.split('_')

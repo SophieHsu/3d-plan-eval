@@ -30,7 +30,7 @@
             
 from agent import Agent
 from lsi_3d.environment.lsi_env import LsiEnv
-from lsi_3d.mdp.hl_state import AgentState, WorldState
+from lsi_3d.mdp.state import AgentState, WorldState
 
 class FixedPolicyAgent(Agent):
     def __init__(self, hlp, mlp, onions_for_soup) -> None:

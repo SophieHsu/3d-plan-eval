@@ -5,7 +5,7 @@ from lsi_3d.utils.functions import norm_cardinal_to_orn
 from utils import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_radians
 from agent import Agent
 from lsi_3d.environment.lsi_env import LsiEnv
-from lsi_3d.mdp.hl_state import AgentState, WorldState
+from lsi_3d.mdp.state import AgentState, WorldState
 import time
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 from igibson.objects.articulated_object import URDFObject
@@ -35,7 +35,7 @@ class HumanAgent():
         self.motion_controller = motion_controller
         self.occupancy_grid = copy.deepcopy(occupancy_grid)
         self.hlp = hlp
-        self.lsi_env = lsi_env
+        self.env = lsi_env
         self.vision_range = math.pi
         self.igibson_env = tracking_env.env
         self.tracking_env = tracking_env
@@ -55,30 +55,30 @@ class HumanAgent():
 
     def change_state(self):
         # pass
-        self.lsi_env.update_human_hl_state("onion_0_onion_onion",
+        self.env.update_human_hl_state("onion_0_onion_onion",
                                            ("pickup", "onion"))
-        self.lsi_env.update_human_hl_state("None_1_onion_onion",
+        self.env.update_human_hl_state("None_1_onion_onion",
                                            ("drop", "onion"))
-        self.lsi_env.update_human_hl_state("onion_1_onion_onion",
+        self.env.update_human_hl_state("onion_1_onion_onion",
                                            ("pickup", "onion"))
-        self.lsi_env.update_human_hl_state("None_2_onion_onion",
+        self.env.update_human_hl_state("None_2_onion_onion",
                                            ("drop", "onion"))
         # self.lsi_env.update_human_hl_state("onion_2_onion_onion", ("pickup", "onion"))
         # self.lsi_env.update_human_hl_state("None_3_onion_onion", ("drop", "onion"))
         # self.lsi_env.update_human_hl_state("dish_3_onion_onion", ("pickup", "dish"))
         # self.lsi_env.update_human_hl_state("soup_3_onion_onion", ("pickup", "soup"))
-        self.lsi_env.update_joint_ml_state()
+        self.env.update_joint_ml_state()
 
     def stuck_handler(self):
         end = None
         if self.stuck_time == None or self.stuck_ml_pos == None:
             # start timer
             self.stuck_time = time.time()
-            self.stuck_ml_pos = self.lsi_env.human_state.ml_state
+            self.stuck_ml_pos = self.env.human_state.ml_state
 
-        if not self.lsi_env.human_state.equal_ml(self.stuck_ml_pos):
+        if not self.env.human_state.equal_ml(self.stuck_ml_pos):
             # reset timer when robot moves
-            self.stuck_ml_pos = self.lsi_env.human_state.ml_state
+            self.stuck_ml_pos = self.env.human_state.ml_state
             self.stuck_time = time.time()
 
         elapsed = time.time() - self.stuck_time
@@ -100,7 +100,7 @@ class HumanAgent():
             actionStep = self.igibson_env.simulator.gen_vr_robot_action()
             self.human.apply_action(actionStep)
             self.check_interact_objects()
-            self.lsi_env.update_human_world_state()
+            self.env.update_human_world_state()
         else:
             x, y, z = self.human.get_position()
 
@@ -114,7 +114,7 @@ class HumanAgent():
                     self.interacting = False
                     orn = norm_cardinal_to_orn(f)
                     self.arrived = self._step(end, orn)
-                    self.lsi_env.update_human_world_state()
+                    self.env.update_human_world_state()
                     
             else:
                 self.stuck_time = None
@@ -284,20 +284,20 @@ class HumanAgent():
 
     def completed_goal(self, next_hl_state, action_object):
         self.step_index = 0
-        self.lsi_env.human_state.update_hl_state(next_hl_state,
-                                                 self.lsi_env.world_state)
+        #self.env.human_state.update_hl_state(next_hl_state,
+        #                                         self.env.world_state)
         self.object_position = None
         self.arrived = False
 
     def get_next_goal(self):
-        agent_state = self.lsi_env.human_state
-        world_state = self.lsi_env.world_state
+        agent_state = self.env.human_state
+        world_state = self.env.world_state
         action, object = 'stay', agent_state.holding
         if agent_state.holding == 'None':
-            if world_state.in_pot == self.tracking_env.kitchen.onions_for_soup - 1 and self.lsi_env.robot_state.holding == 'onion':
+            if world_state.in_pot == self.tracking_env.kitchen.onions_for_soup - 1 and self.env.robot_state.holding == 'onion':
                 action, object = ('pickup', 'dish')
                 next_hl_state = f'dish_{world_state.in_pot}'
-            elif world_state.in_pot >= self.tracking_env.kitchen.onions_for_soup and self.lsi_env.robot_state.holding != 'dish':
+            elif world_state.in_pot >= self.tracking_env.kitchen.onions_for_soup and self.env.robot_state.holding != 'dish':
                 action, object = ('pickup', 'dish')
                 next_hl_state = f'dish_{world_state.in_pot}'
             else:
@@ -312,7 +312,7 @@ class HumanAgent():
             action, object = ('pickup', 'dish')
             next_hl_state = f'dish_{world_state.in_pot}'
             agent_state.next_holding = 'dish'
-        elif agent_state.holding == 'dish' and (world_state.in_pot >= self.lsi_env.mdp.num_items_for_soup or self.interacting == True):
+        elif agent_state.holding == 'dish' and (world_state.in_pot >= self.env.mdp.num_items_for_soup or self.interacting == True):
             action, object = ('pickup', 'soup')
             # world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
@@ -325,8 +325,8 @@ class HumanAgent():
         for order in world_state.orders:
             next_hl_state += f'_{order}'
 
-        possible_motion_goals = self.lsi_env.map_action_to_location(
-            (action, object), self.lsi_env.human_state.ml_state[0:2], is_human=True)
+        possible_motion_goals = self.env.map_action_to_location(
+            (action, object), self.env.human_state.ml_state[0:2], is_human=True)
         goal = possible_motion_goals
         self.next_hl_state = next_hl_state
         self.action_object = (action, object)

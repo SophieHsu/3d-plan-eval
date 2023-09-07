@@ -29,10 +29,14 @@ class Kitchen():
         self.grid = ""
         self.bowls = []
         self.pans = []
+        self.plates = []
         self.onions = []
+        self.steaks = []
         self.counters = []
         self.table = None
         self.fridges = []
+        self.chopping_boards = []
+        self.sinks = []
         self.food_obj = []
         self.static_objs = {}
         self.in_robot_hand = []
@@ -41,11 +45,11 @@ class Kitchen():
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
         self.tile_location = {}
 
-    def setup(self, filepath):
+    def setup(self, filepath, order_list):
         self.kitchen_name = filepath.split('/')[1].split('.')[0]
         obj_x_y, orientation_map, grid = self.read_from_grid_text(filepath)
         self.map = orientation_map
-        self.load_objects(obj_x_y, orientation_map)
+        self.load_objects(obj_x_y, orientation_map, order_list)
         self.load_interact_objs()
 
     def load_interact_objs(self):
@@ -112,6 +116,7 @@ class Kitchen():
         return obj_x_y, orientation_map, grid
 
     def name2abbr(self, name):
+
         name2abbr_map = {
             "counter": "C",
             "table_v": "T",
@@ -120,12 +125,21 @@ class Kitchen():
             "bowl": "B",
             "pan": "P",
             "sink": "W",
-            "fridge": "F"
+            "fridge": "F",
+            "broccoli": "F",
+            "steak": "F",
+            "green_onion": "G",
+            "tray": "F",
+            "apple": "F",
+            "plate": "D",
+            "scrub_brush": "W",
+            "chopping_board": "K",
+            "knife": "K"
         }
 
         return name2abbr_map[name]
 
-    def load_objects(self, obj_x_y, orientation_map):
+    def load_objects(self, obj_x_y, orientation_map, order_list):
         name2path = {
             "counter":
             os.path.join(igibson.ig_dataset_path,
@@ -160,7 +174,37 @@ class Kitchen():
                          "objects/fridge/10373/10373.urdf"),
             "vidalia_onion":
             os.path.join(igibson.ig_dataset_path,
-                         "objects/vidalia_onion/18_1/18_1.urdf")
+                         "objects/vidalia_onion/18_1/18_1.urdf"),
+            "broccoli":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/broccoli/28_0/28_0.urdf"),
+            "green_onion":
+            os.path.join(
+                igibson.ig_dataset_path,
+                "objects/green_onion/green_onion_000/green_onion_000.urdf"),
+            "steak":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/steak/steak_000/steak_000.urdf"),
+            "tray":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/tray/tray_000/tray_000.urdf"),
+            "apple":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/apple/00_0/00_0.urdf"),
+            "plate":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/plate/plate_000/plate_000.urdf"),
+            "scrub_brush":
+            os.path.join(
+                igibson.ig_dataset_path,
+                "objects/scrub_brush/scrub_brush_000/scrub_brush_000.urdf"),
+            "chopping_board":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/chopping_board/10_0/10_0.urdf"),
+            "knife":
+            os.path.join(igibson.ig_dataset_path,
+                         "objects/carving_knife/14_1/14_1.urdf"),
+            "onion": os.path.join(igibson.ig_dataset_path, "objects/vidalia_onion/17_0/17_0.urdf")
         }
 
         name2scale_map = {
@@ -170,10 +214,19 @@ class Kitchen():
             "stove": np.array([1.1, 1, 1]),
             "bowl": np.array([0.8, 0.8, 0.8]),
             "pan": np.array([1.3, 1.3, 1]),
+            "steak": np.array([0.1, 0.1, 0.1]),
+            "broccoli": np.array([0.1, 0.1, 0.1]),
+            "green_onion": np.array([0.1, 0.1, 0.1]),
             "tray": np.array([0.1, 0.1, 0.1]),
             "sink": np.array([1.2, 1.25, 1.25]),
             "fridge": np.array([1.5, 1.2, 1.2]),
-            "vidalia_onion": np.array([2.0, 2.0, 2.0])
+            "vidalia_onion": np.array([2.0, 2.0, 2.0]),
+            "apple": np.array([0.1, 0.1, 0.1]),
+            "plate": np.array([0.01, 0.01, 0.01]),
+            "scrub_brush": np.array([0.01, 0.01, 0.01]),
+            "chopping_board": np.array([1.2, 1.2, 1.2]),
+            "knife": np.array([1, 1, 1]),
+            "onion": np.array([1.0, 1.0, 1.0])
         }
 
         name2shift_map = {
@@ -185,7 +238,18 @@ class Kitchen():
             "pan": (0.23, 0.24, 1.24),  # shift height
             "sink": (0, 0, 0.1),
             "fridge": (0, 0, 0.2),
-            "vidalia_onion": (0.15, -0.1, 1.3)
+            "vidalia_onion": (0.15, -0.1, 1.3),
+            "steak": (0, 0, 0.9), #(0.23, -0.1, 1.25),
+            "tray": (0, 0, 0.9),
+            "apple": (0, 0.2, 1.0),
+            "broccoli": (0, 0.2, 0.6),
+            # "green_onion": (0, -0.2, 0.6),
+            "green_onion": (0, 0, 1.25),
+            "plate": (0, 0, 1.2),
+            "scrub_brush": (0, 0, 1.3),
+            "chopping_board": (0, 0, 1.2),
+            "knife": (0.4, 0, 1.2),
+            "onion": (0.15, -0.1, 0)
         }
 
         # name2abl = {
@@ -206,6 +270,53 @@ class Kitchen():
         #         }
         #     }
         # }
+
+        name2abl = {
+            "counter": None,
+            "table_v": None,
+            "table_h": None,
+            "stove": None,
+            "bowl": {
+                "dustyable": {},
+                "stainable": {}
+            },
+            "pan": None,
+            "sink": None,
+            "fridge": {
+                "coldSource": {
+                    "temperature": 7.0,
+                    "requires_inside": True,
+                }
+            },
+            "steak": None,
+            "tray": None,
+            "apple": None,
+            "broccoli": None,
+            "green_onion": {
+                "burnable": {},
+                "freezable": {},
+                "cookable": {},
+                "sliceable": {
+                    "slice_force": 0.0
+                }
+            },
+            "plate1": {
+                "dustyable": {},
+                "stainable": {}
+            },
+            "plate2": {
+                "dustyable": {},
+                "stainable": {}
+            },
+            "scrub_brush": {
+                "soakable": {},
+                "cleaningTool": {}
+            },
+            "chopping_board": None,
+            "knife": {
+                "slicer": {}
+            }
+        }
 
         shift_l = 0.1
         mapping = {
@@ -241,21 +352,38 @@ class Kitchen():
                 # obj.states[object_states.Open].set_value(True)
 
                 self.fridges.append(obj)
-                for _ in range(10):
-                    onion = URDFObject(
-                        name2path["vidalia_onion"],
-                        scale=name2scale_map["vidalia_onion"] / 1.15,
-                        model_path="/".join(
-                            name2path["vidalia_onion"].split("/")[:-1]),
-                        category="vidalia_onion")
-                    self.env.simulator.import_object(onion)
-                    onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
-                    # pos[0], pos[1] = self.sample_position(pos[0], pos[1], 0.1)
-                    # pos[2] = 1.1
-                    # self.env.set_pos_orn_with_z_offset(onion, pos)
-                    self.onions.append(onion)
-                    body_ids = onion.get_body_ids()
-                    p.changeDynamics(body_ids[0], -1, mass=0.001)
+
+                if 'onion' in order_list:
+                    for _ in range(10):
+                        onion = URDFObject(
+                            name2path["vidalia_onion"],
+                            scale=name2scale_map["vidalia_onion"] / 1.15,
+                            model_path="/".join(
+                                name2path["vidalia_onion"].split("/")[:-1]),
+                            category="vidalia_onion")
+                        self.env.simulator.import_object(onion)
+                        onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+                        # pos[0], pos[1] = self.sample_position(pos[0], pos[1], 0.1)
+                        # pos[2] = 1.1
+                        # self.env.set_pos_orn_with_z_offset(onion, pos)
+                        self.onions.append(onion)
+                        body_ids = onion.get_body_ids()
+                        p.changeDynamics(body_ids[0], -1, mass=0.001)
+                if 'steak' in order_list:
+                    for _ in range(10):
+                        steak = URDFObject(
+                            name2path["steak"],
+                            scale=name2scale_map["steak"] / 1.15,
+                            model_path="/".join(
+                                name2path["steak"].split("/")[:-1]),
+                            category="steak")
+                        self.env.simulator.import_object(steak)
+                        steak.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+
+                        self.steaks.append(steak)
+                        body_ids = steak.get_body_ids()
+                        p.changeDynamics(body_ids[0], -1, mass=0.001)
+                
             elif name == "stove":
                 obj = URDFObject(name2path[name],
                                  scale=name2scale_map[name] / 1.15,
@@ -278,6 +406,50 @@ class Kitchen():
                     rotated_basis, tuple([x - 4.5, y - 4.5, 0]), shift)
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, translated_pos, orn)
+            elif name == "green_onion":
+                obj = URDFObject(name2path[name],
+                             name=name,
+                             category=name,
+                             scale=name2scale_map[name] / 1.15,
+                             model_path="/".join(
+                                 name2path[name].split("/")[:-1]),
+                             abilities=name2abl[name])
+                object_parts = []
+                # Check the parts that compose the apple and create URDF objects of them
+                for i, part in enumerate(obj.metadata["object_parts"]):
+                    part_category = part["category"]
+                    part_model = part["model"]
+                    # Scale the offset accordingly
+                    part_pos = part["pos"] * obj.scale
+                    part_orn = part["orn"]
+                    part_model_path = get_ig_model_path(
+                        part_category, part_model)
+                    part_filename = os.path.join(part_model_path,
+                                                 part_model + ".urdf")
+                    part_obj_name = obj.name + "_part_{}".format(i)
+                    part_obj = URDFObject(
+                        part_filename,
+                        name=part_obj_name,
+                        category=part_category,
+                        model_path=part_model_path,
+                        scale=obj.scale,
+                    )
+                    object_parts.append((part_obj, (part_pos, part_orn)))
+
+                # Group the apple parts into a single grouped object
+                grouped_parts_obj = ObjectGrouper(object_parts)
+
+                # Create a multiplexed object: either the full apple, or the parts
+                multiplexed_obj = ObjectMultiplexer(obj.name + "_multiplexer",
+                                                    [obj, grouped_parts_obj],
+                                                    0)
+                self.env.simulator.import_object(multiplexed_obj)
+                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
+                for i, (part_obj, _) in enumerate(object_parts):
+                    self.env.set_pos_orn_with_z_offset(part_obj, tuple(pos), orn)
+                multiplexed_obj.states[object_states.Sliced].set_value(False)
+
+                obj = multiplexed_obj
             else:
                 obj = URDFObject(name2path[name],
                                  name=name,
@@ -289,7 +461,7 @@ class Kitchen():
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
-            if name not in ("bowl", "pan", "vidalia_onion"):
+            if name not in ("bowl", "pan", "vidalia_onion", "steak", "plate", "chopping_board", "knife"):
                 self.static_objs[obj] = (x, y)
             if name == "bowl":
                 self.bowls.append(obj)
@@ -310,6 +482,29 @@ class Kitchen():
                 self.static_objs[obj] = [(x, y), (x+1, y)]
             if name == "counter":
                 self.counters.append(obj)
+            if name == "chopping_board":
+                self.chopping_boards.append(obj)
+            if name == "sink":
+                self.sinks.append(obj)
+            if name == "plate":
+                self.plates.append(obj)
+            
+            # for steak order
+            # if name in ("apple", "green_onion", "broccoli", "steak"):
+            #     self.food_obj.append(obj)
+            #     obj.states[object_states.Temperature].get_value(),
+            #     obj.states[object_states.Temperature].set_value(7)
+
+            # if "plate" in name:
+            #     if object_states.Dusty in obj.states:
+            #         obj.states[object_states.Dusty].set_value(True)
+
+            #     if object_states.Stained in obj.states:
+            #         obj.states[object_states.Stained].set_value(True)
+            # if name == "sink":
+            #     obj.states[object_states.ToggledOn].set_value(False)
+            # if name == "chopping_board":
+            #     obj.states[object_states.OnTop].set_value(obj, self.static_objs[-1])
 
         try:
             for obj in self.static_objs.keys():
@@ -330,7 +525,10 @@ class Kitchen():
             "P": "pan",
             "F": "fridge",
             "T": "table",
-            "W": "sink"
+            "W": "sink",
+            "K": "chopping_board",
+            "G": "green_onion",
+            "D": "plate"
         }
         return_str = ""
         for x in range(self.HEIGHT):
@@ -353,6 +551,13 @@ class Kitchen():
                         return_str += "{} {} {}\n".format("stove", x, y)
                     if name == "stove":
                         return_str += "{} {} {}\n".format("pan", x, y)
+                    if name == "chopping_board":
+                        return_str += "{} {} {}\n".format("counter", x, y)
+                        return_str += "{} {} {}\n".format("knife", x, y)
+                    if name == "green_onion":
+                        return_str += "{} {} {}\n".format("counter", x, y)
+                    if name == "plate":
+                        return_str += "{} {} {}\n".format("counter", x, y)
 
                     return_str += "{} {} {}\n".format(name, x, y)
 
@@ -423,6 +628,9 @@ class Kitchen():
     
     def get_onion_station(self):
         return self.where_grid_is('F')
+    
+    def get_green_onion_station(self):
+        return self.where_grid_is('G')
 
     def get_center(self):
         grid_center = (floor(len(self.grid) / 2), floor(len(self.grid[0]) / 2))

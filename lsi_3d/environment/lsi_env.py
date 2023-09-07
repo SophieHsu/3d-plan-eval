@@ -4,7 +4,7 @@ from igibson.objects.articulated_object import URDFObject
 from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.mdp.hl_state import AgentState, SoupState, WorldState
+from lsi_3d.mdp.state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import find_nearby_open_spaces, norm_orn_to_cardinal, orn_to_cardinal, quat2euler
 from lsi_3d.environment.tracking_env import TrackingEnv

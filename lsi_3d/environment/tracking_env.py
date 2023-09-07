@@ -6,12 +6,13 @@ from igibson.objects.articulated_object import URDFObject
 from igibson.robots.manipulation_robot import IsGraspingState
 from igibson import object_states
 import pybullet as p
+from lsi_3d.environment.kitchen import Kitchen
 from utils import quat2euler
 
 
 class TrackingEnv():
 
-    def __init__(self, igibsonEnv, kitchen, robot, human):
+    def __init__(self, igibsonEnv, kitchen:Kitchen, robot, human):
         self.env = igibsonEnv
         self.kitchen = kitchen
         self.robot = robot
@@ -26,6 +27,26 @@ class TrackingEnv():
                     onions.append(o)
             if len(onions) > 0:
                 data[b] = onions
+        return data
+    
+    def get_chopping_board_status(self):
+        data = {}
+        for c in self.kitchen.chopping_boards:
+            onions = []
+            for o in self.kitchen.onions:
+                if o.states[object_states.OnTop].get_value(c):
+                    onions.append(o)
+            data[c] = onions
+        return data
+    
+    def get_sink_status(self):
+        data = {}
+        for s in self.kitchen.sinks:
+            plates = []
+            for p in self.kitchen.plates:
+                if p.states[object_states.Inside].get_value(s):
+                    plates.append(p)
+            data[s] = plates
         return data
     
     def is_item_in_object(self, item, object):
