@@ -44,7 +44,7 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-TIME_LIMIT_FAILURE = 900 # 15 mins
+TIME_LIMIT_FAILURE = 1000000 # 900 # 15 mins
 
 def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
     #TODO consolidate config files
@@ -93,7 +93,7 @@ def setup(args):
         exp_config, map_config  = read_in_lsi_config(args.config)
     else:
         # exp_config, map_config = read_in_lsi_config('steak.tml')
-        exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
+        exp_config, map_config = read_in_lsi_config('steak.tml')
 
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],
@@ -113,7 +113,7 @@ def setup(args):
     # scene = EmptyScene()
     # igibson_env.simulator.import_scene(scene)
 
-    kitchen = Kitchen(igibson_env)
+    kitchen = Kitchen(igibson_env, exp_config['max_in_pan'])
     igibson_env.simulator.scene.floor_plane_rgba = [.5,.5,.5,1]
 
     robot_start, human_start = set_start_locations(args, map_config, exp_config, igibson_env, kitchen)
@@ -166,7 +166,7 @@ def setup(args):
     mlp = AStarMotionPlanner(kitchen)
     # hhlp = HLGreedyHumanPlanner(mdp, mlp)
 
-    planner_config = 2
+    planner_config = 3
     if planner_config == 1:
         hhlp = HLHumanPlanner(mdp, mlp, False)
         robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)

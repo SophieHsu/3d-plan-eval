@@ -1,6 +1,7 @@
 import copy
 import math
 import numpy as np
+from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.utils.functions import norm_cardinal_to_orn
 from utils import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_radians
 from agent import Agent
@@ -22,7 +23,7 @@ class HumanAgent():
                  occupancy_grid,
                  hlp,
                  lsi_env,
-                 tracking_env,
+                 tracking_env:TrackingEnv,
                  vr=False,
                  insight_threshold=5):
 
