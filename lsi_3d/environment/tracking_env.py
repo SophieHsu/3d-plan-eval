@@ -7,7 +7,7 @@ from igibson.robots.manipulation_robot import IsGraspingState
 from igibson import object_states
 import pybullet as p
 from lsi_3d.environment.kitchen import Kitchen
-from utils import quat2euler
+from utils import quat2euler, real_to_grid_coord
 
 
 class TrackingEnv():
@@ -34,6 +34,10 @@ class TrackingEnv():
         for c in self.kitchen.chopping_boards:
             onions = []
             for o in self.kitchen.onions:
+                if o.name == "green_onion_multiplexer":
+                    # on top not working for chopped onion
+                    if o.current_index == 1 and real_to_grid_coord(c.get_position()) == real_to_grid_coord(o.current_selection().objects[0].get_position()):
+                        onions.append(o)
                 if o.states[object_states.OnTop].get_value(c):
                     onions.append(o)
             data[c] = onions
@@ -115,6 +119,7 @@ class TrackingEnv():
     def dist_sort(self, objects, agent_pos):
         # agent pos is real coordinate
         sorted_positions = sorted(objects, key=lambda object: self.distance_to_object(object, agent_pos))
+        sorted_positions.reverse()
         return sorted_positions
     
     def get_pan_enum_status(self, pan):
@@ -203,8 +208,18 @@ class TrackingEnv():
         for obj in self.kitchen.bowls:
             body_id = obj.get_body_ids()[0]
             grasping = self.human.is_grasping_all_arms(body_id)
+            
             bowl_status = self.get_bowl_status()
             if IsGraspingState.TRUE in grasping:
+                
+                for onion in self.kitchen.onions:
+                    if onion.states[object_states.Inside].get_value(obj):
+                        return 'dish'
+                for steak in self.kitchen.steaks:
+                    if steak.states[object_states.Inside].get_value(obj):
+                        return 'steak'
+                if obj in self.kitchen.hot_plates:
+                    return 'hot_plate'
                 if obj in bowl_status.keys() and len(bowl_status[obj]) >= self.kitchen.onions_for_soup-1:
                     return 'soup'
                 else:
@@ -213,7 +228,8 @@ class TrackingEnv():
         for obj in self.kitchen.plates:
             body_id = obj.get_body_ids()[0]
             grasping = self.human.is_grasping_all_arms(body_id)
-            
+            if obj in self.kitchen.hot_plates:
+                return 'hot_plate'
             if IsGraspingState.TRUE in grasping:
                 return 'plate'
             
@@ -263,7 +279,6 @@ class TrackingEnv():
         closest_plate = None
         position = agent_pos
         plates = self.dist_sort(self.kitchen.plates, agent_pos)
-        plates.reverse()
         for p in plates:
             for c in self.kitchen.counters:
                 on_c = p.states[object_states.OnTop].get_value(c)
@@ -276,22 +291,31 @@ class TrackingEnv():
     def get_closest_sink(self, agent_pos):
         position = agent_pos
         sinks = self.dist_sort(self.kitchen.sinks, agent_pos)
-        sinks.reverse()
 
         return sinks[0]
+    
+    def get_closest_steak(self, agent_pos):
+        return self.dist_sort(self.kitchen.steaks, agent_pos)[0]
+    
+    def get_closest_knife(self, agent_pos):
+        return self.dist_sort(self.kitchen.knives, agent_pos)[0]
+    
+    def get_closest_chopped_onion(self, agent_pos):
+        for onion in self.kitchen.onions:
+            if onion.current_index == 1:
+                return onion
     
     def get_hot_plates(self, agent_pos):
         hot_plates = []
         for sink in self.kitchen.ready_sinks:
             for plate in self.kitchen.plates:
-                if plate.states[object_states.Inside].get_value():
+                if plate.states[object_states.Inside].get_value(sink):
                     hot_plates.append(plate)
         hot_plates = self.dist_sort(hot_plates, agent_pos)
-        return 
+        return hot_plates
     
     def get_closest_chopping_board(self, agent_pos):
         cs = self.dist_sort(self.kitchen.chopping_boards, agent_pos)
-        cs.reverse()
         return cs[0]
         
 
@@ -329,7 +353,6 @@ class TrackingEnv():
         closest_meat = None
         position = agent_pos
         meats = self.dist_sort(self.kitchen.meats, agent_pos)
-        meats.reverse()
         for m in meats:
             for f in self.kitchen.fridges:
                 on_c = m.states[object_states.OnTop].get_value(f)
@@ -343,7 +366,6 @@ class TrackingEnv():
         closest = None
         position = agent_pos
         objects = self.dist_sort(self.kitchen.onions, agent_pos)
-        objects.reverse()
         # for o in objects:
         #     for f in self.kitchen.counters:
         #         on_c = o.states[object_states.OnTop].get_value(f)

@@ -33,8 +33,10 @@ class Kitchen():
         self.plates = []
         self.rinsing_sinks = {}
         self.ready_sinks = []
+        self.hot_plates = []
         self.onions = []
         self.steaks = []
+        self.knives = []
         self.meats = []
         self.counters = []
         self.table = None
@@ -256,7 +258,7 @@ class Kitchen():
             "plate": (0, 0, 1.2),
             "scrub_brush": (0, 0, 1.3),
             "chopping_board": (0, 0, 1.2),
-            "knife": (0.4, 0, 1.2),
+            "knife": (0, 0.3, 1.4),
             "onion": (0.15, -0.1, 0)
         }
 
@@ -463,7 +465,7 @@ class Kitchen():
                 #     new_pos = pos
                 #     new_pos[2] += 0.07 * ((-1)**i)
                 #     part_obj.set_position(new_pos)
-                pos[2] += 0.1
+                pos[2] += 0.05
                 self.env.set_pos_orn_with_z_offset(whole_obj, tuple(pos), orn)
                 self.onions.append(multiplexed_obj)
                 body_ids = multiplexed_obj.get_body_ids()
@@ -482,7 +484,7 @@ class Kitchen():
             if name not in ("bowl", "pan", "vidalia_onion", "steak", "plate", "chopping_board", "knife", "green_onion"):
                 self.static_objs[obj] = (x, y)
             if name == "bowl" or name == "plate":
-                obj.states[object_states.Dusty].set_state(True)
+                obj.states[object_states.Dusty].set_value(True)
                 self.bowls.append(obj)
                 body_ids = obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.01)
@@ -507,6 +509,11 @@ class Kitchen():
                 self.sinks.append(obj)
             if name == "plate":
                 self.plates.append(obj)
+            if name == "knife":
+                self.knives.append(obj)
+                body_ids = obj.get_body_ids()
+                p.changeDynamics(body_ids[0], -1, mass=0.01)
+                
             
             # for steak order
             # if name in ("apple", "green_onion", "broccoli", "steak"):

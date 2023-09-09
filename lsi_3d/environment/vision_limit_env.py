@@ -1,4 +1,5 @@
 import math
+from igibson import object_states
 from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.environment.kitchen import Kitchen
@@ -6,6 +7,7 @@ from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.mdp.state import AgentState, WorldState
+from lsi_3d.utils.functions import find_nearby_open_spaces
 from utils import grid_to_real_coord, real_to_grid_coord
 
 class VisionLimitEnv(LsiEnv):
@@ -27,9 +29,11 @@ class VisionLimitEnv(LsiEnv):
             if len(pans_status[pan]) == 0:
                 self.world_state.state_dict['pot_states']['empty'].append(pan)
             elif len(pans_status[pan]) == self.kitchen.onions_for_soup:
-                self.world_state.state_dict['pot_states']['cooking'].append(pan)
-            elif len(self.kitchen.steaks) > 0:
-                self.world_state.state_dict['pot_states']['cooking'].append(pan)
+                for item in pans_status[pan]:
+                    if item in self.kitchen.steaks:
+                        self.world_state.state_dict['pot_states']['ready'].append(pan)
+                    else:
+                        self.world_state.state_dict['pot_states']['cooking'].append(pan)
 
         # chopping boards
         chop_status = self.tracking_env.get_chopping_board_status()
@@ -41,7 +45,11 @@ class VisionLimitEnv(LsiEnv):
             if len(chop_status[chop]) == 0:
                 self.world_state.state_dict['chop_states']['empty'].append(chop)
             else:
-                self.world_state.state_dict['chop_states']['ready'].append(chop)
+                for onion in chop_status[chop]:
+                    if onion.current_index == 1:
+                        self.world_state.state_dict['chop_states']['ready'].append(chop)
+                    else:
+                        self.world_state.state_dict['chop_states']['full'].append(chop)
 
         # sinks
         sink_status = self.tracking_env.get_sink_status()
@@ -95,18 +103,18 @@ class VisionLimitEnv(LsiEnv):
             station_loc = self.kitchen.get_chopping_station()[0]
             arrival_loc = self.transform_end_location(station_loc)
             return arrival_loc
+        elif action == "chop" and object == "onion":
+            location = self.tracking_env.get_closest_chopping_board(agent_pos).get_position()
+        elif action == "pickup" and object == "garnish":
+            location = self.tracking_env.get_closest_chopped_onion(agent_pos).current_selection().objects[0].get_position()
         elif action == "drop" and object == "meat":
             pan_status = self.tracking_env.get_pan_status()
             agent_location_real = grid_to_real_coord(agent_location)
             pans_sorted = sorted(self.kitchen.pans, key=lambda pan: (self.tracking_env.get_pan_enum_status(pan), math.dist(pan.get_position()[0:2], agent_location_real)))
             location = pans_sorted[0].get_position()
-        elif action == "deliver" and object == "dish":
-            # dish includes plate, steak, and garnish
-            dish = self.tracking_env.get_dish()
-            location = dish.get_position()
 
 
-        elif action == "deliver" and object == "soup":
+        elif action == "deliver" and (object == "soup" or object == "dish"):
             # serving_locations = self.mdp.get_serving_locations()
             serving_locations = self.tracking_env.get_table_locations()
             for bowl in self.kitchen.bowls:
@@ -121,6 +129,7 @@ class VisionLimitEnv(LsiEnv):
 
             sorted_serv_locations = self.sort_locations(open_serving_locations, agent_location)
             return sorted_serv_locations[0] if len(sorted_serv_locations) > 0 else None
+
         elif action == "pickup" and object == "soup":
             # gets pan closest to done
             for pan in self.tracking_env.dist_sort(self.kitchen.pans, agent_location):
@@ -150,11 +159,8 @@ class VisionLimitEnv(LsiEnv):
             return arrival_loc
         
         elif action == "pickup" and object == "steak":
-            ready_pans = self.world_state["pot_states"]["ready"]
-            status = self.tracking_env.get_pan_status()
-            ready_meat = status[ready_pans[0]]
-            arrival_loc = self.transform_end_location(station_loc)
-            return arrival_loc
+            ready_pans = self.world_state.state_dict["pot_states"]["ready"]
+            location = ready_pans[0].get_position()
         
         elif action == "pickup" and object == "hot_plate":
             sink = self.kitchen.ready_sinks[0]

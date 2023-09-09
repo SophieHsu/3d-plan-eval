@@ -1,6 +1,8 @@
+from igibson import object_states
 from lsi_3d.agents.human_agent import HumanAgent
 from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.environment.tracking_env import TrackingEnv
+import pybullet as p
 
 class VisionLimitHumanAgent(HumanAgent):
     def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env:LsiEnv, tracking_env:TrackingEnv, vr=False, insight_threshold=5):
@@ -147,23 +149,6 @@ class VisionLimitHumanAgent(HumanAgent):
         hand_pos = self.human._parts["right_hand"].get_position()
         # next_hl_state = self.next_hl_state
         action, object = action_object = self.action_object
-        # if action == "pickup" and object == "onion":
-        #     if self.object_position is None:
-        #         self.target_object = self.tracking_env.get_closest_green_onion(
-        #         )
-        #         self.object_position = self.target_object.get_position()
-
-        #     # marker_2 = VisualMarker(visual_shape=p.GEOM_SPHERE, radius=0.06)
-        #     # self.igibson_env.simulator.import_object(marker_2)
-        #     # marker_2.set_position(self.object_position)
-        #     is_holding_onion = self.tracking_env.is_obj_in_human_hand(self.target_object)
-        #     done = self.pick(self.object_position, [0, 0, 0.05])
-
-        #     if done:
-        #         if is_holding_onion:
-        #             self.completed_goal(None, action_object)
-        #         else:
-        #             self.object_position = None
         if action == "pickup" and object == "meat":
             if self.object_position is None:
                 self.target_object = self.tracking_env.get_closest_meat(self.human.get_position())
@@ -200,8 +185,9 @@ class VisionLimitHumanAgent(HumanAgent):
                 sink_pos = sink.get_position()
                 # orn = self.tracking_env.kitchen.orientation_map[("bowl", x, y)]
                 # shift = self.tracking_env.kitchen.name2shift_map["bowl"]
+                self.env.kitchen.hot_plates.append(self.target_object)
                 pos = self.motion_controller.translate_loc(self.human, sink_pos, [0.3, 0, 0.5])
-                pos = [sink_pos[0], sink_pos[1], 1.2]
+                # pos = [sink_pos[0], sink_pos[1], 1.2]
                 self.env.nav_env.set_pos_orn_with_z_offset(self.target_object, tuple(pos), (0, 0, -1.5707))
             self.object_position = self.target_object.get_position()
 
@@ -220,18 +206,130 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.env.kitchen.rinse_sink(sink)
                 self.completed_goal(None, action_object)
         elif action == "pickup" and object == "steak":
-            status = self.tracking_env.get_pan_status()
+            if self.object_position is None:
+                pan = self.tracking_env.get_closest_pan()
+                self.tracking_env.kitchen.interact_objs[pan] = True
+                self.interact_obj = pan
+                self.object_position = pan.get_position()
+            if self.step_index == 0:
+                done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
+                if done:
+                    self.step_index = self.step_index + 1
+                    steak = self.tracking_env.get_closest_steak(self.human.get_position())
+                    self.object_position = steak.get_position()
+                    self.target_object = steak
+            elif self.step_index == 1:
+                is_holding_steak = self.tracking_env.is_obj_in_human_hand(self.target_object)
+                done = self.pick(self.object_position, [0, -0.03, 0.05])
+                if done:
+                    if is_holding_steak:
+                        self.step_index = self.step_index + 1
+                        self.object_position = self.tracking_env.get_closest_bowl(
+                        ).get_position()
+                    else:
+                        bowl = self.tracking_env.get_closest_bowl()
+                        bowl_pos = bowl.get_position()
+                        self.target_object.set_position(bowl_pos + [0,0,0.3])
+                        self.step_index = 3
+                        self.target_object = bowl
+                        self.object_position = bowl_pos
+            elif self.step_index == 2:
+                done = self.drop(self.object_position, [0, -0.1, 0.3])
+                if done:
+                    self.step_index = 3
+                    bowl = self.tracking_env.get_closest_bowl()
+                    self.object_position = bowl.get_position()
+                    self.target_object = bowl
+            elif self.step_index == 3:
+                is_holding_bowl = self.tracking_env.is_obj_in_human_hand(self.target_object)
+                done = self.pick(self.object_position, [0, -0.3, 0.1]) and is_holding_bowl
+                if done:
+                    self.step_index = self.step_index + 1
+            else:
+                self.completed_goal(None, action_object)
+                self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
+        elif action == "pickup" and object == "garnish":
+            if self.object_position is None:
+                chopped_onion = self.tracking_env.get_closest_chopped_onion(self.human.get_position())
+                self.tracking_env.kitchen.interact_objs[chopped_onion] = True
+                self.interact_obj = chopped_onion
+                self.object_position = chopped_onion.current_selection().objects[0].get_position()
+                self.target_object = chopped_onion
+            if self.step_index == 0:
+                done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
+                if done:
+                    self.step_index = self.step_index + 1
+            elif self.step_index == 1:
+                done = self.pick(self.object_position, [0, -0.03, 0.2])
+                if done:
+                    bowl = self.tracking_env.get_closest_bowl()
+                    bowl_pos = bowl.get_position()
+                    for i,object in enumerate(self.target_object.current_selection().objects):
+                        object.set_position(bowl_pos + [0,0,0.05 + i*0.05])
+                    self.step_index = 2
+                    self.target_object = bowl
+                    self.object_position = bowl_pos
+            elif self.step_index == 2:
+                done = self.drop(self.human._parts["right_hand"].get_position(), [0,0,0])
+                if done:
+                    self.step_index = 3
+            elif self.step_index == 3:
+                is_holding_bowl = self.tracking_env.is_obj_in_human_hand(self.target_object)
+                done = self.pick(self.object_position, [0, -0.3, 0.1]) and is_holding_bowl
+                if done:
+                    self.step_index = self.step_index + 1
+            else:
+                self.completed_goal(None, action_object)
+                self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
+        elif action == "chop" and object == "onion":
+            if self.object_position is None:
+                knife = self.tracking_env.get_closest_knife(self.human.get_position())
+                self.tracking_env.kitchen.interact_objs[knife] = True
+                self.interact_obj = knife
+                self.object_position = knife.get_position()
+                self.target_object = knife
+            elif self.step_index == 0:
+                is_holding = self.tracking_env.is_obj_in_human_hand(self.target_object)
+                done = self.pick(self.object_position, [0, -0.02, 0.03])
+                if done:
+                    if is_holding:
+                        self.step_index = 2
+                        self.target_object = self.tracking_env.get_closest_chopping_board(self.human.get_position())
+                        self.object_position = self.target_object.get_position()
+                    else:
+                        # set onion to sliced
+                        o = self.tracking_env.get_closest_green_onion(self.human.get_position())
+                        o.states[object_states.Sliced].set_value(True)
+                        self.completed_goal(None, action_object)
+                        self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
+                        self.step_index = 1
+            elif self.step_index == 1:
+                reset_hand_ori = [-2.908, 0.229, 0]
+                self.human._parts["right_hand"].set_orientation(p.getQuaternionFromEuler(reset_hand_ori))
+                done = self.drop(self.human._parts["right_hand"].get_position(), [0,0,0])
+                if done:
+                    self.step_index = 2
+
+            elif self.step_index == 2:
+                done = self.drop(self.object_position, [0, -0.3, 0.3])
+                if done:
+                    o = self.tracking_env.get_closest_green_onion(self.human.get_position())
+                    o.states[object_states.Sliced].set_value(True)
+                    self.completed_goal(None, action_object)
+                    self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
+                
         elif action == "pickup" and object == "onion":
             if self.object_position is None:
                 self.target_object = self.tracking_env.get_closest_green_onion(hand_pos)
             self.object_position = self.target_object.get_position()
             is_holding = self.tracking_env.is_obj_in_human_hand(self.target_object)
-            done = self.pick(self.object_position, [0, -0.1, 0.05])
+            done = self.pick(self.object_position, [0, -0.1, 0.04])
 
             if done:
                 if is_holding:
                     self.completed_goal(None, action_object)
                 else:
+                    self.target_object.set_position(self.object_position + [0,0,0.3])
                     self.object_position = None
         elif action == "drop" and object == "onion":
             if self.object_position is None:
@@ -240,10 +338,10 @@ class VisionLimitHumanAgent(HumanAgent):
             done = self.drop(self.object_position, [0, -0.1, 0.25])
             if done:
                 self.completed_goal(None, action_object)
-        elif action == "deliver" and object == "soup":
+        elif action == "deliver" and (object == "soup" or object == "dish"):
             done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
             if done:
-                self.completed_goal(next_hl_state, action_object)
+                self.completed_goal(None, action_object)
         elif (action == "pickup" and object == "soup") or self.step_index >= 1:
             if self.object_position is None:
                 pan = self.tracking_env.get_closest_pan()
