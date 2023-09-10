@@ -107,6 +107,8 @@ class VisionLimitEnv(LsiEnv):
             location = self.tracking_env.get_closest_chopping_board(agent_pos).get_position()
         elif action == "pickup" and object == "garnish":
             location = self.tracking_env.get_closest_chopped_onion(agent_pos).current_selection().objects[0].get_position()
+            if location == None:
+                location = self.tracking_env.get_closest_chopping_board(agent_location)
         elif action == "drop" and object == "meat":
             pan_status = self.tracking_env.get_pan_status()
             agent_location_real = grid_to_real_coord(agent_location)
@@ -160,10 +162,16 @@ class VisionLimitEnv(LsiEnv):
         
         elif action == "pickup" and object == "steak":
             ready_pans = self.world_state.state_dict["pot_states"]["ready"]
-            location = ready_pans[0].get_position()
+            if len(ready_pans) == 0:
+                location = self.tracking_env.get_closest_pan()
+            else:
+                location = ready_pans[0].get_position()
         
         elif action == "pickup" and object == "hot_plate":
-            sink = self.kitchen.ready_sinks[0]
+            if len(self.kitchen.ready_sinks) > 0:
+                sink = self.kitchen.ready_sinks[0]
+            else:
+                sink = self.tracking_env.get_closest_sink()
             location = sink.get_position()
 
         if location is not None:

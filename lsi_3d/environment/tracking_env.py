@@ -3,6 +3,7 @@ import os
 import math
 import igibson
 from igibson.objects.articulated_object import URDFObject
+from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
 from igibson import object_states
 import pybullet as p
@@ -317,6 +318,15 @@ class TrackingEnv():
     def get_closest_chopping_board(self, agent_pos):
         cs = self.dist_sort(self.kitchen.chopping_boards, agent_pos)
         return cs[0]
+    
+    def get_position(self, obj):
+        if obj.name == 'green_onion_multiplexer':
+            if obj.current_index == 0:
+                return real_to_grid_coord(obj.get_position())
+            else:
+                return real_to_grid_coord(obj.current_selection().objects[0].get_position())
+        else:
+            return real_to_grid_coord(obj.get_position())
         
 
     def get_bowls_dist_sort(self, is_human=None):

@@ -649,6 +649,29 @@ class Kitchen():
 
         return indexes
     
+    def get_immobile_objects(self):
+        key_objects_list = [
+            *self.pans
+            , *self.fridges
+            , *self.chopping_boards
+            , *self.sinks
+        ]
+
+        return key_objects_list
+    
+    def get_mobile_objects(self):
+        key_objects_list = [
+            *self.bowls
+            , *self.plates
+            , *self.hot_plates
+            , *self.onions 
+            , *self.steaks
+            , *self.knives
+            , *self.meats
+        ]
+
+        return key_objects_list
+    
     def get_empty_squares(self):
         return self.where_grid_is('X')
     
