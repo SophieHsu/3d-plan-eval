@@ -34,6 +34,12 @@ def grid_to_real_coord(coord):
         # return (coord[0] + 0.5, coord[1] + 0.5)
         return (coord[0] - 4.5, coord[1] - 4.5)
 
+def to_overcooked_grid(loc):
+        pos = loc
+        r,c = pos
+        x,y = c+1,r+1
+        return (x,y)
+
 def normalize_radians(rad):
         # Convert radians to value between 0 and 2 * pi
         rad = rad % (2 * math.pi)

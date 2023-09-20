@@ -16,6 +16,11 @@ class LsiMdp(object):
         self.height = len(map)
         self.width = len(map[0])
 
+        # steak domain
+        self.num_items_for_steak = 1
+        self.chopping_time = 2
+        self.wash_time = 2
+
     @staticmethod
     def from_config(start_locations, exp_config, grid):
         #a1_loc = (agent_configs[1]['start_x'], agent_configs[1]['start_y'])

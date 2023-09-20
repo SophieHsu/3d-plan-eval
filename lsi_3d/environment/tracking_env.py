@@ -44,13 +44,17 @@ class TrackingEnv():
             data[c] = onions
         return data
     
-    def get_sink_status(self):
+    def get_sink_status(self, same_location = False):
         data = {}
         for s in self.kitchen.sinks:
             plates = []
             for p in self.kitchen.plates:
                 if p.states[object_states.Inside].get_value(s):
                     plates.append(p)
+
+            if real_to_grid_coord(p.get_position()) == real_to_grid_coord(s.get_position()) and same_location:
+                    plates.append(p)
+
             data[s] = plates
         return data
     
@@ -120,7 +124,7 @@ class TrackingEnv():
     def dist_sort(self, objects, agent_pos):
         # agent pos is real coordinate
         sorted_positions = sorted(objects, key=lambda object: self.distance_to_object(object, agent_pos))
-        sorted_positions.reverse()
+        # sorted_positions.reverse()
         return sorted_positions
     
     def get_pan_enum_status(self, pan):
@@ -184,13 +188,22 @@ class TrackingEnv():
         return []
 
     def obj_in_human_hand(self):
-        all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls + self.kitchen.meats + self.kitchen.plates
+        all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls + self.kitchen.meats + self.kitchen.plates + self.kitchen.hot_plates + self.kitchen.steaks
         for obj in all_objs:
             body_id = obj.get_body_ids()[0]
             grasping = self.human.is_grasping_all_arms(body_id)
             if IsGraspingState.TRUE in grasping:
                 return obj
         return None
+    
+    # def get_obj_in_robot_hand(self):
+    #     all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls + self.kitchen.meats + self.kitchen.plates + self.kitchen.hot_plates + self.kitchen.steaks
+    #     for obj in all_objs:
+    #         body_id = obj.get_body_ids()[0]
+    #         grasping = self.robot.object.is_grasping_all_arms(body_id)
+    #         if IsGraspingState.TRUE in grasping:
+    #             return obj
+    #     return None
         # return self.kitchen.in_human_hand
 
     def get_human_holding(self):
@@ -272,7 +285,7 @@ class TrackingEnv():
     #         position = agent_pos
 
     def distance_to_object(self, object, position):
-        object_position = object.get_position()[0:2]
+        object_position = self.get_position(object)[0:2]
         position = position[0:2]
         return math.dist(object_position, position)
     
@@ -286,6 +299,30 @@ class TrackingEnv():
                 if on_c:
                     closest_plate = p
                     break
+
+        return closest_plate
+    
+    def get_closest_plate_in_sink(self, agent_pos):
+        closest_plate = None
+        position = agent_pos
+        plates = self.dist_sort(self.kitchen.plates, agent_pos)
+        for p in plates:
+            for c in self.kitchen.sinks:
+                on_c = p.states[object_states.OnTop].get_value(c)
+                if on_c:
+                    closest_plate = p
+                    break
+
+                on_c = p.states[object_states.Inside].get_value(c)
+                if on_c:
+                    closest_plate = p
+                    break
+
+                # sink_pos = real_to_grid_coord(c.get_position())[0:2]
+                # plate_pos = real_to_grid_coord(p.get_position())[0:2]
+                # if sink_pos == plate_pos:
+                #     closest_plate = p
+                #     break
 
         return closest_plate
     
@@ -305,6 +342,7 @@ class TrackingEnv():
         for onion in self.kitchen.onions:
             if onion.current_index == 1:
                 return onion
+        
     
     def get_hot_plates(self, agent_pos):
         hot_plates = []
@@ -327,6 +365,15 @@ class TrackingEnv():
                 return real_to_grid_coord(obj.current_selection().objects[0].get_position())
         else:
             return real_to_grid_coord(obj.get_position())
+        
+    def get_real_position(self, obj):
+        if obj.name == 'green_onion_multiplexer':
+            if obj.current_index == 0:
+                return obj.get_position()
+            else:
+                return obj.current_selection().objects[0].get_position()
+        else:
+            return obj.get_position()
         
 
     def get_bowls_dist_sort(self, is_human=None):
@@ -396,7 +443,7 @@ class TrackingEnv():
             position = agent_pos
         for p in self.kitchen.pans:
             pan_position = p.get_position()
-            dist = math.dist(position, pan_position)
+            dist = math.dist(position[0:2], pan_position[0:2])
             if dist < min_dist:
                 min_dist = dist
                 closest_pan = p

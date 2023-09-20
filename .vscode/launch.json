@@ -11,7 +11,8 @@
             // "cwd": "${workspaceFolder}\\3d-plan-eval",
             "program": "${workspaceFolder}\\3d_plan_eval_main.py",
             "console": "integratedTerminal",
-            "args": ["-m", "vr", "-c", "user_study_1.tml"],
+            //"args": ["-m", "vr", "-c", "user_study_1.tml"],
+            "args": ["-c", "steak.tml"],
             "justMyCode": true
         }
     ]

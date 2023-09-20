@@ -6,8 +6,9 @@ from lsi_3d.agents.human_agent import HumanAgent
 from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.environment.tracking_env import TrackingEnv
 import pybullet as p
+from lsi_3d.utils.functions import find_nearby_open_spaces
 
-from utils import real_to_grid_coord
+from utils import grid_to_real_coord, real_to_grid_coord
 
 class VisionLimitHumanAgent(HumanAgent):
     def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env:LsiEnv, tracking_env:TrackingEnv, vr=False, insight_threshold=5):
@@ -29,9 +30,9 @@ class VisionLimitHumanAgent(HumanAgent):
         self.knowledge_base['mobile'] = {}
         self.knowledge_base['immobile'] = {}
         for obj in self.env.kitchen.get_mobile_objects():
-            self.knowledge_base['mobile'][obj] = {'name': obj.name, 'pos': self.tracking_env.get_position(obj)}
+            self.knowledge_base['mobile'][obj] = {'name': obj.name, 'pos': self.tracking_env.get_position(obj), 'status': 'on_counter'}
         for obj in self.env.kitchen.get_immobile_objects():
-            self.knowledge_base['immobile'][obj] = {'name': obj.name, 'pos': self.tracking_env.get_position(obj)}
+            self.knowledge_base['immobile'][obj] = {'name': obj.name, 'pos': self.tracking_env.get_position(obj), 'status':'empty', 'objects':None}
 
         self.knowledge_base['other_player'] = {'name': obj.name, 'holding': self.env.robot_state.holding}
     
@@ -104,7 +105,7 @@ class VisionLimitHumanAgent(HumanAgent):
                     tmp_kb['mobile'][obj]['chop'] = None
                     tmp_kb['mobile'][obj]['status'] = 'on_counter'
                     for chop in chop_status:
-                        if self.in_bound(agent_rcf, chop.get_position()):
+                        if self.in_bound(agent_rcf, real_to_grid_coord(chop.get_position())):
                             if obj in chop_status[chop]:
                                 tmp_kb['mobile'][obj]['chop'] = chop
                                 if obj.current_index == 0:
@@ -117,13 +118,22 @@ class VisionLimitHumanAgent(HumanAgent):
                     tmp_kb['mobile'][obj]['sink'] = None
                     tmp_kb['mobile'][obj]['status'] = 'on_counter'
                     for sink in sink_status:
-                        if self.in_bound(agent_rcf, sink.get_position()):
+                        if self.in_bound(agent_rcf, real_to_grid_coord(sink.get_position())):
                             if obj in sink_status[sink]:
-                                tmp_kb[obj]['sink'] = sink
-                                if obj in self.env.kitchen.ready_plates:
-                                    tmp_kb[obj]['status'] = 'hot'
+                                tmp_kb['mobile'][obj]['sink'] = sink
+                                if self.env.kitchen.overcooked_object_states[obj]['state'] != 2:
+                                    tmp_kb['mobile'][obj]['status'] = 'cold'
                                 else:
-                                    tmp_kb[obj]['status'] = 'not_hot'
+                                    tmp_kb['mobile'][obj]['status'] = 'hot'
+                            # plates = sink_status[sink]
+                            # if len(plates) == 0:
+                            #     self.world_state.state_dict['sink_states']['empty'].append(sink)
+                            # elif self.kitchen.overcooked_object_states[plates[0]]['state'] != 2:
+                            #     tmp_kb['mobile'][obj]['status'] = 'cold'
+                            #     self.world_state.state_dict['sink_states']['full'].append(sink)
+                            # elif self.kitchen.overcooked_object_states[plates[0]]['state'] == 2:
+                            #     tmp_kb['mobile'][obj]['status'] = 'cold'
+                            #     self.world_state.state_dict['sink_states']['ready'].append(sink)
                         
         for obj, state in tmp_kb['immobile'].items():
             if self.in_bound(agent_rcf, state['pos']):
@@ -131,34 +141,43 @@ class VisionLimitHumanAgent(HumanAgent):
                     in_pan = self.tracking_env.get_pan_status()[obj]
                     if len(in_pan) == 0:
                         tmp_kb['immobile'][obj]['status'] = 'empty'
+                        tmp_kb['immobile'][obj]['objects'] = None
                     else:
                         for m in in_pan:
                             if m.states[object_states.Cooked].get_value():
                                 tmp_kb['immobile'][obj]['status'] = 'ready'
+                                tmp_kb['immobile'][obj]['objects'] = m
                             else:
                                 tmp_kb['immobile'][obj]['status'] = 'cooking'
+                                tmp_kb['immobile'][obj]['objects'] = m
 
                 if obj.name == 'chopping_board':
                     on_chop = self.tracking_env.get_chopping_board_status()[obj]
                     if len(on_chop) == 0:
                         tmp_kb['immobile'][obj]['status'] = 'empty'
+                        tmp_kb['immobile'][obj]['objects'] = None
                     else:
                         for o in on_chop:
                             if o.current_index == 0:
                                 tmp_kb['immobile'][obj]['status'] = 'full'
+                                tmp_kb['immobile'][obj]['objects'] = o
                             else:
                                 tmp_kb['immobile'][obj]['status'] = 'ready'
+                                tmp_kb['immobile'][obj]['objects'] = o
 
                 if obj.name == 'sink':
                     in_sink = self.tracking_env.get_sink_status()[obj]
                     if len(in_sink) == 0:
                         tmp_kb['immobile'][obj]['status'] = 'empty'
+                        tmp_kb['immobile'][obj]['objects'] = None
                     else:
-                        for p in in_sink:
-                            if p in self.kitchen.hot_plates:
-                                tmp_kb['immobile'][obj]['status'] = 'ready'
-                            else:
-                                tmp_kb['immobile'][obj]['status'] = 'full'
+                        plate = self.tracking_env.get_sink_status()[obj][0]
+                        if self.env.kitchen.overcooked_object_states[plate]['state'] != 2:
+                            tmp_kb['immobile'][obj]['status'] = 'ready'
+                            tmp_kb['immobile'][obj]['objects'] = in_sink[0]
+                        else:
+                            tmp_kb['immobile'][obj]['status'] = 'full'
+                            tmp_kb['immobile'][obj]['objects'] = in_sink[0]
                 
                 # if 'counter' in obj.name:
                 #     in_fridge = self.tracking_env.get_fridge_status()[obj]
@@ -170,6 +189,30 @@ class VisionLimitHumanAgent(HumanAgent):
                 #                 tmp_kb['immobile'][obj]['status'] = 'ready'
                 #             else:
                 #                 tmp_kb['immobile'][obj]['status'] = 'full'
+
+        for steak in self.get_kb_item_by_name('steak'):
+            if self.in_bound(agent_rcf, tmp_kb['mobile'][steak]['pos']):
+                if tmp_kb['mobile'][steak]['pan'] is None:
+                    for pan in self.get_kb_pans():
+                        if tmp_kb['immobile'][pan]['objects'] == steak:
+                            tmp_kb['immobile'][pan]['objects'] = None
+                            tmp_kb['immobile'][pan]['status'] = 'empty'
+
+        for onion in self.get_kb_item_by_name('green_onion'):
+            if self.in_bound(agent_rcf, tmp_kb['mobile'][onion]['pos']):
+                if tmp_kb['mobile'][onion]['chop'] is None:
+                    for chop in self.get_kb_chops():
+                        if tmp_kb['immobile'][chop]['objects'] == onion:
+                            tmp_kb['immobile'][chop]['objects'] = None
+                            tmp_kb['immobile'][chop]['status'] = 'empty'
+        
+        for plate in self.get_kb_item_by_name('plate'):
+            if self.in_bound(agent_rcf, tmp_kb['mobile'][plate]['pos']):
+                if tmp_kb['mobile'][plate]['sink'] is None:
+                    for sink in self.get_kb_sinks():
+                        if tmp_kb['immobile'][sink]['objects'] == plate:
+                            tmp_kb['immobile'][sink]['objects'] = None
+                            tmp_kb['immobile'][sink]['status'] = 'empty'
                                 
         # check if other player is in vision
         other_player = self.env.robot_state
@@ -187,24 +230,78 @@ class VisionLimitHumanAgent(HumanAgent):
     
     def get_kb_pans(self):
         pans = []
-        for k,b in self.knowledge_base.items():
+        for k,b in self.knowledge_base['immobile'].items():
             if 'pan' in k.name:
                 pans.append(k)
         return pans
     
     def get_kb_chops(self):
         items = []
-        for k,v in self.knowledge_base.items():
+        for k,v in self.knowledge_base['immobile'].items():
             if 'chopping_board' in k.name:
                 items.append(k)
         return items
     
     def get_kb_sinks(self):
         items = []
-        for k,v in self.knowledge_base.items():
+        for k,v in self.knowledge_base['immobile'].items():
             if 'sink' in k.name:
                 items.append(k)
         return items
+    
+    def get_kb_item_by_name(self, name):
+        items = []
+        for k,v in self.knowledge_base['immobile'].items():
+            if name in k.name:
+                items.append(k)
+
+        for k,v in self.knowledge_base['mobile'].items():
+            if name in k.name:
+                items.append(k)
+        return items
+
+    def get_kb_closest_fridge(self, pos):
+        fridges = self.get_kb_item_by_name('counter')
+        return self.tracking_env.dist_sort(fridges, pos)[0]
+    
+    def get_kb_closest_whole_onion(self, pos):
+        onions = self.get_kb_item_by_name('green_onion')
+        found = []
+        for o in onions:
+            status = self.knowledge_base['mobile'][o]['status']
+            if status == 'on_counter':
+                found.append(o)
+
+        return self.tracking_env.dist_sort(found, pos)[0]
+    
+    def get_kb_closest_empty_chopping_station(self, pos):
+        objs = self.knowledge_base['chop_states']['empty']
+        return self.tracking_env.dist_sort(objs, pos)[0]
+    
+    def get_kb_closest_full_chopping_station(self, pos):
+        objs = self.knowledge_base['chop_states']['full']
+        return self.tracking_env.dist_sort(objs, pos)[0]
+    
+    def get_kb_closest_ready_chopping_station(self, pos):
+        objs = self.knowledge_base['chop_states']['ready']
+        return self.tracking_env.dist_sort(objs, pos)[0]
+    
+    def get_kb_closest_empty_pan(self, pos):
+        objs = self.knowledge_base['pot_states']['empty']
+        return self.tracking_env.dist_sort(objs, pos)[0]
+    
+    def get_kb_closest_plate(self, pos):
+        plates = self.get_kb_item_by_name('plate')
+        items = []
+        for plate in plates:
+            if self.knowledge_base['mobile'][plate]['status'] == 'on_counter':
+                items.append(plate)
+
+        return self.tracking_env.dist_sort(items, pos)[0]
+    
+    def get_kb_closest_empty_sink(self, pos):
+        objs = self.knowledge_base['sink_states']['empty']
+        return self.tracking_env.dist_sort(objs, pos)[0]
 
     def update_kb_world_states(self):
         # pans
@@ -246,28 +343,6 @@ class VisionLimitHumanAgent(HumanAgent):
             elif self.knowledge_base['immobile'][sink]['status'] == 'ready':
                 self.knowledge_base['sink_states']['ready'].append(sink)
 
-
-        # update orders left get number of bowls on table remove from original list
-        order_list = self.world_state.init_orders.copy()
-        for p in self.kitchen.plates:
-            if self.tracking_env.is_item_on_table(p):
-                order_list.pop()
-                
-        self.world_state.orders = order_list
-
-        self.update_joint_ml_state()
-
-        # update holding
-        if len(self.tracking_env.obj_in_robot_hand()) > 0:
-            self.robot_state.holding = self.tracking_env.obj_in_robot_hand()[0][0]
-        else:
-            self.robot_state.holding = 'None'
-
-        if self.tracking_env.obj_in_human_hand() is not None:
-            self.human_state.holding = self.tracking_env.get_human_holding()
-        else:
-            self.human_state.holding = 'None'
-
         return
 
 
@@ -289,19 +364,19 @@ class VisionLimitHumanAgent(HumanAgent):
         robot_state = self.env.robot_state
 
         # TODO: update the state based on kb
-        self.update()
+        self.knowledge_base = self.update()
         
         # player = state.players[self.agent_index]
         # other_player = self.knowledge_base['other_player']
         # am = self.mlp.ml_action_manager
 
         counter_objects = self.tracking_env.kitchen.counters
-        # sink_status = self.knowledge_base['sink_states']
-        # chopping_board_status = self.knowledge_base['chop_states']
-        # pot_states_dict = self.knowledge_base['pot_states']
-        sink_status = world_state.state_dict['sink_states']
-        chopping_board_status = world_state.state_dict['chop_states']
-        pot_states_dict = world_state.state_dict['pot_states']
+        sink_status = self.knowledge_base['sink_states']
+        chopping_board_status = self.knowledge_base['chop_states']
+        pot_states_dict = self.knowledge_base['pot_states']
+        # sink_status = world_state.state_dict['sink_states']
+        # chopping_board_status = world_state.state_dict['chop_states']
+        # pot_states_dict = world_state.state_dict['pot_states']
         # NOTE: this most likely will fail in some tomato scenarios
         curr_order = world_state.orders[-1]
 
@@ -313,10 +388,13 @@ class VisionLimitHumanAgent(HumanAgent):
             ready_soups = pot_states_dict['ready']
             cooking_soups = pot_states_dict['cooking']
 
+        other_holding = self.knowledge_base['other_player']['holding']
+        # other_holding = robot_state.holding
+
         steak_nearly_ready = len(ready_soups) > 0 or len(cooking_soups) > 0
-        other_has_dish = robot_state.holding == 'dish'
-        other_has_hot_plate = robot_state.holding == 'hot_plate'
-        other_has_steak = robot_state.holding == 'steak'
+        other_has_dish = other_holding == 'dish'
+        other_has_hot_plate = other_holding == 'hot_plate'
+        other_has_steak = other_holding == 'steak'
 
         garnish_ready = len(chopping_board_status['ready']) > 0
         chopping = len(chopping_board_status['full']) > 0
@@ -413,12 +491,103 @@ class VisionLimitHumanAgent(HumanAgent):
             #     motion_goals += am.place_obj_on_counter_actions(state)
 
 
-        possible_motion_goals = self.env.map_action_to_location(
-            (action, object), self.env.human_state.ml_state[0:2], is_human=True)
+        possible_motion_goals = self.kb_map_action_to_location(
+            (action, object), self.human.get_position())
         goal = possible_motion_goals
         # self.next_hl_state = next_hl_state
         self.action_object = (action, object)
         return goal
+    
+    def kb_map_action_to_location(self, action_object, agent_location):
+        # return position and orientation given the agents location and the action object
+        agent_pos = grid_to_real_coord(agent_location)
+        location = None
+        action, object = action_object
+        if action == "pickup" and object == "onion":
+            # location = self.tracking_env.get_closest_onion().get_position()
+            # station_loc = self.kitchen.get_green_onion_station()[0]
+            onion = self.get_kb_closest_whole_onion(agent_location)
+            station_loc = self.tracking_env.get_position(onion)
+            arrival_loc = self.env.transform_end_location(station_loc)
+            return arrival_loc
+        elif action == "drop" and object == "onion":
+            station = self.get_kb_closest_empty_chopping_station(agent_location)
+            station_loc = self.tracking_env.get_position(station)
+            arrival_loc = self.env.transform_end_location(station_loc)
+            return arrival_loc
+        elif action == "chop" and object == "onion":
+            location = self.get_kb_closest_full_chopping_station(agent_pos).get_position()
+        elif action == "pickup" and object == "garnish":
+            location = self.get_kb_closest_ready_chopping_station(agent_pos).get_position()
+            if location is None:
+                location = self.get_kb_closest_full_chopping_station(agent_location)
+            if location is None:
+                location = self.get_kb_closest_empty_chopping_station(agent_location)
+        elif action == "drop" and object == "meat":
+            empty_pan = self.get_kb_closest_empty_pan(agent_location)
+            location = empty_pan.get_position()
+
+        elif action == "deliver" and (object == "soup" or object == "dish"):
+            # serving_locations = self.mdp.get_serving_locations()
+            serving_locations = self.tracking_env.get_table_locations()
+            for bowl in self.env.kitchen.bowls:
+                bowl_location = real_to_grid_coord(bowl.get_position())
+                if bowl_location in serving_locations:
+                    serving_locations.remove(bowl_location)
+
+            # sort serving locations by distance from robot
+            open_serving_locations = []
+            for serving_loc in serving_locations:
+                open_serving_locations += find_nearby_open_spaces(self.env.kitchen.grid, serving_loc)
+
+            sorted_serv_locations = self.env.sort_locations(open_serving_locations, agent_location)
+            return sorted_serv_locations[0] if len(sorted_serv_locations) > 0 else None
+
+        elif action == "pickup" and object == "soup":
+            # gets pan closest to done
+            for pan in self.tracking_env.dist_sort(self.kitchen.pans, agent_location):
+                cooked_onions, uncooked_onions = self.tracking_env.is_pan_cooked(pan)
+                total_onions = cooked_onions + uncooked_onions
+                if total_onions >= self.mdp.num_items_for_soup:
+                    location = pan.get_position()
+                    break
+        elif action == "drop" and object == "dish":
+            empty_counters = self.tracking_env.get_empty_counters()
+            sorted_counters = self.tracking_env.dist_sort(empty_counters, grid_to_real_coord(agent_location))
+            closest_empty_counter = sorted_counters[0]
+            location = closest_empty_counter.get_position()
+        
+        elif action == "pickup" and object == "plate":
+            closest_plate = self.get_kb_closest_plate(agent_location)
+            location = closest_plate.get_position()
+
+        elif action == "drop" and object == "plate":
+            sink = self.get_kb_closest_empty_sink(agent_location)
+            location = sink.get_position()
+
+        elif action == "pickup" and object == "meat":
+            location = self.get_kb_closest_fridge(agent_pos).get_position()
+        
+        elif action == "pickup" and object == "steak":
+            ready_pans = self.knowledge_base["pot_states"]["ready"]
+            if len(ready_pans) == 0:
+                location = self.tracking_env.get_closest_pan().get_position()
+            else:
+                location = ready_pans[0].get_position()
+        
+        elif action == "pickup" and object == "hot_plate":
+            ready_sinks = self.knowledge_base['sink_states']['ready']
+            if len(ready_sinks) > 0:
+                sink = ready_sinks[0]
+            else:
+                sink = self.tracking_env.get_closest_sink(agent_pos)
+            location = sink.get_position()
+
+        if location is not None:
+            arrival_loc = real_to_grid_coord(location)
+            location = self.env.transform_end_location(arrival_loc)
+
+        return location
     
     def _arrival_step(self):
         hand_pos = self.human._parts["right_hand"].get_position()
@@ -433,8 +602,10 @@ class VisionLimitHumanAgent(HumanAgent):
             done = self.pick(self.object_position, [0, 0, 0.03])
 
             if done:
+                # self.tracking_env.kitchen.update_overcooked_human_holding(self.tracking_env.get_human_holding()[0])
                 if is_holding:
                     self.completed_goal(None, action_object)
+                    human_ml_pos = real_to_grid_coord(self.human.get_position())
                 else:
                     self.object_position = None
 
@@ -445,6 +616,8 @@ class VisionLimitHumanAgent(HumanAgent):
             done = self.drop(self.object_position, [0, -0.1, 0.25])
             if done:
                 self.completed_goal(None, action_object)
+                
+                # self.tracking_env.kitchen.drop_meat(self.target_object)
         elif action == "pickup" and object == "plate":
             if self.object_position is None:
                 self.target_object = self.tracking_env.get_closest_plate(hand_pos)
@@ -504,7 +677,7 @@ class VisionLimitHumanAgent(HumanAgent):
                     else:
                         bowl = self.tracking_env.get_closest_bowl()
                         bowl_pos = bowl.get_position()
-                        self.target_object.set_position(bowl_pos + [0,0,0.3])
+                        self.target_object.set_position(bowl_pos + [0,0,0.1])
                         self.step_index = 3
                         self.target_object = bowl
                         self.object_position = bowl_pos
@@ -573,11 +746,14 @@ class VisionLimitHumanAgent(HumanAgent):
                         self.object_position = self.target_object.get_position()
                     else:
                         # set onion to sliced
-                        o = self.tracking_env.get_closest_green_onion(self.human.get_position())
-                        o.states[object_states.Sliced].set_value(True)
-                        self.completed_goal(None, action_object)
-                        self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
-                        self.step_index = 1
+                        self.step_index = 2
+                        self.target_object = self.tracking_env.get_closest_chopping_board(self.human.get_position())
+                        self.object_position = self.target_object.get_position()
+                        # o = self.tracking_env.get_closest_green_onion(self.human.get_position())
+                        # o.states[object_states.Sliced].set_value(True)
+                        # self.completed_goal(None, action_object)
+                        # self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
+                        # self.step_index = 1
             elif self.step_index == 1:
                 reset_hand_ori = [-2.908, 0.229, 0]
                 self.human._parts["right_hand"].set_orientation(p.getQuaternionFromEuler(reset_hand_ori))

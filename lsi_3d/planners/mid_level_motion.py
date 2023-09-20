@@ -67,6 +67,11 @@ class AStarMotionPlanner(object):
             x,y = start
             start = x,y,'N'
 
+        if len(goal) == 3:
+            x,y,f = goal
+            goal = x,y
+            end_facing = f
+
         r1,c1,d1 = start
         return single_agent_astar(self.map, (r1,c1,d1), goal, end_facing=end_facing)
 

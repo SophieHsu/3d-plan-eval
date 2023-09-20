@@ -16,6 +16,11 @@ class WorldState():
             self.max_in_pot = 2
             self.state_dict = {}
 
+    def deepcopy(self):
+        w = WorldState(orders=self.orders.copy())
+        w.state_dict = self.state_dict.copy()
+        return w
+
     def parse_hl_state(self, hl_state):
         parsed = hl_state.split('_')
         return (int(parsed[1]), parsed[2:])

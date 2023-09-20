@@ -218,9 +218,7 @@ class HlQmdpPlanningAgent(Agent):
             if ml_a == 'I' and self.ig_robot.action_completed(ml_a):
                 # self.env.update_world()
                 self.human_sim_state.ml_state = self.env.human_state.ml_state
-                _, _, hl_robot_action_object = self.hl_robot_action
-                self.env.update_robot_hl_state(hl_robot_action_object)
-                self.take_hl_robot_step = True
+                self.take_ml_robot_step = True
 
     def hl_human_step(self):
         # take high level step when the human has completed an interact

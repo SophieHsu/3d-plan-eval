@@ -13,6 +13,7 @@ from igibson.utils.utils import quatToXYZW, parse_config
 from transforms3d.euler import euler2quat
 import pybullet as p
 from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
+from lsi_3d.agents.vision_limit_robot import VisionLimitRobotAgent
 from lsi_3d.environment.vision_limit_env import VisionLimitEnv
 
 from lsi_3d.planners.a_star_planner import AStarPlanner
@@ -20,6 +21,9 @@ from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHu
 from lsi_3d.agents.human_agent import HumanAgent
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.environment.tracking_env import TrackingEnv
+from lsi_3d.planners.steak_human_subtask_qmdp_planner import SteakHumanSubtaskQMDPPlanner
+from lsi_3d.planners.steak_knowledge_base_planner import SteakKnowledgeBasePlanner
+from lsi_3d.planners.steak_mdp_planner import SteakMediumLevelMDPPlanner
 from utils import real_to_grid_coord, grid_to_real_coord
 
 from lsi_3d.environment.kitchen import Kitchen
@@ -30,7 +34,7 @@ from tokenize import String
 
 from igibson.envs.igibson_env import iGibsonEnv
 import pybullet as p
-from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent
+from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent, SteakFixedPolicyHumanAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.agents.hl_qmdp_agent import HlQmdpPlanningAgent
 from lsi_3d.environment.lsi_env import LsiEnv
@@ -194,12 +198,20 @@ def setup(args):
         env = VisionLimitEnv(mdp, igibson_env, tracking_env, human, robot, kitchen)
         human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
                              kitchen.grid, hlp, env, tracking_env, human_vr)
-
+        #robot_hlp = SteakKnowledgeBasePlanner(mdp, mlp, vision_limited_human=human_agent)
+        # robot_hlp = SteakHumanSubtaskQMDPPlanner(mdp, mlp, vision_limited_human=human_agent)
+        # robot_hlp.compute_mdp(orders=['steak','steak'], filename='qmdp_steak_subtask.pkl')
+        # robot_hlp.precompute_future_cost()
+        #
         robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
-        robot_hlp.compute_mdp(order_list)
+        robot_hlp.compute_mdp(filename='hi')#orders=['steak','steak'], filename='qmdp_steak_subtask.pkl')
+        
+        # robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
         robot_hlp.post_mdp_setup()
-        human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
-        robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
+        
+        #robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
+        human_sim_agent = SteakFixedPolicyHumanAgent(env, human_agent)
+        robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, env,
                                           robot)
 
     # TODO: Get rid of 4.5 offset
@@ -284,7 +296,7 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, env:LsiEnv):
     while True:
         env.update_world()
         human_agent.step()
-        # robot_agent.step()
+        robot_agent.step()
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1

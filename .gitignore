@@ -138,3 +138,5 @@ dmypy.json
 *.code-workspace
 
 lsi_3d/test_logs/
+
+*.pkl

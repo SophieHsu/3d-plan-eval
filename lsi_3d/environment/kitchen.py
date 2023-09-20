@@ -12,7 +12,7 @@ from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplex
 from igibson.utils.assets_utils import get_ig_model_path
 from igibson.object_states.heat_source_or_sink import HeatSourceOrSink
 from igibson import object_states
-from utils import quat2euler, normalize_radians
+from utils import quat2euler, normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 import pybullet as p
 
@@ -50,6 +50,105 @@ class Kitchen():
 
         # tile location is a dictionary of item locations in the environment indexed by letter (eg F for fridge)
         self.tile_location = {}
+
+        # key is plate object and value is state
+        self.overcooked_object_states = {}
+        self.overcooked_max_id = 0
+        self.overcooked_obj_to_id = {}
+        self.overcooked_robot_holding = ('None',None)
+        self.overcooked_human_holding = ('None',None)
+
+    # def pickup_meat(self, meat, agent_ml_state):
+    #     self.overcooked_object_states[meat] = {
+    #         "id": self.overcooked_max_id,
+    #         "name": self.get_name(meat),
+    #         "position": to_overcooked_grid(agent_ml_state[0:2]),
+    #         "state": None
+    #     }
+    #     self.overcooked_max_id += 1
+
+    def drop_plate(self, plate):
+        id = self.overcooked_max_id
+        self.overcooked_max_id +=1
+        self.overcooked_obj_to_id[plate] = id
+        curr_state = self.overcooked_object_states[plate]['state']
+        state = 0 if curr_state is None else curr_state + 1
+        self.overcooked_object_states[plate] = {
+                'id': id,
+                'name': 'hot_plate',
+                'position': to_overcooked_grid(real_to_grid_coord(plate.get_position())),
+                'state':state
+            }
+        
+        return
+        
+    def heat_plate(self, plate):
+        curr_state = self.overcooked_object_states[plate]['state']
+        state = 0 if curr_state is None else curr_state + 1
+        self.overcooked_object_states[plate] = {
+                'id': self.overcooked_obj_to_id[plate],
+                'name': 'hot_plate',
+                'position': to_overcooked_grid(real_to_grid_coord(plate.get_position())),
+                'state':state
+            }
+        
+        return
+
+    def drop_meat(self, obj):
+        id = self.overcooked_max_id
+        self.overcooked_max_id += 1
+        self.overcooked_obj_to_id[obj] = id
+        curr_state = self.overcooked_object_states[obj]['state']
+        state = 1 if curr_state is None else curr_state + 1
+        self.overcooked_object_states[obj] = {
+                'id': id,
+                'name': 'steak',
+                'position': to_overcooked_grid(real_to_grid_coord(obj.get_position())),
+                'state':('steak',1,10)
+            }
+        
+        return
+    
+    def drop_onion(self, obj):
+        id = self.overcooked_max_id
+        self.overcooked_max_id +=1
+        self.overcooked_obj_to_id[obj] = id
+        curr_state = self.overcooked_object_states[obj]['state']
+        state = 0 if curr_state is None else curr_state + 1
+        self.overcooked_object_states[obj] = {
+                'id': id,
+                'name': 'garnish',
+                'position': to_overcooked_grid(real_to_grid_coord(obj.get_position())),
+                'state':state
+            }
+        
+        return
+    
+    def chop_onion(self, obj):
+        curr_state = self.overcooked_object_states[obj]['state']
+        state = 2
+        self.overcooked_object_states[obj] = {
+                'id': self.overcooked_obj_to_id[obj],
+                'name': 'garnish',
+                'position': to_overcooked_grid(real_to_grid_coord(obj.current_selection().objects[0].get_position())),
+                'state':state
+            }
+        
+        return
+    
+    def update_overcooked_human_holding(self, holding, obj):
+        # need to delay human holding for overcooked 
+        # overcooked human holding is tuple of (human_)
+        if self.overcooked_human_holding[0] != holding:
+            self.overcooked_human_holding = (holding, obj)
+
+        return self.overcooked_human_holding[1]
+    
+    def update_overcooked_robot_holding(self):
+        if len(self.in_robot_hand) > 0:
+            self.overcooked_robot_holding = self.in_robot_hand[0][1]
+        else:
+            self.overcooked_robot_holding = None
 
     def setup(self, filepath, order_list):
         self.kitchen_name = filepath.split('/')[1].split('.')[0]
@@ -112,8 +211,18 @@ class Kitchen():
                 self.tile_location['F'] = (x, y)
             elif name == 'stove':
                 self.tile_location['S'] = (x, y)
+            elif 'pan' in name:
+                self.tile_location['P'] = (x, y)
             elif name == 'bowl':
                 self.tile_location['B'] = (x, y)
+            elif name == 'plate':
+                self.tile_location['D'] = (x, y)
+            elif 'green_onion' in name:
+                self.tile_location['G'] = (x, y)
+            elif 'chopping_board' in name:
+                self.tile_location['K'] = (x, y)
+            elif 'sink' in name:
+                self.tile_location['W'] = (x, y)
             elif name == 'table_h' or name == 'table_v':
                 self.tile_location['T'] = (x, y)
 
@@ -380,7 +489,7 @@ class Kitchen():
                         body_ids = onion.get_body_ids()
                         p.changeDynamics(body_ids[0], -1, mass=0.001)
                 if 'steak' in order_list:
-                    for _ in range(10):
+                    for _ in range(3):
                         steak = URDFObject(
                             name2path["steak"],
                             scale=name2scale_map["steak"] / 1.15,
@@ -393,7 +502,30 @@ class Kitchen():
                         self.meats.append(steak)
                         body_ids = steak.get_body_ids()
                         p.changeDynamics(body_ids[0], -1, mass=0.001)
-                
+
+            elif name == 'plate':
+                obj = URDFObject(name2path[name],
+                                 name=name,
+                                 category=name,
+                                 scale=name2scale_map[name] / 1.15,
+                                 # avg_obj_dims={'density': 10000},
+                                 model_path="/".join(
+                                     name2path[name].split("/")[:-1]))
+                self.env.simulator.import_object(obj)
+                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
+                self.bowl_spawn_pos = pos
+
+                for i in range(3):
+                    obj2 = URDFObject(name2path[name],
+                                    name=name,
+                                    category=name,
+                                    scale=name2scale_map[name] / 1.15,
+                                    # avg_obj_dims={'density': 10000},
+                                    model_path="/".join(
+                                        name2path[name].split("/")[:-1]))
+                    self.env.simulator.import_object(obj2)
+                    self.env.set_pos_orn_with_z_offset(obj2, tuple([200 + 5*i,200, 1]), orn)
+                    self.plates.append(obj2)
             elif name == "stove":
                 obj = URDFObject(name2path[name],
                                  scale=name2scale_map[name] / 1.15,
@@ -469,6 +601,60 @@ class Kitchen():
                 self.env.set_pos_orn_with_z_offset(whole_obj, tuple(pos), orn)
                 self.onions.append(multiplexed_obj)
                 body_ids = multiplexed_obj.get_body_ids()
+                p.changeDynamics(body_ids[0], -1, mass=0.001)
+
+                ####################################################
+                self.onion_spawn_pos = pos
+                whole_obj_2 = URDFObject(name2path[name],
+                             name=name,
+                             category=name,
+                             scale=name2scale_map[name] / 1.15,
+                             model_path="/".join(
+                                 name2path[name].split("/")[:-1]),
+                             abilities=name2abl[name])
+
+                object_parts = []
+                # Check the parts that compose the apple and create URDF objects of them
+                for i, part in enumerate(whole_obj_2.metadata["object_parts"]):
+                    part_category = part["category"]
+                    part_model = part["model"]
+                    # Scale the offset accordingly
+                    part_pos = part["pos"] * whole_obj_2.scale
+                    part_orn = part["orn"]
+                    part_model_path = get_ig_model_path(part_category, part_model)
+                    part_filename = os.path.join(part_model_path, part_model + ".urdf")
+                    part_obj_name = whole_obj_2.name + "_part_{}".format(i)
+                    part_obj = URDFObject(
+                        part_filename,
+                        name=part_obj_name,
+                        category=part_category,
+                        model_path=part_model_path,
+                        scale=whole_obj_2.scale,
+                    )
+                    object_parts.append((part_obj, (part_pos, part_orn)))
+
+                # Group the apple parts into a single grouped object
+                grouped_parts_obj_2 = ObjectGrouper(object_parts)
+
+                # Create a multiplexed object: either the full apple, or the parts
+                multiplexed_obj_2 = ObjectMultiplexer(whole_obj_2.name + "_multiplexer", [whole_obj_2, grouped_parts_obj_2], 0)
+
+                # Finally, load the multiplexed object
+                self.env.simulator.import_object(multiplexed_obj_2)
+                whole_obj_2.set_position([200, 100, -100])
+                for i, (part_obj, _) in enumerate(object_parts):
+                    part_obj.set_position([201 + i, 100, -100])
+
+                # multiplexed_obj.set_position([0, 0, 0.72])
+                # for i, (part_obj, _) in enumerate(object_parts):
+                #     # self.env.set_pos_orn_with_z_offset(part_obj, tuple(pos), orn)
+                #     new_pos = pos
+                #     new_pos[2] += 0.07 * ((-1)**i)
+                #     part_obj.set_position(new_pos)
+                pos[2] += 0.05
+                self.env.set_pos_orn_with_z_offset(whole_obj_2, tuple([200,100,1]), orn)
+                self.onions.append(multiplexed_obj_2)
+                body_ids = multiplexed_obj_2.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.001)
             else:
                 obj = URDFObject(name2path[name],
@@ -717,39 +903,45 @@ class Kitchen():
         return chosen_space
     
     def rinse_sink(self, sink):
-        self.rinsing_sinks[sink] = time.time()
+        if sink not in self.rinsing_sinks:
+            self.rinsing_sinks[sink] = time.time()
+    
+    def get_name(self, obj):
+        # if obj in self.bowls:
+        #     return 'bowl'
+        if obj in self.plates:
+            return 'plate'
+        elif obj in self.hot_plates:
+            return 'hot_plate'
+        elif obj in self.onions:
+            return 'onion'
+        elif obj in self.steaks:
+            return 'steak'
+        elif obj in self.knives:
+            return 'knife'
+        elif obj in self.meats:
+            return 'meat'
+        else:
+            return 'object not in any mobile list'
+        
+    def get_position(self, obj):
+        if obj.name == 'green_onion_multiplexer':
+            if obj.current_index == 0:
+                return real_to_grid_coord(obj.get_position())
+            else:
+                return real_to_grid_coord(obj.current_selection().objects[0].get_position())
+        else:
+            return real_to_grid_coord(obj.get_position())
 
     def step(self, count=0):
-        # for obj in self.food_obj:
-        #     try:
-        #         print(
-        #             "%s. Temperature: %.2f. Frozen: %r. Cooked: %r. Burnt: %r."
-        #             % (
-        #                 obj.name,
-        #                 obj.states[object_states.Temperature].get_value(),
-        #                 obj.states[object_states.Frozen].get_value(),
-        #                 obj.states[object_states.Cooked].get_value(),
-        #                 obj.states[object_states.Burnt].get_value(),
-        #             ))
-        #     except:
-        #         pass
 
-        #     if obj.name == "green_onion_multiplexer" and count > 80:
-        #         print("Slicing the green onion and moving the parts")
-        #         # Slice the apple and set the object parts away
-        #         part_pos = obj.get_position()
-        #         obj.states[object_states.Sliced].set_value(True)
-
-        #         # Check that the multiplexed changed to the group of parts
-        #         assert isinstance(obj.current_selection(), ObjectGrouper)
-        #         self.food_obj.remove(obj)
-
-        #         # Move the parts
-        #         for i, part_obj in enumerate(obj.objects):
-        #             new_pos = part_pos.copy()
-        #             new_pos[1] += 0.05 * ((-1)**i)
-        #             part_obj.set_position(new_pos)
-        #             self.food_obj.append(part_obj)
+        for sink in self.sinks:
+            if sink in self.overcooked_object_states:
+                state = self.overcooked_object_states[sink]['state']
+                if state is not None and state < 2:
+                    self.rinsing_sinks.append(sink)
+                elif state == 2:
+                    self.ready_sinks.append(sink)
 
         for sink, time in self.rinsing_sinks.copy().items():
             # if time == None:
@@ -766,3 +958,40 @@ class Kitchen():
 
         for obj in self.in_robot_hand:
             obj[-1].set_position(self.env.robots[0].get_eef_position())
+
+        plate_in_dish_station = False
+        for plat in self.plates:
+            dish_station_pos = self.where_grid_is('D')[0]
+            if real_to_grid_coord(plat.get_position()) == dish_station_pos:
+                plate_in_dish_station = True
+                break
+
+        if not plate_in_dish_station:
+            # get farthest plate
+            plate = None
+            for plat in self.plates:
+                pos = plat.get_position()
+                if pos[0] > 100:
+                    plate = plat
+            self.env.set_pos_orn_with_z_offset(plate, self.bowl_spawn_pos, [0,0,0])
+            body_ids = plate.get_body_ids()
+            p.changeDynamics(body_ids[0], -1, mass=0.001)
+
+        
+        onion_in_onion_station = False
+        for o in self.onions:
+            onion_station_pos = self.where_grid_is('G')[0]
+            if self.get_position(o) == onion_station_pos:
+                onion_in_onion_station = True
+                break
+
+        if not onion_in_onion_station:
+            # get farthest plate
+            onion = None
+            for o in self.onions:
+                pos = self.get_position(o)
+                if pos[0] > 100:
+                    onion = o
+            self.env.set_pos_orn_with_z_offset(onion, self.onion_spawn_pos, [0,0,0])
+            body_ids = onion.get_body_ids()
+            p.changeDynamics(body_ids[0], -1, mass=0.001)

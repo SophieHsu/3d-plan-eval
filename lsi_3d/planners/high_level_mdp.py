@@ -184,7 +184,7 @@ class HighLevelMdpPlanner(object):
 
 
     def init_mdp(self, order_list):
-        self.init_states(order_list)
+        self.init_states(order_list=order_list)
         self.init_actions()
         self.init_transition_matrix()
         self.init_reward()
