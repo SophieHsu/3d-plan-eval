@@ -52,6 +52,9 @@ class TrackingEnv():
                 if p.states[object_states.Inside].get_value(s):
                     plates.append(p)
 
+                if p.states[object_states.OnTop].get_value(s):
+                    plates.append(p)
+
             if real_to_grid_coord(p.get_position()) == real_to_grid_coord(s.get_position()) and same_location:
                     plates.append(p)
 
@@ -164,6 +167,10 @@ class TrackingEnv():
             if val:
                 return True
         return False
+    
+    def get_closest_counter(self, agent_pos):
+        counters = self.dist_sort(self.kitchen.counters, agent_pos)
+        return counters[0]
 
     def obj_in_robot_hand(self):
         # return object in robot hand
@@ -285,7 +292,7 @@ class TrackingEnv():
     #         position = agent_pos
 
     def distance_to_object(self, object, position):
-        object_position = self.get_position(object)[0:2]
+        object_position = self.get_real_position(object)[0:2]
         position = position[0:2]
         return math.dist(object_position, position)
     
@@ -419,7 +426,7 @@ class TrackingEnv():
 
         return closest_meat
     
-    def get_closest_green_onion(self, agent_pos=None):
+    def get_closest_green_onion(self, agent_pos=None, chopped=None):
         closest = None
         position = agent_pos
         objects = self.dist_sort(self.kitchen.onions, agent_pos)
@@ -429,6 +436,13 @@ class TrackingEnv():
         #         if on_c:
         #             closest = o
         #             break
+        closest = None
+        if chopped is not None:
+            for obj in objects:
+                if chopped == False and obj.current_index == 0:
+                    return obj
+                elif chopped == True and obj.current_index == 1:
+                    return obj
         closest = objects[0]
 
         return closest

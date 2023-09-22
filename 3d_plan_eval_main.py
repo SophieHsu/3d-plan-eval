@@ -205,9 +205,9 @@ def setup(args):
         #
         robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         robot_hlp.compute_mdp(filename='hi')#orders=['steak','steak'], filename='qmdp_steak_subtask.pkl')
-        
+        #robot_hlp = None
         # robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
-        robot_hlp.post_mdp_setup()
+        # robot_hlp.post_mdp_setup()
         
         #robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
         human_sim_agent = SteakFixedPolicyHumanAgent(env, human_agent)

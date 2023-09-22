@@ -299,6 +299,15 @@ class VisionLimitHumanAgent(HumanAgent):
 
         return self.tracking_env.dist_sort(items, pos)[0]
     
+    def get_plate_station(self, pos):
+        plates = self.get_kb_item_by_name('plate')
+        # items = []
+        # for plate in plates:
+        #     if self.knowledge_base['mobile'][plate]['status'] == 'on_counter':
+        #         items.append(plate)
+        #self.tracking_env.dist_sort(items, pos)[0]
+        return self.tracking_env.kitchen.where_grid_is('D')[0]
+    
     def get_kb_closest_empty_sink(self, pos):
         objs = self.knowledge_base['sink_states']['empty']
         return self.tracking_env.dist_sort(objs, pos)[0]
@@ -558,8 +567,9 @@ class VisionLimitHumanAgent(HumanAgent):
             location = closest_empty_counter.get_position()
         
         elif action == "pickup" and object == "plate":
-            closest_plate = self.get_kb_closest_plate(agent_location)
-            location = closest_plate.get_position()
+            location = self.get_plate_station(agent_location)
+            return self.env.transform_end_location(location)
+            # location = closest_plate.get_position()
 
         elif action == "drop" and object == "plate":
             sink = self.get_kb_closest_empty_sink(agent_location)
@@ -579,6 +589,14 @@ class VisionLimitHumanAgent(HumanAgent):
             ready_sinks = self.knowledge_base['sink_states']['ready']
             if len(ready_sinks) > 0:
                 sink = ready_sinks[0]
+            else:
+                sink = self.tracking_env.get_closest_sink(agent_pos)
+            location = sink.get_position()
+
+        elif action == "heat" and object == "hot_plate":
+            full_sinks = self.knowledge_base['sink_states']['full']
+            if len(full_sinks) > 0:
+                sink = full_sinks[0]
             else:
                 sink = self.tracking_env.get_closest_sink(agent_pos)
             location = sink.get_position()
@@ -704,7 +722,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.object_position = chopped_onion.current_selection().objects[0].get_position()
                 self.target_object = chopped_onion
             if self.step_index == 0:
-                done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
+                done = self.drop(self.object_position, [-0.3, -0.22, 0.2])
                 if done:
                     self.step_index = self.step_index + 1
             elif self.step_index == 1:

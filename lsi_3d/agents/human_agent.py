@@ -130,7 +130,8 @@ class HumanAgent():
         # check if holding bowl collision radius is larger
         collision_radius = 0.8
         if self.tracking_env.is_human_holding_bowl():
-            collision_radius = 1.05
+            # collision_radius = 1.05
+            collision_radius = 1
 
         if math.dist([x, y], [robot_x, robot_y]) < collision_radius and self.avoiding_start_time is None:
             self.avoiding_start_time = datetime.now()
@@ -157,6 +158,7 @@ class HumanAgent():
 
         if len(path) > 0:
             self.prev_end = end
+            
         return self.motion_controller.step(self.human, self.robot, final_ori,
                                            path, is_new_end)
 

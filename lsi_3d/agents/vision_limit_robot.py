@@ -3,13 +3,14 @@ import math
 import time
 import numpy as np
 from lsi_3d.agents.agent import Agent
-from lsi_3d.agents.hl_qmdp_agent import MAX_DELAY_TIME, HlQmdpPlanningAgent
+from lsi_3d.agents.hl_qmdp_agent import MAX_DELAY_TIME, STUCK_TIME_LIMIT, HlQmdpPlanningAgent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.planners.steak_human_subtask_qmdp_planner import SteakHumanSubtaskQMDPPlanner
 from lsi_3d.utils.functions import grid_transition
+import pprint
 
 import json
 import socket
@@ -109,7 +110,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         super().__init__(hlp_planner, mlp, hl_human_agent, env, ig_robot)
 
         self.action_obj = None
-
+        self.stuck_plan = []
         self.dispatcher = UdpToPygame()
 
     def action(self):
@@ -179,6 +180,33 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                 self.action_obj = None
                 self.human_sim_state.ml_state = self.env.human_state.ml_state
                 self.take_ml_robot_step = True
+
+    def stuck_handler(self):
+
+        if self.stuck_time == None or self.stuck_ml_pos == None:
+            # start timer
+            self.stuck_time = time.time()
+            self.stuck_ml_pos = self.env.robot_state.ml_state
+
+        elapsed = time.time() - self.stuck_time
+        if elapsed > STUCK_TIME_LIMIT:
+            print('Resolving Stuck')
+            # set a new ml goal to adjacent square and recalculate plan
+            # self.take = True
+            new_ml_goal = self.adjacent_empty_square(
+                self.env.human_state.ml_state)
+            self.robot_goal = new_ml_goal
+            self.stuck_plan = self.mlp.compute_single_agent_astar_path(
+                self.env.robot_state.ml_state, new_ml_goal)
+            self.stuck_plan.append((None, 'D'))
+            self.stuck_plan.append((None, 'D'))
+
+            self.stuck_time = time.time()
+
+        if not self.env.robot_state.equal_ml(self.stuck_ml_pos):
+            # reset timer when robot moves
+            self.stuck_ml_pos = self.env.robot_state.ml_state
+            self.stuck_time = time.time()
     
     def step(self):
         self.update_world_state()
@@ -186,12 +214,14 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         # self.ml_human_action = self.ml_human_step()
         # self.hl_robot_action = self.hl_robot_step()
         self.ml_robot_action = self.ml_robot_step()
-        # self.stuck_handler()
+        self.stuck_handler()
         self.ll_step()
 
     def from_overcooked_action(self, res_dict):
         action = tuple(res_dict['action'])
+        print('overcooked action: ', action)
         q = res_dict['q']
+        print('overcooked q: ', q)
         max_q_idx = np.argmax(q)
         if round(q[max_q_idx], 5) == round(q[4], 5):
             # return stay if stay value is equal to the max value
@@ -208,10 +238,13 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             a = 'D'
         elif action[0] == 'i':
             a = 'I'
+
+        print('action: ', a)
         return a
 
     def robot_action_from_overcooked_api(self):
         overcooked_state_dict = self.env.to_overcooked_state()
+        pprint.pprint(overcooked_state_dict)
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -224,6 +257,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
 
             if data is not None:
                 dic = json.loads(data['data'].decode())
+                print('overcooked action: ')
                 self.ml_robot_action = self.from_overcooked_action(dic)
 
         return self.ml_robot_action
@@ -233,18 +267,21 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
     def ml_robot_step(self):
         if self.take_ml_robot_step:
             # if human is directly in front of robot then just wait
-            robot_action = self.robot_action_from_overcooked_api()
-            plan = []
-            if robot_action == self.env.robot_state.ml_state[2]:
-                plan.append((None, 'F'))
-            elif robot_action in 'DI':
-                plan.append((None, robot_action))
+            if len(self.stuck_plan) > 0:
+                self.ml_robot_action = self.stuck_plan.pop(0)
             else:
-                plan.append((None, robot_action))
-                plan.append((None, 'F'))
+                robot_action = self.robot_action_from_overcooked_api()
+                plan = []
+                if robot_action == self.env.robot_state.ml_state[2]:
+                    plan.append((None, 'F'))
+                elif robot_action in 'DI':
+                    plan.append((None, robot_action))
+                else:
+                    plan.append((None, robot_action))
+                    plan.append((None, 'F'))
+                self.ml_robot_action = plan.pop(0)
             self.take_ml_robot_step = False
 
-            self.ml_robot_action = plan.pop(0)
             
             # if self.ml_robot_action and self.env.human_state.ml_state[:2] == grid_transition(self.ml_robot_action[1],
             #                                      self.env.robot_state.ml_state)[0:2]:
@@ -276,11 +313,13 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
 
         if station_key == 'D':
             action_object = ('pickup','plate')
+        elif station_key == 'F':
+            action_object = ('pickup', 'meat')
         elif station_key == 'W':
             plate = self.env.tracking_env.get_closest_plate_in_sink(self.ig_robot.object.get_position())
             if plate is not None:
                 if self.env.kitchen.overcooked_object_states[plate]['state'] == 2:
-                    action_object = ('pickup', 'plate')
+                    action_object = ('pickup', 'hot_plate')
                 else:
                     action_object = ('heat', 'plate')
             else:
@@ -296,11 +335,13 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         elif station_key == 'F':
             action_object = ('pickup','meat')
         elif station_key == 'P' and self.env.tracking_env.obj_in_robot_hand()[0][0] == 'meat':
-            action_object = ('pickup','meat')
+            action_object = ('drop','meat')
         elif station_key == 'P' and len(self.env.tracking_env.obj_in_robot_hand()) == 0:
-            action_object = ('pickup','meat')
+            action_object = ('pickup','steak')
+        elif station_key == 'C':
+            action_object = ('drop', 'item')
         else:
-            action_object = ('no action object')
+            action_object = None
         return action_object
         
     def update_state(self, action_obj):

@@ -10,6 +10,7 @@ class AStarPlanner():
     def __init__(self, env):
         self.env = env
         self.markers = []
+        self.grid_size = 10
         # self.initialize_markers()
 
     def initialize_markers(self):
@@ -86,7 +87,7 @@ class AStarPlanner():
             x_neighbor = loc[0] + n[0]
             y_neighbor = loc[1] + n[1]
 
-            if 0 <= x_neighbor < 8 and 0 <= y_neighbor < 8:
+            if 0 <= x_neighbor < self.grid_size and 0 <= y_neighbor < self.grid_size:
                 neighbor_locs.append((x_neighbor, y_neighbor))
         return neighbor_locs
 

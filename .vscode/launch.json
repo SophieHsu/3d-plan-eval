@@ -14,6 +14,16 @@
             //"args": ["-m", "vr", "-c", "user_study_1.tml"],
             "args": ["-c", "steak.tml"],
             "justMyCode": true
-        }
+        },
+        {
+            "name": "Side 3",
+            "type": "python",
+            "request": "launch",
+            // "cwd": "${workspaceFolder}\\3d-plan-eval",
+            "program": "${workspaceFolder}/3d_plan_eval_main.py",
+            "console": "integratedTerminal",
+            "args": ["-m", "vr", "-c", "steak_side_3.tml"],
+            "justMyCode": true
+        },
     ]
 }

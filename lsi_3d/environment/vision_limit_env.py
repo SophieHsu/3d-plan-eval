@@ -129,7 +129,9 @@ class VisionLimitEnv(LsiEnv):
                 if real_to_grid_coord(s.get_position()) == real_to_grid_coord(plate.get_position()) and sink in self.kitchen.ready_sinks:     
                     # if plate is in same location as sink and sink is in ready sinks then heat it
                     p_state = self.kitchen.overcooked_object_states[plate]
-                    if p_state['state']<2:
+                    if p_state['state'] == None:
+                        self.kitchen.drop_plate(plate)
+                    elif p_state['state']<2:
                         self.kitchen.heat_plate(p)
 
         # if meat is now steak change id and object
@@ -169,6 +171,7 @@ class VisionLimitEnv(LsiEnv):
             for pan in self.kitchen.pans:
                 
                 if 'hot_plate' in st['name']:
+                    # sets hot plate to in hand obj if in same position as pan
                     obj_position = real_to_grid_coord(obj.get_position())
                     if obj_position == real_to_grid_coord(pan.get_position()):
                         human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
@@ -177,6 +180,17 @@ class VisionLimitEnv(LsiEnv):
                             in_human_hand = obj
                         else:
                             in_robot_hand = obj
+
+        
+
+            # same for garnish
+            # if st['name'] == 'hot_plate':
+            #     for onion in self.kitchen.onions:
+            #         if onion.states[object_states.Inside].get_value(obj):
+            #             if obj == in_human_hand:
+            #                 in_human_hand = onion
+            #             else:
+            #                 in_robot_hand = onion
 
         # need to also make plate with steak when at same position as cutting board to pass holding to overcooked
         for obj,st in self.kitchen.overcooked_object_states.items():
@@ -192,13 +206,72 @@ class VisionLimitEnv(LsiEnv):
                         else:
                             in_robot_hand = obj
 
+        # also need to modify in hand object to be steak or dish if inside hot plate
+        for obj, st in self.kitchen.overcooked_object_states.copy().items():
+            if st['name'] == 'hot_plate':
+                is_dish = False
+
+                for onion in self.kitchen.onions:
+                    if onion.states[object_states.Inside].get_value(obj) or onion.states[object_states.OnTop].get_value(obj):
+                        print('setting hot plate state to dish')
+                        is_dish = True
+                        
+                        self.kitchen.overcooked_object_states[obj] = {
+                            'id': self.kitchen.overcooked_max_id,
+                            'name': 'dish',
+                            'position':self.kitchen.overcooked_object_states[obj]['position'],
+                            'state': None
+                        }
+                        self.kitchen.overcooked_max_id += 1
+                        obj_position = real_to_grid_coord(obj.get_position())
+                        human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
+                        robot_dist = math.dist(self.robot_state.ml_state[0:2], obj_position)
+                        if human_dist < robot_dist:
+                            in_human_hand = obj
+                        else:
+                            in_robot_hand = obj
+
+                if not is_dish:
+                    for steak in self.kitchen.steaks:
+                        if steak.states[object_states.Inside].get_value(obj):
+                            if obj == in_human_hand:
+                                in_human_hand = steak
+                            elif obj == in_robot_hand:
+                                in_robot_hand = steak
+
+                            # add tag saying steak is in hot plate
+                            st['in_hot_plate'] = [steak]
+
+        # but if now we have a dish, then that will always be in someones hand
+        for obj, st in self.kitchen.overcooked_object_states.copy().items():
+            if st['name'] == 'dish' and st['state'] != 'delivered':
+                obj_position = real_to_grid_coord(obj.get_position())
+                human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
+                robot_dist = math.dist(self.robot_state.ml_state[0:2], obj_position)
+                if human_dist < robot_dist:
+                    in_human_hand = obj
+                else:
+                    in_robot_hand = obj
+            
+            if st['name'] == 'dish' and self.tracking_env.is_item_on_table(obj) and st['state'] != 'delivered':
+                st['state'] = 'delivered'
+                print('delivered dish!')
+
+
+        # check if holding hot plate and hot plate has a steak and garnish then set hot plate state to be dish
+
+
+                        # remove the hot plate from world
+                        # self.kitchen.overcooked_object_states.pop(obj)
+                        # self.kitchen.stored_overcooked_object_states[obj] = st
+
         # keep track of objects and the order they were picked up as they now have an id
         # in_human_hand = self.kitchen.update_overcooked_human_holding(self.human_state.holding, self.tracking_env.obj_in_human_hand())
         
         self.kitchen.overcooked_object_states
         self.human_state.state_dict['human_holding'] = {}
         if in_human_hand is not None:
-            if in_human_hand not in self.kitchen.overcooked_object_states.keys():
+            if in_human_hand not in self.kitchen.overcooked_object_states.keys() and in_human_hand not in self.kitchen.stored_overcooked_object_states.keys():
                 self.kitchen.overcooked_object_states[in_human_hand] = {
                     "id": self.kitchen.overcooked_max_id,
                     "name": self.kitchen.get_name(in_human_hand),
@@ -215,7 +288,7 @@ class VisionLimitEnv(LsiEnv):
         # do same for robot
         self.robot_state.state_dict['robot_holding'] = {}
         if in_robot_hand is not None:
-            if in_robot_hand not in self.kitchen.overcooked_object_states.keys():
+            if in_robot_hand not in self.kitchen.overcooked_object_states.keys() and in_robot_hand not in self.kitchen.stored_overcooked_object_states.keys():
                 self.kitchen.overcooked_object_states[in_robot_hand] = {
                     "id": self.kitchen.overcooked_max_id,
                     "name": self.kitchen.get_name(in_robot_hand),
@@ -239,8 +312,12 @@ class VisionLimitEnv(LsiEnv):
             if obj == in_human_hand:
                 unowned_objects.pop(obj)
 
-            
-        
+        # also remove hot plates containing steak or garnish
+        for obj,st in self.kitchen.overcooked_object_states.items():
+            if 'in_hot_plate' in st.keys():
+                if len(st['in_hot_plate']) > 0 and obj in unowned_objects:
+                    unowned_objects.pop(obj)
+
         self.world_state.state_dict['unowned_objects'] = unowned_objects
 
         self.world_state.state_dict['objects'] = self.kitchen.overcooked_object_states

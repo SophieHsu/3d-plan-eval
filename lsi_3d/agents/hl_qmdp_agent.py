@@ -16,7 +16,7 @@ from lsi_3d.utils.functions import grid_transition, get_states_in_forward_radius
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from utils import grid_to_real_coord, normalize_radians, quat2euler, real_to_grid_coord
 
-STUCK_TIME_LIMIT = 60
+STUCK_TIME_LIMIT = 45
 MAX_DELAY_TIME = 5
 
 class HlQmdpPlanningAgent(Agent):
@@ -33,10 +33,11 @@ class HlQmdpPlanningAgent(Agent):
         self.recalc_res = 1
         self.ig_robot = ig_robot
 
+        if self.mdp_planner is not None:
         # uniform distribution
-        self.belief = np.full((len(self.mdp_planner.subtask_dict)),
-                              1.0 / len(self.mdp_planner.subtask_dict),
-                              dtype=float)
+            self.belief = np.full((len(self.mdp_planner.subtask_dict)),
+                                1.0 / len(self.mdp_planner.subtask_dict),
+                                dtype=float)
         self.prev_dist_to_feature = {}
 
         self.human_sim_state = AgentState(None, env.human_state.ml_state)

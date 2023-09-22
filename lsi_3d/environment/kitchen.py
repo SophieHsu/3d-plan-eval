@@ -24,8 +24,8 @@ class Kitchen():
 
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
-        self.HEIGHT = 8  # x
-        self.WIDTH = 8  # y
+        self.HEIGHT = 10  # x
+        self.WIDTH = 10  # y
         self.orientation_map = ""
         self.grid = ""
         self.bowls = []
@@ -57,6 +57,7 @@ class Kitchen():
         self.overcooked_obj_to_id = {}
         self.overcooked_robot_holding = ('None',None)
         self.overcooked_human_holding = ('None',None)
+        self.stored_overcooked_object_states = {}
 
     # def pickup_meat(self, meat, agent_ml_state):
     #     self.overcooked_object_states[meat] = {
@@ -663,7 +664,8 @@ class Kitchen():
                                  scale=name2scale_map[name] / 1.15,
                                  # avg_obj_dims={'density': 10000},
                                  model_path="/".join(
-                                     name2path[name].split("/")[:-1]))
+                                     name2path[name].split("/")[:-1]),
+                                 abilities=name2abl[name])
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
 
@@ -691,6 +693,8 @@ class Kitchen():
                 self.counters.append(obj)
             if name == "chopping_board":
                 self.chopping_boards.append(obj)
+                body_ids = obj.get_body_ids()
+                p.changeDynamics(body_ids[0], -1, mass=100)
             if name == "sink":
                 self.sinks.append(obj)
             if name == "plate":
@@ -743,8 +747,8 @@ class Kitchen():
             "D": "plate"
         }
         return_str = ""
-        for x in range(self.HEIGHT):
-            for y in range(self.WIDTH):
+        for x in range(len(grid)):
+            for y in range(len(grid[0])):
                 if grid[x][y] == "X":
                     continue
                 elif grid[x][y] == "T":
@@ -935,13 +939,22 @@ class Kitchen():
 
     def step(self, count=0):
 
-        for sink in self.sinks:
-            if sink in self.overcooked_object_states:
-                state = self.overcooked_object_states[sink]['state']
+        for obj, state in self.overcooked_object_states.items():
+            if state['name'] == 'hot_plate':
+                state = self.overcooked_object_states[obj]['state']
+
+                # TODO: wont work with multiple sinks
+                sink = self.sinks[0]
                 if state is not None and state < 2:
-                    self.rinsing_sinks.append(sink)
+                    
+                    self.rinse_sink(sink)
                 elif state == 2:
                     self.ready_sinks.append(sink)
+
+            # also check world
+            # for plate in self.plates:
+            #     if plate.states[object_states.OnTop].get_value(sink):
+            #         self.rinse_sink(sink)
 
         for sink, time in self.rinsing_sinks.copy().items():
             # if time == None:
@@ -956,8 +969,14 @@ class Kitchen():
                 self.steaks.append(meat)
                 self.meats.remove(meat)
 
+        in_robot_hand_id = 0
         for obj in self.in_robot_hand:
-            obj[-1].set_position(self.env.robots[0].get_eef_position())
+            in_robot_hand_id += 1
+            # if type(obj[-1]) == ObjectMultiplexer:
+            #     obj[-1].current_selection().set_position(self.env.robots[0].get_eef_position())
+            # else:
+            (x,y,z) = self.env.robots[0].get_eef_position()
+            obj[-1].set_position((x,y,z+(0.12*in_robot_hand_id)))
 
         plate_in_dish_station = False
         for plat in self.plates:
@@ -992,6 +1011,8 @@ class Kitchen():
                 pos = self.get_position(o)
                 if pos[0] > 100:
                     onion = o
-            self.env.set_pos_orn_with_z_offset(onion, self.onion_spawn_pos, [0,0,0])
-            body_ids = onion.get_body_ids()
-            p.changeDynamics(body_ids[0], -1, mass=0.001)
+
+            if onion is not None:
+                self.env.set_pos_orn_with_z_offset(onion, self.onion_spawn_pos, [0,0,0])
+                body_ids = onion.get_body_ids()
+                p.changeDynamics(body_ids[0], -1, mass=0.001)
