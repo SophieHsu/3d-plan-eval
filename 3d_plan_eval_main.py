@@ -104,8 +104,8 @@ def setup(args):
         mode=args.mode,
         # action_timestep=1.0 / 15,
         # physics_timestep=1.0 / 30,  #1.0 / 30,
-        action_timestep=1.0 / 30,
-        physics_timestep=1.0 / 120,  #1.0 / 30,
+        action_timestep= 1.0 / 30,
+        physics_timestep= 1.0 / 120,  #1.0 / 30,
         use_pb_gui=True)
 
     # if not headless:
@@ -270,7 +270,7 @@ def check_completion(lsi_env, start_time, kitchen):
     if lsi_env.world_state.orders == []:
         print("Orders Completed")
 
-        filename = 'lsi_3d/test_logs/' + kitchen.kitchen_name + '_log.txt'
+        filename = 'lsi_3d/logs/' + kitchen.kitchen_name + '_log.txt'
         f = open(filename, 'a')
         f.write("success")
         f.close()

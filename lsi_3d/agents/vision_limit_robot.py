@@ -116,6 +116,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         self.ig_robot.name = "human_sim"
         self.awaiting_response = False
         self.current_q = []
+        self.current_ovc_action = None
 
     def action(self):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
@@ -227,10 +228,12 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         q = res_dict['q']
         self.current_q = q
         print('overcooked q: ', q)
+        
         max_q_idx = np.argmax(q[0:4])
 
         if action[0] == 'i':
             a = 'I'
+            self.current_ovc_action = a
             return a
         if round(q[max_q_idx], 5) == round(q[4], 5):
             # return stay if stay value is equal to the max value
@@ -249,6 +252,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             a = 'I'
 
         print('action: ', a)
+        self.current_ovc_action = a
         return a
 
     def robot_action_from_overcooked_api(self):
@@ -329,6 +333,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         s = '\n'
         s += 'Plan: ' + str(self.ml_robot_plan) + '\n'
         s += 'Overcooked Q: \t' + str(self.current_q) + '\n'
+        s += 'Overcooked A: \t' + str(self.current_ovc_action) + '\n'
         f.write(s)
         f.close()
     
@@ -420,6 +425,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                 self.env.tracking_env,
                 num_item_needed_in_dish=self.mdp_planner.mdp.num_items_for_soup
             )
+            self.env.nav_env.simulator.step()
         else:
             self.continuous_motion(ml_action)
             # self.stepped_motion(ml_action)

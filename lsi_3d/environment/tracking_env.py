@@ -162,6 +162,10 @@ class TrackingEnv():
 
     def is_item_on_table(self, item):
         val = item.states[object_states.OnTop].get_value(self.kitchen.table)
+
+        tables = self.get_table_locations()
+        if real_to_grid_coord(item.get_position()) in tables:
+            return True
         return val
     
     def is_item_on_counter(self, item):
@@ -278,10 +282,14 @@ class TrackingEnv():
     #     fridge.states[object_states.Open].set_value(True)
 
     def set_in_robot_hand(self, name, obj):
-        self.kitchen.in_robot_hand.append([name, obj])
+        if [name, obj] not in self.kitchen.in_robot_hand:
+            self.kitchen.in_robot_hand.append([name, obj])
 
     def get_table_locations(self):
         return self.kitchen.static_objs[self.kitchen.table]
+    
+    def get_closest_table_location(self, agent_pos):
+        return self.dist_sort(self.get_table_locations, agent_pos)[0]
 
     def remove_in_robot_hand(self, item, pos=None, counter=0):
         self.kitchen.in_robot_hand.remove(item)
@@ -363,11 +371,12 @@ class TrackingEnv():
         return self.dist_sort(self.kitchen.knives, agent_pos)[0]
     
     def get_closest_chopped_onion(self, agent_pos):
-        for onion in self.kitchen.onions:
-            if onion.current_index == 1:
-                return onion
-        
+        chopped_onions = [o for o in self.kitchen.onions if o.current_index == 1]
+        if len(chopped_onions) == 0:
+            return None
     
+        return self.dist_sort(chopped_onions, agent_pos)[0]
+        
     def get_hot_plates(self, agent_pos):
         hot_plates = []
         for sink in self.kitchen.ready_sinks:

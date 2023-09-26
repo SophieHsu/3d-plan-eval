@@ -462,6 +462,23 @@ class iGibsonAgent:
             self.interact_step_index = -1
             self.object_position = None
         elif action == 'pickup' and object == 'garnish':
+            onion = tracking_env.get_closest_chopped_onion(
+                agent_pos=self.object.get_position()
+                )
+            
+            offset = 1
+            x,y,z = self.object.get_eef_position()
+            for obj in onion.objects:
+                obj.set_position([x,y,z+offset*0.1])
+                offset += 1
+
+            # tracking_env.kitchen.in_
+            
+            tracking_env.set_in_robot_hand('onion', onion)
+            self.interact_step_index = -1
+            self.object_position = None
+            tracking_env.kitchen.robot_carrying_dish = True
+
             self.target_object = tracking_env.get_closest_chopped_onion(
                     agent_pos=self.object.get_eef_position())
             self.object_position = tracking_env.get_real_position(self.target_object)
@@ -474,6 +491,7 @@ class iGibsonAgent:
             if done or in_hand: # and in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
+
         # elif action == "drop" and object == "dish":
         #     # if self.object_position is None:
         #     self.object_position = tracking_env.get_closest_pan(
@@ -557,84 +575,134 @@ class iGibsonAgent:
                 self.interact_step_index = -1
                 self.object_position = None
         elif action == "deliver" and (object == "soup" or object == "dish"):
-            if self.object_position is None:
-                self.object_position = self.object.get_position()
-            done, in_hand = self.drop(
-                self.object_position,
-                tracking_env,
-                tracking_env.get_closest_bowl(
-                    agent_pos=self.object.get_eef_position()),
-                name='dish',
-                offset=[0, 1, 1.2 + HEIGHT_OFFSET])
-            if done or in_hand:
-                self.interact_step_index = -1
-                self.object_position = None
+            agent_location = self.object.get_position()
+            locs = [grid_to_real_coord(x) for x in tracking_env.kitchen.where_grid_is('T')]
+            plate = tracking_env.kitchen.robot_stash_dish
+            closest = sorted(locs, key=lambda location: math.dist(location[0:2], agent_location[0:2]))[0]
+            onion = tracking_env.get_closest_chopped_onion(tracking_env.kitchen.robot_stash_dish.get_position())
+            steak = tracking_env.get_closest_steak(tracking_env.kitchen.robot_stash_dish.get_position())
+
+            # tracking_env.kitchen.delivered_dishes[plate] = {
+            #     'onion': onion,
+            #     'steak': steak
+            # }
+            tracking_env.kitchen.overcooked_object_states[plate]['state'] = 'delivered'
+            tracking_env.kitchen.overcooked_object_states.pop(onion)
+            tracking_env.kitchen.overcooked_object_states.pop(steak)
+
+            tracking_env.kitchen.robot_stash_dish.set_position([closest[0], closest[1], 1.15])
+            # tracking_env.env.set_pos_orn_with_z_offset(tracking_env.kitchen.robot_stash_dish,
+            #                               [closest[0], closest[1], 1.05], [0, 0, 0])
+            # tracking_env.remove_in_robot_hand(['hot_plate', tracking_env.kitchen.robot_stash_dish])
+            offset = 1
+
+            x,y,z = tracking_env.kitchen.robot_stash_dish.get_position()
+            steak.set_position([x,y,z+offset*0.05])
+            
+            # tracking_env.remove_in_robot_hand(['steak', steak])
+            offset+=1
+            
+            for on in onion.objects:
+                # obj.set_position([x,y,z+offset*0.05])
+                offset += 1
+            
+            tracking_env.kitchen.robot_carrying_dish = False
+            # tracking_env.remove_in_robot_hand(['onion', onion])
+            # tracking_env.kitchen.in_robot_hand.clear()
+
+            self.interact_step_index = -1
+            self.object_position = None
+
+            # tracking_env.kitchen.in_robot_hand.clear()
+
+            # if self.object_position is None:
+            #     self.object_position = self.object.get_position()
+            # done, in_hand = self.drop(
+            #     self.object_position,
+            #     tracking_env,
+            #     # tracking_env.get_closest_bowl(
+            #     #     agent_pos=self.object.get_eef_position()),
+            #     tracking_env.kitchen.robot_stash_dish,
+            #     name='dish',
+            #     offset=[0, 1, 1.12])
+            # if done or in_hand:
+            #     self.interact_step_index = -1
+            #     self.object_position = None
         elif action == "pickup" and object == "steak": # object == "soup"
+            # if self.object_position is None:
+            steak = tracking_env.get_closest_steak(
+                agent_pos=self.object.get_position()
+                )
+            
+            tracking_env.set_in_robot_hand('steak', steak)
+            self.interact_step_index = -1
+            self.object_position = None
 
-            if self.object_position is None:
-                pan = tracking_env.get_closest_pan(
-                    agent_pos=self.object.get_position())
-                tracking_env.kitchen.interact_objs[pan] = True
-                self.interact_obj = pan
-                self.object_position = pan.get_position()
-            if self.interact_step_index == 0:
-                done, in_hand = self.drop(
-                    self.object_position,
-                    tracking_env,
-                    tracking_env.get_closest_pan(
-                        agent_pos=self.object.get_position()),
-                    name='hot_plate',
-                    offset=[-0.6, 0, 0.2])
-                if done or in_hand:
-                    self.interact_step_index = 1
-                    self.object_position = tracking_env.get_closest_steak(
-                        agent_pos=self.object.get_position()
-                        ).get_position()
-                    self.item_in_bowl = 0
 
-            # start pick and drop items from pan/pot to bowl/dish/plate
-            elif self.interact_step_index == 1:
-                done, in_hand = self.pick(
-                    self.object_position,
-                    tracking_env,
-                    tracking_env.get_closest_steak(
-                        agent_pos=self.object.get_position()),
-                    name='steak',
-                    offset=[0, -0.05, 0.05 + HEIGHT_OFFSET])
-                if done or in_hand:
-                    self.interact_step_index = self.interact_step_index = 2
-                    self.object_position = tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_position()).get_position()
-            elif self.interact_step_index == 2:
-                done, in_hand = self.drop(
-                    self.object_position,
-                    tracking_env,
-                    tracking_env.get_closest_plate(
-                        agent_pos=self.object.get_position()),
-                    name='hot_plate',
-                    offset=[0, -0.1, HEIGHT_OFFSET])
-                if done or in_hand:
-                    self.item_in_bowl += 1
-                    # if self.item_in_bowl < num_item_needed_in_dish:
-                    #     self.interact_step_index = self.interact_step_index = 1
-                    #     self.object_position = tracking_env.get_closest_steak(
-                    #         agent_pos=self.object.get_position()).get_position()
-                    # else:
-                    self.interact_step_index = self.interact_step_index = 3
-            elif self.interact_step_index == 3:  #7:
-                done, in_hand = self.pick(
-                    self.object_position,
-                    tracking_env,
-                    tracking_env.get_closest_bowl(
-                        agent_pos=self.object.get_eef_position()),
-                    name='dish',
-                    offset=[0, -0.3, 0.1 + HEIGHT_OFFSET])
-                if done or in_hand:
-                    self.interact_step_index = self.interact_step_index + 1
-            else:
-                self.interact_step_index = -1
-                self.object_position = None
-                tracking_env.kitchen.interact_objs[self.interact_obj] = False
+            # if self.object_position is None:
+            #     pan = tracking_env.get_closest_pan(
+            #         agent_pos=self.object.get_position())
+            #     tracking_env.kitchen.interact_objs[pan] = True
+            #     self.interact_obj = pan
+            #     self.object_position = pan.get_position()
+            # if self.interact_step_index == 0:
+            #     done, in_hand = self.drop(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_pan(
+            #             agent_pos=self.object.get_position()),
+            #         name='hot_plate',
+            #         offset=[-0.6, 0, 0.2])
+            #     if done or in_hand:
+            #         self.interact_step_index = 1
+            #         self.object_position = tracking_env.get_closest_steak(
+            #             agent_pos=self.object.get_position()
+            #             ).get_position()
+            #         self.item_in_bowl = 0
+
+            # # start pick and drop items from pan/pot to bowl/dish/plate
+            # elif self.interact_step_index == 1:
+            #     done, in_hand = self.pick(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_steak(
+            #             agent_pos=self.object.get_position()),
+            #         name='steak',
+            #         offset=[0, -0.05, 0.05 + HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.interact_step_index = self.interact_step_index = 2
+            #         self.object_position = tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_position()).get_position()
+            # elif self.interact_step_index == 2:
+            #     done, in_hand = self.drop(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_plate(
+            #             agent_pos=self.object.get_position()),
+            #         name='hot_plate',
+            #         offset=[0, -0.1, HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.item_in_bowl += 1
+            #         # if self.item_in_bowl < num_item_needed_in_dish:
+            #         #     self.interact_step_index = self.interact_step_index = 1
+            #         #     self.object_position = tracking_env.get_closest_steak(
+            #         #         agent_pos=self.object.get_position()).get_position()
+            #         # else:
+            #         self.interact_step_index = self.interact_step_index = 3
+            # elif self.interact_step_index == 3:  #7:
+            #     done, in_hand = self.pick(
+            #         self.object_position,
+            #         tracking_env,
+            #         tracking_env.get_closest_bowl(
+            #             agent_pos=self.object.get_eef_position()),
+            #         name='dish',
+            #         offset=[0, -0.3, 0.1 + HEIGHT_OFFSET])
+            #     if done or in_hand:
+            #         self.interact_step_index = self.interact_step_index + 1
+            # else:
+            #     self.interact_step_index = -1
+            #     self.object_position = None
+            #     tracking_env.kitchen.interact_objs[self.interact_obj] = False
         # elif action == "pickup" and object == "garnish": # object == "soup"
 
         #     if self.object_position is None:

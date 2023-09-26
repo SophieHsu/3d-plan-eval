@@ -22,7 +22,7 @@
             // "cwd": "${workspaceFolder}\\3d-plan-eval",
             "program": "${workspaceFolder}/3d_plan_eval_main.py",
             "console": "integratedTerminal",
-            "args": ["-m", "vr", "-c", "steak_mid_2.tml"],
+            "args": ["-m", "vr", "-c", "steak_side_4.tml"],
             "justMyCode": true
         },
     ]
