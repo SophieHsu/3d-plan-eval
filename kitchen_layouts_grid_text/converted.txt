@@ -1,10 +1,11 @@
 XXXXXXXXXXXXXXX
-XXXBXXPXDXXXXXX
-XX        SXXXX
-XW 2      SXXXX
-XX        XXXXX
-X       1 XXXXX
-X         XXXXX
-XX        XXXXX
-XXXXXXXXXXXXXXX
+XXXOXMXXXPXXDXX
+XX           XX
+XX           XX
+XX           XX
+XX   XBWXX   XX
+XX   XXSSX   XX
+XX           XX
+XX           XX
+XX           XX
 XXXXXXXXXXXXXXX

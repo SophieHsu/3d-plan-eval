@@ -1,4 +1,5 @@
 import math
+import time
 from igibson import object_states
 from igibson.envs.igibson_env import iGibsonEnv
 from lsi_3d.agents.igibson_agent import iGibsonAgent
@@ -19,8 +20,12 @@ class VisionLimitEnv(LsiEnv):
         self.world_state = WorldState(orders=['steak','steak'])
         self.world_state.state_dict['obj_curr_idx'] = 0
         self.world_state.state_dict['objects'] = {}
+        self.log_time = time.time()
 
     def update_world(self):
+        
+
+
         # pans
         pans_status = self.tracking_env.get_pan_status()
         self.world_state.state_dict['pot_states'] = {}
@@ -83,16 +88,15 @@ class VisionLimitEnv(LsiEnv):
 
         self.update_joint_ml_state()
 
-        # update holding
-        if len(self.tracking_env.obj_in_robot_hand()) > 0:
-            self.robot_state.holding = self.tracking_env.obj_in_robot_hand()[0][0]
-        else:
-            self.robot_state.holding = 'None'
+        
 
-        if self.tracking_env.obj_in_human_hand() is not None:
-            self.human_state.holding = self.tracking_env.get_human_holding()
-        else:
-            self.human_state.holding = 'None'
+        # update all mobile object position
+        # for obj, state in self.kitchen.overcooked_object_states.items():
+        #     state['position'] = self.tracking_env.get_position(obj)
+
+        
+        
+            
 
         #### The following state dict items are for keeping accurate state for overcooked api
         
@@ -113,11 +117,19 @@ class VisionLimitEnv(LsiEnv):
         #                 'state':state
         #             }
 
+        # if item is dropped put on closest counter
+        for obj, state in self.kitchen.overcooked_object_states.items():
+            position = self.tracking_env.get_real_position(obj)
+            x,y,z = position
+            if z < 0.1:
+                self.tracking_env.set_item_on_closest_counter(obj)
+
         for obj, state in self.kitchen.overcooked_object_states.items():
             state['position'] = self.to_overcooked_grid(self.tracking_env.get_position(obj))
+
                 
         for plate in self.kitchen.plates:
-            for s,ps in self.tracking_env.get_sink_status().items():
+            for s,ps in self.tracking_env.get_sink_status(same_location=True).items():
                 for p in ps:
                     # if plate is in sink and its state is none, change to 0
                     p_state = self.kitchen.overcooked_object_states[p]
@@ -137,13 +149,12 @@ class VisionLimitEnv(LsiEnv):
         # if meat is now steak change id and object
         for object, state in self.kitchen.overcooked_object_states.items():
             # meat becomes steak human holding nothing and meat is on
-            if state['name'] == 'meat' and self.human_state.holding == 'None':
+            if state['name'] == 'meat' and (self.human_state.holding == 'None' or self.robot_state.holding == 'None'):
                 # if object is in same location as pan then make it a steak
                 pans = self.tracking_env.get_pan_status().items()
                 for p,objs in pans:
                     if self.tracking_env.get_position(p) == self.tracking_env.get_position(object):
                     # if p.states[object_states.Inside].get_value(object):
-
                         self.kitchen.drop_meat(object)
 
         
@@ -164,6 +175,26 @@ class VisionLimitEnv(LsiEnv):
         in_human_hand = self.tracking_env.obj_in_human_hand()
         self.kitchen.update_overcooked_robot_holding()
         in_robot_hand = self.kitchen.overcooked_robot_holding
+
+        # update holding
+        if len(self.tracking_env.obj_in_robot_hand()) > 0:
+            self.robot_state.holding = self.tracking_env.obj_in_robot_hand()[0][0]
+        else:
+            # overcooked wont allow object in same location but not holding
+            self.robot_state.holding = 'None'
+            for obj, state in self.kitchen.overcooked_object_states.items():
+                if state['position'] == self.to_overcooked_grid(self.robot_state.ml_state[0:2]):
+                    # self.robot_state.holding = obj
+                    in_robot_hand = obj
+
+        if self.tracking_env.obj_in_human_hand() is not None:
+            self.human_state.holding = self.tracking_env.get_human_holding()
+        else:
+            # overcooked wont allow object in same location but not holding
+            self.human_state.holding = 'None'
+            for obj, state in self.kitchen.overcooked_object_states.items():
+                if state['position'] == self.to_overcooked_grid(self.human_state.ml_state[0:2]):
+                    in_human_hand = obj
         
         # if hot plate is in same location as the pan then set the overcooked position to be the same as the agent
         # overcooked expects hot plate to be in human hand
@@ -223,17 +254,26 @@ class VisionLimitEnv(LsiEnv):
                             'state': None
                         }
                         self.kitchen.overcooked_max_id += 1
-                        obj_position = real_to_grid_coord(obj.get_position())
-                        human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
-                        robot_dist = math.dist(self.robot_state.ml_state[0:2], obj_position)
-                        if human_dist < robot_dist:
-                            in_human_hand = obj
-                        else:
-                            in_robot_hand = obj
+                        st['in_hot_plate'] = [onion]
+
+                        for steak in self.kitchen.steaks:
+                            if steak.states[object_states.Inside].get_value(obj):
+                                # add tag saying steak is in hot plate
+                                st['in_hot_plate'].append(steak)
+
+                        # obj_position = real_to_grid_coord(obj.get_position())
+                        # human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
+                        # robot_dist = math.dist(self.robot_state.ml_state[0:2], obj_position)
+                        # if human_dist < robot_dist:
+                        #     in_human_hand = obj
+                        # else:
+                        #     in_robot_hand = obj
 
                 if not is_dish:
                     for steak in self.kitchen.steaks:
-                        if steak.states[object_states.Inside].get_value(obj):
+                        # if steak.states[object_states.Inside].get_value(obj):
+                        in_same_pos = real_to_grid_coord(steak.get_position()) == real_to_grid_coord(obj.get_position())
+                        if steak.states[object_states.Inside].get_value(obj) or in_same_pos:
                             if obj == in_human_hand:
                                 in_human_hand = steak
                             elif obj == in_robot_hand:
@@ -244,18 +284,58 @@ class VisionLimitEnv(LsiEnv):
 
         # but if now we have a dish, then that will always be in someones hand
         for obj, st in self.kitchen.overcooked_object_states.copy().items():
-            if st['name'] == 'dish' and st['state'] != 'delivered':
-                obj_position = real_to_grid_coord(obj.get_position())
-                human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
-                robot_dist = math.dist(self.robot_state.ml_state[0:2], obj_position)
-                if human_dist < robot_dist:
-                    in_human_hand = obj
-                else:
-                    in_robot_hand = obj
-            
-            if st['name'] == 'dish' and self.tracking_env.is_item_on_table(obj) and st['state'] != 'delivered':
-                st['state'] = 'delivered'
-                print('delivered dish!')
+            if st['name'] == 'dish':
+                if st['name'] == 'dish' and st['state'] != 'delivered':
+
+                    if not (obj == in_human_hand or obj == in_robot_hand):
+                        # if not already in hand then need to decide based on distance
+                        obj_position = real_to_grid_coord(obj.get_position())
+                        human_dist = math.dist(self.human_state.ml_state[0:2], obj_position)
+                        robot_dist = math.dist(self.robot_state.ml_state[0:2], obj_position)
+                        if human_dist < robot_dist:
+                            in_human_hand = obj
+                        else:
+                            in_robot_hand = obj
+
+                        # use this list to remove items from unowned objects list
+                        # for onion in self.kitchen.onions:
+                        #     if onion.states[object_states.Inside].get_value(obj):
+                        #         # add tag saying onion is in hot plate
+                        #         st['in_hot_plate'] = [onion]
+
+                        # for steak in self.kitchen.steaks:
+                        #     if steak.states[object_states.Inside].get_value(obj):
+                        #         # add tag saying steak is in hot plate
+                        #         st['in_hot_plate'].append(steak)
+
+                        onion = self.tracking_env.get_closest_chopped_onion(obj.get_position())
+                        st['in_hot_plate'] = [onion]
+                        steak = self.tracking_env.get_closest_steak(obj.get_position())
+                        st['in_hot_plate'].append(steak)
+                        
+                        if in_human_hand == obj:
+                            for item in st['in_hot_plate']:
+                                if item.name == 'green_onion_multiplexer':
+                                    for sub_obj in onion.objects:
+                                        if sub_obj.get_position()[2] < 0.1:
+                                            sub_obj.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
+                                elif item.get_position()[2] < 0.1:
+                                    item.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
+                
+                if st['name'] == 'dish' and self.tracking_env.is_item_on_table(obj) and st['state'] != 'delivered':
+                    st['state'] = 'delivered'
+                    print('delivered dish!')
+                    onion = self.tracking_env.get_closest_chopped_onion(obj.get_position())
+                    st['in_hot_plate'] = [onion]
+                    steak = self.tracking_env.get_closest_steak(obj.get_position())
+                    st['in_hot_plate'].append(steak)
+                elif st['name'] == 'dish' and self.tracking_env.is_item_on_table(obj) and st['state'] == 'delivered':
+                    onion = self.tracking_env.get_closest_chopped_onion(obj.get_position())
+                    st['in_hot_plate'] = [onion]
+                    steak = self.tracking_env.get_closest_steak(obj.get_position())
+                    st['in_hot_plate'].append(steak)
+
+                
 
 
         # check if holding hot plate and hot plate has a steak and garnish then set hot plate state to be dish
@@ -270,7 +350,7 @@ class VisionLimitEnv(LsiEnv):
         
         self.kitchen.overcooked_object_states
         self.human_state.state_dict['human_holding'] = {}
-        if in_human_hand is not None:
+        if in_human_hand is not None and in_human_hand in self.kitchen.get_mobile_objects():
             if in_human_hand not in self.kitchen.overcooked_object_states.keys() and in_human_hand not in self.kitchen.stored_overcooked_object_states.keys():
                 self.kitchen.overcooked_object_states[in_human_hand] = {
                     "id": self.kitchen.overcooked_max_id,
@@ -287,7 +367,7 @@ class VisionLimitEnv(LsiEnv):
         
         # do same for robot
         self.robot_state.state_dict['robot_holding'] = {}
-        if in_robot_hand is not None:
+        if in_robot_hand is not None and in_robot_hand in self.kitchen.get_mobile_objects():
             if in_robot_hand not in self.kitchen.overcooked_object_states.keys() and in_robot_hand not in self.kitchen.stored_overcooked_object_states.keys():
                 self.kitchen.overcooked_object_states[in_robot_hand] = {
                     "id": self.kitchen.overcooked_max_id,
@@ -301,7 +381,8 @@ class VisionLimitEnv(LsiEnv):
             self.robot_state.state_dict['robot_holding']['position'] = self.to_overcooked_grid(self.robot_state.ml_state[0:2])
             self.kitchen.overcooked_object_states[in_robot_hand]['position'] = self.to_overcooked_grid(self.robot_state.ml_state[0:2])
 
-
+        if in_robot_hand == in_human_hand and in_robot_hand != None:
+            print('same object being held')
 
         # check that objects are not in holding list and object list
         unowned_objects = self.kitchen.overcooked_object_states.copy()
@@ -315,13 +396,47 @@ class VisionLimitEnv(LsiEnv):
         # also remove hot plates containing steak or garnish
         for obj,st in self.kitchen.overcooked_object_states.items():
             if 'in_hot_plate' in st.keys():
-                if len(st['in_hot_plate']) > 0 and obj in unowned_objects:
-                    unowned_objects.pop(obj)
+                if len(st['in_hot_plate']) > 0:
+                    if obj in unowned_objects:
+                        unowned_objects.pop(obj)
+                    for object in st['in_hot_plate']:
+                        if object in unowned_objects:
+                            unowned_objects.pop(object)
+                st.pop('in_hot_plate')
 
         self.world_state.state_dict['unowned_objects'] = unowned_objects
 
         self.world_state.state_dict['objects'] = self.kitchen.overcooked_object_states
+
+
+        # check object states
+        for onion in self.kitchen.onions:
+            if onion.current_index == 1 and onion in unowned_objects:
+                # check if position below 0.1 then place back on chopping board
+                for sub_obj in onion.objects:
+                    if sub_obj.get_position()[2] < 0.1:
+                        sub_obj.states[object_states.OnTop].set_value(self.chopping_boards[0], True, use_ray_casting_method=True)
+                    
+
+        self.log_state()
         return
+    
+    def log_state(self):
+        elapsed = time.time() - self.log_time
+
+        if elapsed > 1:
+            self.log_time = time.time()
+            filename = 'lsi_3d/logs/' + self.kitchen.kitchen_name + '_log.txt'
+            f = open(filename, "a")
+            s = ''
+            s += 'Logging State at Time:\t' + str(self.log_time) + '\n'
+            s += 'Robot ML State:\t' + str(self.robot_state.ml_state) + '\n'
+            s += 'Human ML State:\t' + str(self.human_state.ml_state) + '\n'
+            s += 'Robot LL State:\t' + str(self.ig_robot.object.get_position()) + '\n'
+            s += 'Human LL State:\t' + str(self.ig_human.object.get_position()) + '\n'
+            s += '\n'
+            f.write(s)
+            f.close()
     
     def map_action_to_location(self, action_object, agent_location=None, is_human=False):
         # return position and orientation given the agents location and the action object

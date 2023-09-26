@@ -294,7 +294,7 @@ class HlQmdpPlanningAgent(Agent):
             self.ig_robot.prepare_for_next_action(self.env.robot_state.ml_state, self.ml_robot_action[1])
 
             # log every ml step
-            self.log_state()
+            # self.log_state()
             print('In ml_robot_step:', self.ml_robot_action)
         return self.ml_robot_action
 
@@ -338,7 +338,7 @@ class HlQmdpPlanningAgent(Agent):
                     self.take_hl_robot_step = True
 
     def log_state(self):
-        filename = 'lsi_3d/test_logs/' + self.env.kitchen.kitchen_name + '_log.txt'
+        filename = 'lsi_3d/logs/' + self.env.kitchen.kitchen_name + '_log.txt'
         f = open(filename, "a")
         s = ''
         s += 'QMDP Index: ' + str(self.env.robot_state.hl_state) + '\n'

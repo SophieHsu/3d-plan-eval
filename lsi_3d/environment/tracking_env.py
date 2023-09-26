@@ -55,7 +55,7 @@ class TrackingEnv():
                 if p.states[object_states.OnTop].get_value(s):
                     plates.append(p)
 
-            if real_to_grid_coord(p.get_position()) == real_to_grid_coord(s.get_position()) and same_location:
+                if real_to_grid_coord(p.get_position()) == real_to_grid_coord(s.get_position()) and same_location:
                     plates.append(p)
 
             data[s] = plates
@@ -85,6 +85,9 @@ class TrackingEnv():
     def items_in_bowl(self, bowl):
         data = []
         for o in self.kitchen.onions:
+            if o.states[object_states.Inside].get_value(bowl):
+                data.append(o)
+        for o in self.kitchen.steaks:
             if o.states[object_states.Inside].get_value(bowl):
                 data.append(o)
         return data
@@ -171,6 +174,13 @@ class TrackingEnv():
     def get_closest_counter(self, agent_pos):
         counters = self.dist_sort(self.kitchen.counters, agent_pos)
         return counters[0]
+    
+    def set_item_on_closest_counter(self, obj):
+        target_object = self.get_closest_counter(
+                agent_pos=self.get_real_position(obj))
+        object_position = target_object.get_position()
+        # self.object_position = self.object.get_eef_position()
+        self.set_position(obj, object_position + [0,0,0.7])
 
     def obj_in_robot_hand(self):
         # return object in robot hand
@@ -275,13 +285,13 @@ class TrackingEnv():
 
     def remove_in_robot_hand(self, item, pos=None, counter=0):
         self.kitchen.in_robot_hand.remove(item)
-        ori_ori = item[1].get_orientation()
-        ori_pos = item[1].get_position()
-        item[1].set_orientation([ori_ori[0], 0, 0, 0])
+        ori_ori = self.get_orientation(item[1])
+        ori_pos = self.get_real_position(item[1])
+        self.set_orientation(item[1], [ori_ori[0], 0, 0, 0])
         if pos is not None:
             pos[-1] += counter * 0.01
-            item[1].set_position(pos)
-            item[1].set_orientation([0, 0, 0, 1])
+            self.set_position(item[1], pos)
+            self.set_orientation(item[1], [0, 0, 0, 1])
 
     # def get_closest_onion(self, agent_pos=None, on_pan=False):
     #     closest_onion = None
@@ -340,7 +350,14 @@ class TrackingEnv():
         return sinks[0]
     
     def get_closest_steak(self, agent_pos):
-        return self.dist_sort(self.kitchen.steaks, agent_pos)[0]
+        if len(self.kitchen.steaks) > 0:
+            return self.dist_sort(self.kitchen.steaks, agent_pos)[0]
+        else:
+            # for meat in self.kitchen.meats:
+            #     for pan in self.kitchen.pans:
+            #         if meat.state[object_states.Inside].get_value(pan):
+            #             return meat
+            return self.dist_sort(self.kitchen.meats, agent_pos)[0]
     
     def get_closest_knife(self, agent_pos):
         return self.dist_sort(self.kitchen.knives, agent_pos)[0]
@@ -381,6 +398,35 @@ class TrackingEnv():
                 return obj.current_selection().objects[0].get_position()
         else:
             return obj.get_position()
+        
+    def get_orientation(self, obj):
+        if obj.name == 'green_onion_multiplexer':
+            if obj.current_index == 0:
+                return obj.get_orientation()
+            else:
+                return obj.current_selection().objects[0].get_orientation()
+        else:
+            return obj.get_orientation()
+        
+    def set_position(self, obj, pos):
+        if obj.name == 'green_onion_multiplexer':
+            if obj.current_index == 0:
+                obj.set_position(pos)
+            else:
+                for sub_obj in obj.current_selection().objects:
+                    sub_obj.set_position(pos)
+        else:
+            obj.set_position(pos)
+        
+    def set_orientation(self, obj, orientation):
+        if obj.name == 'green_onion_multiplexer':
+            if obj.current_index == 0:
+                return obj.set_orientation(orientation)
+            else:
+                for sub_obj in obj.current_selection().objects:
+                    sub_obj.set_orientation(orientation)
+        else:
+            return obj.set_orientation(orientation)
         
 
     def get_bowls_dist_sort(self, is_human=None):

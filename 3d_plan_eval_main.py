@@ -83,7 +83,7 @@ def print_grid(array):
     return grid_str
 
 def setup_log(kitchen, start_locations):
-    filename = 'lsi_3d/test_logs/' + kitchen.kitchen_name + '_log.txt'
+    filename = 'lsi_3d/logs/' + kitchen.kitchen_name + '_log.txt'
     f = open(filename, 'w')
     f.write(f"Start Locations (robot, human): {start_locations}\n")
     f.write("Kitchen Layout:\n")
@@ -289,10 +289,12 @@ def check_completion(lsi_env, start_time, kitchen):
     
     return False
 
-
+SKIP_NUMBER = 30
 def main_loop(igibson_env, robot_agent, human_agent, kitchen, env:LsiEnv):
     start_time = time.time()
     count = 0
+    i = 0
+    
     while True:
         env.update_world()
         human_agent.step()

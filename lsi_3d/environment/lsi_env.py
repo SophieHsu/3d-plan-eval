@@ -4,10 +4,10 @@ from igibson.objects.articulated_object import URDFObject
 from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
+from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.mdp.state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.functions import find_nearby_open_spaces, norm_orn_to_cardinal, orn_to_cardinal, quat2euler
-from lsi_3d.environment.tracking_env import TrackingEnv
 from utils import grid_to_real_coord, normalize_radians, real_to_grid_coord
 
 
@@ -132,9 +132,16 @@ class LsiEnv(object):
         # print('human ml state:', human_ml_state)
         robot_ml_state = self.get_ml_state(self.ig_robot)
         # human_sim_ml_state = self.get_ml_state(self.ig_human_sim)
-        self.robot_state.ml_state = robot_ml_state
-        self.human_state.ml_state = human_ml_state
-        # self.human_sim_state.ml_state = human_sim_ml_state
+
+        if self.kitchen.grid[human_ml_state[0]][human_ml_state[1]] == 'X':
+            self.robot_state.ml_state = robot_ml_state
+        else:
+            pass
+
+        if self.kitchen.grid[human_ml_state[0]][human_ml_state[1]] == 'X':
+            self.human_state.ml_state = human_ml_state
+        else:
+            pass
 
         return (human_ml_state, robot_ml_state)
 

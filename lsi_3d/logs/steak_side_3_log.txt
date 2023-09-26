@@ -1,0 +1,13 @@
+Start Locations (robot, human): ((3, 8, 'S'), (2, 2, 'S'))
+Kitchen Layout:
+C C K C P C D C F C 
+C X X X X X X X X G 
+W X X X X X X X X C 
+C X X X X X X X X C 
+C C C C C X X X X C 
+C T T C C X X X X C 
+C X X X X X X X X C 
+C C C C C C C C C C 
+X X X X X X X X X X 
+X X X X X X X X X X 
+success

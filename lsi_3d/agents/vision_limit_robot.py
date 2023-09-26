@@ -4,11 +4,12 @@ import time
 import numpy as np
 from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.hl_qmdp_agent import MAX_DELAY_TIME, STUCK_TIME_LIMIT, HlQmdpPlanningAgent
-from lsi_3d.agents.igibson_agent import iGibsonAgent
+from lsi_3d.agents.igibson_agent import ONE_STEP, iGibsonAgent
 from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.planners.steak_human_subtask_qmdp_planner import SteakHumanSubtaskQMDPPlanner
+from lsi_3d.utils.constants import TARGET_ORNS
 from lsi_3d.utils.functions import grid_transition
 import pprint
 
@@ -112,6 +113,9 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         self.action_obj = None
         self.stuck_plan = []
         self.dispatcher = UdpToPygame()
+        self.ig_robot.name = "human_sim"
+        self.awaiting_response = False
+        self.current_q = []
 
     def action(self):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
@@ -221,8 +225,13 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         action = tuple(res_dict['action'])
         print('overcooked action: ', action)
         q = res_dict['q']
+        self.current_q = q
         print('overcooked q: ', q)
-        max_q_idx = np.argmax(q)
+        max_q_idx = np.argmax(q[0:4])
+
+        if action[0] == 'i':
+            a = 'I'
+            return a
         if round(q[max_q_idx], 5) == round(q[4], 5):
             # return stay if stay value is equal to the max value
             action = (0,0)
@@ -243,22 +252,26 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         return a
 
     def robot_action_from_overcooked_api(self):
-        overcooked_state_dict = self.env.to_overcooked_state()
-        pprint.pprint(overcooked_state_dict)
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        if not self.awaiting_response:
+            overcooked_state_dict = self.env.to_overcooked_state()
+            pprint.pprint(overcooked_state_dict)
 
-        #while True:
-        sock.sendto(json.dumps(overcooked_state_dict, cls=EnvEncoder).encode(), ("127.0.0.1", 15006))
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+            #while True:
+            sock.sendto(json.dumps(overcooked_state_dict, cls=EnvEncoder).encode(), ("127.0.0.1", 15006))
+            self.awaiting_response = True
 
         self.ml_robot_action = None
-        while self.ml_robot_action is None:
-            data = self.dispatcher.update()
+        # while self.ml_robot_action is None:
+        data = self.dispatcher.update()
 
-            if data is not None:
-                dic = json.loads(data['data'].decode())
-                print('overcooked action: ')
-                self.ml_robot_action = self.from_overcooked_action(dic)
+        if data is not None:
+            self.awaiting_response = False
+            dic = json.loads(data['data'].decode())
+            print('overcooked action: ')
+            self.ml_robot_action = self.from_overcooked_action(dic)
 
         return self.ml_robot_action
 
@@ -270,34 +283,54 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             if len(self.stuck_plan) > 0:
                 self.ml_robot_action = self.stuck_plan.pop(0)
             else:
+                self.ml_robot_action = None
                 robot_action = self.robot_action_from_overcooked_api()
-                plan = []
-                if robot_action == self.env.robot_state.ml_state[2]:
-                    plan.append((None, 'F'))
-                elif robot_action in 'DI':
-                    plan.append((None, robot_action))
-                else:
-                    plan.append((None, robot_action))
-                    plan.append((None, 'F'))
-                self.ml_robot_action = plan.pop(0)
-            self.take_ml_robot_step = False
+                if robot_action is not None:
+                    plan = []
+
+                    # check if action will take robot to open space
+                    if robot_action == self.env.robot_state.ml_state[2]:
+                        next_ml_pos = grid_transition('F', self.env.robot_state.ml_state)
+                        if self.env.kitchen.grid[next_ml_pos[0]][next_ml_pos[1]] is not 'X':
+                            plan.append((None,'D'))
+                            print('attempted to move to non empty square so delay')
+                        else:
+                            plan.append((None, 'F'))
+                    elif robot_action in 'DI':
+                        plan.append((None, robot_action))
+                    else:
+                        plan.append((None, robot_action))
+                        plan.append((None, 'F'))
+                    self.ml_robot_action = plan.pop(0)
+
+            if self.ml_robot_action is not None:
+                self.take_ml_robot_step = False
 
             
             # if self.ml_robot_action and self.env.human_state.ml_state[:2] == grid_transition(self.ml_robot_action[1],
             #                                      self.env.robot_state.ml_state)[0:2]:
             #     self.ml_robot_plan = [(None, 'D')]
 
-            self.robot_delay = self.ml_robot_action[1] == 'D'
-            if self.ml_robot_action[1] == 'D':
-                self.delay_time = time.time()
-            
-            self.ig_robot.prepare_for_next_action(self.env.robot_state.ml_state, self.ml_robot_action[1])
+                self.robot_delay = self.ml_robot_action[1] == 'D'
+                if self.ml_robot_action[1] == 'D':
+                    self.delay_time = time.time()
+                
+                self.ig_robot.prepare_for_next_action(self.env.robot_state.ml_state, self.ml_robot_action[1])
             
             
             # log every ml step
-            # self.log_state()
-            print('In ml_robot_step:', self.ml_robot_action)
+                self.log_state()
+                print('In ml_robot_step:', self.ml_robot_action)
         return self.ml_robot_action
+    
+    def log_state(self):
+        filename = 'lsi_3d/logs/' + self.env.kitchen.kitchen_name + '_log.txt'
+        f = open(filename, "a")
+        s = '\n'
+        s += 'Plan: ' + str(self.ml_robot_plan) + '\n'
+        s += 'Overcooked Q: \t' + str(self.current_q) + '\n'
+        f.write(s)
+        f.close()
     
     def get_action_object(self, ml_state):
         # gets the action object just performed for interacting at the passed ml state
@@ -330,16 +363,18 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             action_object = ('drop','onion')
         elif station_key == 'K' and robot_holding_name == None and self.env.tracking_env.get_closest_green_onion(self.ig_robot.object.get_position()).current_index == 0:
             action_object = ('chop','onion')
-        elif station_key == 'K' and robot_holding_name == None and self.env.tracking_env.get_closest_green_onion(self.ig_robot.object.get_position()).current_index == 1:
+        elif station_key == 'K' and robot_holding_name == 'steak' and self.env.tracking_env.get_closest_green_onion(self.ig_robot.object.get_position()).current_index == 1:
             action_object = ('pickup','garnish')
         elif station_key == 'F':
             action_object = ('pickup','meat')
         elif station_key == 'P' and self.env.tracking_env.obj_in_robot_hand()[0][0] == 'meat':
             action_object = ('drop','meat')
-        elif station_key == 'P' and len(self.env.tracking_env.obj_in_robot_hand()) == 0:
+        elif station_key == 'P' and (len(self.env.tracking_env.obj_in_robot_hand()) == 0 or self.env.tracking_env.obj_in_robot_hand()[0][0] == 'hot_plate'):
             action_object = ('pickup','steak')
         elif station_key == 'C':
             action_object = ('drop', 'item')
+        elif station_key == 'T':
+            action_object = ('deliver', 'dish')
         else:
             action_object = None
         return action_object
@@ -386,7 +421,23 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                 num_item_needed_in_dish=self.mdp_planner.mdp.num_items_for_soup
             )
         else:
-            # low level collision avoidance
+            self.continuous_motion(ml_action)
+            # self.stepped_motion(ml_action)
+    
+    def stepped_motion(self, ml_action):
+        target_x = self.ig_robot.target_x
+        target_y = self.ig_robot.target_y
+        target_dir = self.ig_robot.target_direction
+        target_orn = TARGET_ORNS[target_dir]
+        # self.env.nav_env.set_pos_orn_with_z_offset(
+        #    self.ig_robot.object, [target_x, target_y, 0.6], orn=[0,0,target_orn], offset=[0, 0, 0])
+
+        self.ig_robot.agent_set_pos_orn(target_x, target_y, target_dir)
+
+
+
+    def continuous_motion(self, ml_action):
+        # low level collision avoidance
             h_x, h_y, h_z = self.env.ig_human.object.get_position()
             r_x, r_y, _ = self.env.ig_robot.object.get_position()
             collision_radius = 0.75
