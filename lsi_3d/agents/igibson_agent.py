@@ -478,6 +478,7 @@ class iGibsonAgent:
             self.interact_step_index = -1
             self.object_position = None
             tracking_env.kitchen.robot_carrying_dish = True
+            tracking_env.kitchen.robot_carrying_steak = False
 
             self.target_object = tracking_env.get_closest_chopped_onion(
                     agent_pos=self.object.get_eef_position())
@@ -635,6 +636,9 @@ class iGibsonAgent:
                 )
             
             tracking_env.set_in_robot_hand('steak', steak)
+
+            tracking_env.kitchen.robot_carrying_steak = True
+
             self.interact_step_index = -1
             self.object_position = None
 

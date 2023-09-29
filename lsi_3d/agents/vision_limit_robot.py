@@ -107,7 +107,7 @@ class EnvEncoder(json.JSONEncoder):
 
 
 class VisionLimitRobotAgent(HlQmdpPlanningAgent):
-    def __init__(self, hlp_planner: SteakHumanSubtaskQMDPPlanner, mlp: AStarMotionPlanner, hl_human_agent: Agent, env: LsiEnv, ig_robot: iGibsonAgent):
+    def __init__(self, hlp_planner: SteakHumanSubtaskQMDPPlanner, mlp: AStarMotionPlanner, hl_human_agent: Agent, env: LsiEnv, ig_robot: iGibsonAgent, log_dict={}):
         super().__init__(hlp_planner, mlp, hl_human_agent, env, ig_robot)
 
         self.action_obj = None
@@ -117,6 +117,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         self.awaiting_response = False
         self.current_q = []
         self.current_ovc_action = None
+        self.log_dict = log_dict
 
     def action(self):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
@@ -228,13 +229,14 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         q = res_dict['q']
         self.current_q = q
         print('overcooked q: ', q)
-        
-        max_q_idx = np.argmax(q[0:4])
 
         if action[0] == 'i':
             a = 'I'
             self.current_ovc_action = a
             return a
+        
+        max_q_idx = np.argmax(q[0:4])
+        
         if round(q[max_q_idx], 5) == round(q[4], 5):
             # return stay if stay value is equal to the max value
             action = (0,0)
@@ -258,14 +260,55 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
     def robot_action_from_overcooked_api(self):
 
         if not self.awaiting_response:
+
             overcooked_state_dict = self.env.to_overcooked_state()
+
+            all_objects_ids_dict = self.env.all_objects_ids_dict()
+
+            transfer_dict = {'ovc_state': overcooked_state_dict, 'ids_dict': all_objects_ids_dict}
             pprint.pprint(overcooked_state_dict)
+
+            for i in range(1,self.log_dict['i']):
+                for j, object in enumerate(self.log_dict[i]['overcooked_state_sent']['objects']):
+                    if 'in_hot_plate' in object:
+                        object.pop('in_hot_plate')
+                        self.log_dict[i]['overcooked_state_sent']['objects'][j] = object
+
+            for i, object in enumerate(overcooked_state_dict['objects']):
+                if 'in_hot_plate' in object:
+                    object.pop('in_hot_plate')
+                    overcooked_state_dict['objects'][i] = object
+
+            self.log_dict['i'] += 1
+            counter = self.log_dict['i']
+            self.log_dict[counter] = {}
+            self.log_dict[counter]['overcooked_state_sent'] = overcooked_state_dict.copy()
+            self.log_dict[counter]['low_level_logs'] = []
+            self.log_dict['event_start_time'] = time.time()
+            print(counter)
+
+
+            # try:
+            filename = 'lsi_3d/logs/' + self.env.kitchen.kitchen_name + self.log_dict['log_id'] + '_log_dict.json'
+            open(filename, 'w').close()
+            filename = 'lsi_3d/logs/' + self.env.kitchen.kitchen_name + self.log_dict['log_id'] + '_log_dict.json'
+            f = open(filename, "a")
+            # json_string = json.dumps(self.log_dict)
+            json.dump(self.log_dict, f)
+            # f.write(json_string)
+            f.close()
+            # except:
+            #     print('problem with logging')
+
 
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
             #while True:
-            sock.sendto(json.dumps(overcooked_state_dict, cls=EnvEncoder).encode(), ("127.0.0.1", 15006))
+            sock.sendto(json.dumps(transfer_dict, cls=EnvEncoder).encode(), ("127.0.0.1", 15006))
             self.awaiting_response = True
+            self.wait_time = time.time()
+
+        
 
         self.ml_robot_action = None
         # while self.ml_robot_action is None:
@@ -275,7 +318,14 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             self.awaiting_response = False
             dic = json.loads(data['data'].decode())
             print('overcooked action: ')
+            self.log_dict[self.log_dict['i']]['overcooked_recieved'] = dic
             self.ml_robot_action = self.from_overcooked_action(dic)
+
+
+
+        elapsed = time.time()-self.wait_time
+        if self.ml_robot_action == None and elapsed > 3:
+            self.awaiting_response = False
 
         return self.ml_robot_action
 
@@ -420,11 +470,15 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         if ml_action == 'I':
             if self.action_obj is None:
                 self.action_obj = self.get_action_object(self.env.robot_state.ml_state)
-            self.ig_robot.interact_ll_control(
-                self.action_obj, # self.hl_robot_action[-1],
-                self.env.tracking_env,
-                num_item_needed_in_dish=self.mdp_planner.mdp.num_items_for_soup
-            )
+
+            if self.action_obj is not None:
+                self.ig_robot.interact_ll_control(
+                    self.action_obj, # self.hl_robot_action[-1],
+                    self.env.tracking_env,
+                    num_item_needed_in_dish=self.mdp_planner.mdp.num_items_for_soup
+                )
+            else:
+                print('action object is None')
             self.env.nav_env.simulator.step()
         else:
             self.continuous_motion(ml_action)

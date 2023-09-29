@@ -376,6 +376,17 @@ class TrackingEnv():
             return None
     
         return self.dist_sort(chopped_onions, agent_pos)[0]
+    
+    def in_start_location(self, object):
+        obj_position = self.get_position(object)
+        if 'plate' in object.name:
+            return obj_position == self.kitchen.where_grid_is('D')[0]
+        if 'steak' in object.name:
+            return obj_position == self.kitchen.where_grid_is('F')[0]
+        if 'onion' in object.name:
+            return obj_position == self.kitchen.where_grid_is('G')[0]
+        else:
+            return False
         
     def get_hot_plates(self, agent_pos):
         hot_plates = []

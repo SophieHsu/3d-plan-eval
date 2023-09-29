@@ -1,7 +1,7 @@
 import numpy as np
 
 
-grid = open('kitchen_layouts_grid_text/steak_none_3.txt', "r").read().strip().split("\n")
+grid = open('kitchen_layouts_grid_text/steak_practice.txt', "r").read().strip().split("\n")
 sophie_grid = []
 max_r = 8
 max_c = 8

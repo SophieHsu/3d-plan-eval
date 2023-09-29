@@ -11,11 +11,12 @@ from lsi_3d.utils.functions import find_nearby_open_spaces
 from utils import grid_to_real_coord, real_to_grid_coord
 
 class VisionLimitHumanAgent(HumanAgent):
-    def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env:LsiEnv, tracking_env:TrackingEnv, vr=False, insight_threshold=5):
+    def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env:LsiEnv, tracking_env:TrackingEnv, vr=False, insight_threshold=5, log_dict={}):
         super().__init__(human, planner, motion_controller, occupancy_grid, hlp, lsi_env, tracking_env, vr, insight_threshold)
         self.knowledge_base = None
         self.vision_limit = True
         self.vision_bound = 120
+        self.log_dict=log_dict
 
     def deepcopy(self, world_state=None):
         new_human_model = VisionLimitHumanAgent(self.human, self.planner, self.motion_controller, self.occupancy_grid, self.hlp, self.lsi_env, self.tracking_env, self.vr, self.insight_threshold)

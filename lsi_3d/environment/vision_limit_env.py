@@ -1,3 +1,4 @@
+import json
 import math
 import time
 from igibson import object_states
@@ -9,10 +10,10 @@ from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.mdp.state import AgentState, WorldState
 from lsi_3d.utils.functions import find_nearby_open_spaces, grid_transition
-from utils import grid_to_real_coord, real_to_grid_coord
+from utils import grid_to_real_coord, quat2euler, real_to_grid_coord
 
 class VisionLimitEnv(LsiEnv):
-    def __init__(self, mdp: LsiMdp, nav_env: iGibsonEnv, tracking_env: TrackingEnv, ig_human: iGibsonAgent, ig_robot: iGibsonAgent, kitchen: Kitchen, recalc_res=None, avoid_radius=None) -> None:
+    def __init__(self, mdp: LsiMdp, nav_env: iGibsonEnv, tracking_env: TrackingEnv, ig_human: iGibsonAgent, ig_robot: iGibsonAgent, kitchen: Kitchen, recalc_res=None, avoid_radius=None, log_dict={}) -> None:
         super().__init__(mdp, nav_env, tracking_env, ig_human, ig_robot, kitchen, recalc_res, avoid_radius)
 
         self.robot_state = AgentState()
@@ -21,6 +22,7 @@ class VisionLimitEnv(LsiEnv):
         self.world_state.state_dict['obj_curr_idx'] = 0
         self.world_state.state_dict['objects'] = {}
         self.log_time = time.time()
+        self.log_dict = log_dict
 
     def update_world(self):
         
@@ -35,8 +37,10 @@ class VisionLimitEnv(LsiEnv):
         for pan in pans_status:
             if len(pans_status[pan]) == 0:
                 self.world_state.state_dict['pot_states']['empty'].append(pan)
+                self.kitchen.stove.states[object_states.ToggledOn].set_value(False)
             elif len(pans_status[pan]) == self.kitchen.onions_for_soup:
                 for item in pans_status[pan]:
+                    self.kitchen.stove.states[object_states.ToggledOn].set_value(True)
                     if item in self.kitchen.steaks:
                         self.world_state.state_dict['pot_states']['ready'].append(pan)
                     else:
@@ -247,11 +251,13 @@ class VisionLimitEnv(LsiEnv):
                 is_dish = False
 
                 onion = self.tracking_env.get_closest_chopped_onion(self.ig_human.object.get_position())
+                plate = self.tracking_env.get_closest_plate(self.ig_human.object.get_position())
 
                 human_created_dish = False
-                r,c,f = grid_transition('F', self.human_state.ml_state)
-                at_chopping_station = self.kitchen.grid[r][c] == 'K'
-                if onion is not None and at_chopping_station and (onion.states[object_states.Inside].get_value(obj) or onion.states[object_states.OnTop].get_value(obj)):
+                # r,c,f = grid_transition('F', self.human_state.ml_state)
+                # at_chopping_station = self.kitchen.grid[r][c] == 'K'
+                # human_holding_plate = self.tracking_env.is_obj_in_human_hand(plate)
+                if onion is not None and (onion.states[object_states.Inside].get_value(obj) or onion.states[object_states.OnTop].get_value(obj)):
                     human_created_dish = True
 
                 if (human_created_dish and obj != self.kitchen.robot_stash_dish) or (obj == self.kitchen.robot_stash_dish and self.kitchen.robot_carrying_dish): # or self.kitchen.robot_carrying_dish:
@@ -288,10 +294,15 @@ class VisionLimitEnv(LsiEnv):
                     # else:
                     #     in_robot_hand = obj
 
+                
+                if obj == self.kitchen.robot_stash_steak_bowl:
+                    st['position'] = self.to_overcooked_grid(self.robot_state.ml_state[0:2])
                 if not is_dish:
+                    
                     for steak in self.kitchen.steaks:
                         # if steak.states[object_states.Inside].get_value(obj):
-                        in_same_pos = real_to_grid_coord(steak.get_position()) == real_to_grid_coord(obj.get_position())
+                        # in_same_pos = real_to_grid_coord(steak.get_position()) == real_to_grid_coord(obj.get_position())
+                        in_same_pos = self.to_overcooked_grid(real_to_grid_coord(steak.get_position())) == st['position']
                         if steak.states[object_states.Inside].get_value(obj) or in_same_pos:
                             if obj == in_human_hand:
                                 in_human_hand = steak
@@ -369,9 +380,6 @@ class VisionLimitEnv(LsiEnv):
                     elif obj == in_robot_hand:
                         in_robot_hand = None
 
-                
-
-                
         # if self.kitchen.robot_carrying_dish:
         #     for obj, st in self.kitchen.overcooked_object_states.items():
         #         if obj == self.kitchen.robot_stash_dish and st['name'] == 'hot_plate':
@@ -388,8 +396,8 @@ class VisionLimitEnv(LsiEnv):
         # in_human_hand = self.kitchen.update_overcooked_human_holding(self.human_state.holding, self.tracking_env.obj_in_human_hand())
         
         self.human_state.state_dict['human_holding'] = {}
-        if in_human_hand is not None and in_human_hand in self.kitchen.get_mobile_objects():
-            if in_human_hand not in self.kitchen.overcooked_object_states.keys() and in_human_hand not in self.kitchen.stored_overcooked_object_states.keys():
+        if in_human_hand is not None and in_human_hand in self.kitchen.get_mobile_objects() and not self.tracking_env.in_start_location(in_human_hand):
+            if in_human_hand not in self.kitchen.overcooked_object_states.keys():
                 self.kitchen.overcooked_object_states[in_human_hand] = {
                     "id": self.kitchen.overcooked_max_id,
                     "name": self.kitchen.get_name(in_human_hand),
@@ -406,7 +414,7 @@ class VisionLimitEnv(LsiEnv):
         # do same for robot
         self.robot_state.state_dict['robot_holding'] = {}
         if in_robot_hand is not None and in_robot_hand in self.kitchen.get_mobile_objects():
-            if in_robot_hand not in self.kitchen.overcooked_object_states.keys() and in_robot_hand not in self.kitchen.stored_overcooked_object_states.keys():
+            if in_robot_hand not in self.kitchen.overcooked_object_states.keys():
                 self.kitchen.overcooked_object_states[in_robot_hand] = {
                     "id": self.kitchen.overcooked_max_id,
                     "name": self.kitchen.get_name(in_robot_hand),
@@ -423,6 +431,8 @@ class VisionLimitEnv(LsiEnv):
             print('same object being held')
             if in_robot_hand in [x[1] for x in self.kitchen.in_robot_hand]:
                 in_human_hand = None
+            else:
+                in_human_hand = None
 
         # check that objects are not in holding list and object list
         unowned_objects = self.kitchen.overcooked_object_states.copy()
@@ -435,6 +445,7 @@ class VisionLimitEnv(LsiEnv):
 
         # also remove hot plates containing steak or garnish
         for obj,st in self.kitchen.overcooked_object_states.items():
+            
             if 'in_hot_plate' in st.keys():
                 if len(st['in_hot_plate']) > 0:
                     if obj in unowned_objects:
@@ -443,6 +454,12 @@ class VisionLimitEnv(LsiEnv):
                         if object in unowned_objects:
                             unowned_objects.pop(object)
                 st.pop('in_hot_plate')
+
+        for obj,st in self.kitchen.overcooked_object_states.items():
+            if st['name'] == 'dish':
+                if st['state'] == 'delivered' and obj in unowned_objects:
+                    unowned_objects.pop(obj)
+        
 
         self.world_state.state_dict['unowned_objects'] = unowned_objects
 
@@ -455,12 +472,31 @@ class VisionLimitEnv(LsiEnv):
                 # check if position below 0.1 then place back on chopping board
                 for sub_obj in onion.objects:
                     if sub_obj.get_position()[2] < 0.1:
-                        sub_obj.states[object_states.OnTop].set_value(self.chopping_boards[0], True, use_ray_casting_method=True)
+                        sub_obj.states[object_states.OnTop].set_value(self.kitchen.chopping_boards[0], True, use_ray_casting_method=True)
                     
 
-        # self.log_state()
+        self.log_state()
+        self.log_dict_state()
         return
     
+    def log_dict_state(self):
+        elapsed = time.time() - self.log_dict['event_start_time']
+
+        if elapsed > 0.05:
+            
+            ll_dict = {}
+            ll_dict['robot_ml'] = self.robot_state.ml_state
+            ll_dict['human_ml'] = self.human_state.ml_state
+            ll_dict['robot_ll'] = self.ig_robot.object.get_position().tolist()
+            ll_dict['human_ll'] = self.ig_human.object.get_position().tolist()
+            x,y,z,w = self.ig_robot.object.get_orientation().tolist()
+            ll_dict['robot_ll_ori'] = quat2euler(x,y,z,w)
+            x,y,z,w = self.ig_human.object.get_orientation().tolist()
+            ll_dict['human_ll_ori'] = quat2euler(x,y,z,w)
+
+            self.log_dict[self.log_dict['i']]['low_level_logs'].append(ll_dict.copy())
+            self.log_dict['event_start_time'] = time.time()
+
     def log_state(self):
         elapsed = time.time() - self.log_time
 
@@ -600,6 +636,8 @@ class VisionLimitEnv(LsiEnv):
         if holding == {}:
             return None
         else:
+            if 'in_hot_plate' in holding.keys():
+                holding.pop('in_hot_plate')
             return holding
         
     def to_overcooked_grid(self, loc):
@@ -607,6 +645,14 @@ class VisionLimitEnv(LsiEnv):
         r,c = pos
         x,y = c+1,r+1
         return (x,y)
+    
+    def all_objects_ids_dict(self):
+        id_dict = {}
+
+        for obj, st in self.kitchen.overcooked_object_states.items():
+            id_dict[st['id']] = st
+
+        return id_dict
     
     def to_overcooked_state(self):
         state_dict = {}
@@ -626,6 +672,9 @@ class VisionLimitEnv(LsiEnv):
         ]
         # state_dict['objects'] = [v for k,v in self.world_state.state_dict['objects'].items()]
         state_dict['objects'] = [v for k,v in self.world_state.state_dict['unowned_objects'].items()]
+        for st in state_dict['objects']:
+            if 'in_hot_plate' in st.keys():
+                del st['in_hot_plate']
         state_dict['order_list'] = self.world_state.orders
 
         return state_dict
