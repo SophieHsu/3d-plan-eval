@@ -760,6 +760,17 @@ class Kitchen():
                 # self.onions.append(multiplexed_obj_2)
                 # body_ids = multiplexed_obj_2.get_body_ids()
                 # p.changeDynamics(body_ids[0], -1, mass=0.001)
+            elif 'counter' in name:
+                obj = URDFObject(name2path[name],
+                                 name=name,
+                                 category=name,
+                                 scale=name2scale_map[name] / 1.15,
+                                 avg_obj_dims={'density': 10000},
+                                 model_path="/".join(
+                                     name2path[name].split("/")[:-1]),
+                                 abilities=name2abl[name])
+                self.env.simulator.import_object(obj)
+                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
             else:
                 obj = URDFObject(name2path[name],
                                  name=name,
@@ -1097,6 +1108,22 @@ class Kitchen():
                         onion.states[object_states.OnTop].set_value(self.onion_counter, True, use_ray_casting_method=True)
                     # x,y = grid_to_real_coord(self.onion_counter.get_position())
                     # onion.set_position([x,y,1.1])
+
+        # to check if onion is on chopping board
+        # for onion in self.onions:
+        #     holding_onion = False
+        #     for agent in self.env.robots:
+        #         body_id = onion.get_body_ids()[0]
+        #         grasping = agent.is_grasping_all_arms(body_id)
+        #         holding_onion = IsGraspingState.TRUE in grasping
+        #         if holding_onion:
+        #             break
+        #     if not holding_onion:
+        #         if onion.current_index == 1:
+        #             if not onion.states[object_states.OnTop].get_value(self.chopping_boards[0]):
+        #                 onion.objects[0].states[object_states.OnTop].set_value(self.chopping_boards[0], True, use_ray_casting_method=True)
+        #             # x,y = grid_to_real_coord(self.onion_counter.get_position())
+        #             # onion.set_position([x,y,1.1])
             
         for obj, state in self.overcooked_object_states.items():
             if state['name'] == 'hot_plate':

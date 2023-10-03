@@ -500,7 +500,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         # low level collision avoidance
             h_x, h_y, h_z = self.env.ig_human.object.get_position()
             r_x, r_y, _ = self.env.ig_robot.object.get_position()
-            collision_radius = 0.75
+            collision_radius = 1
             if math.dist([h_x, h_y], [r_x, r_y]) > collision_radius:
                 self.ig_robot.agent_move_one_step(self.env.nav_env, ml_action)
 

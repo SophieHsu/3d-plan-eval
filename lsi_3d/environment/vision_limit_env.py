@@ -3,6 +3,7 @@ import math
 import time
 from igibson import object_states
 from igibson.envs.igibson_env import iGibsonEnv
+from igibson.robots.manipulation_robot import IsGraspingState
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.environment.lsi_env import LsiEnv
@@ -306,11 +307,17 @@ class VisionLimitEnv(LsiEnv):
                         if steak.states[object_states.Inside].get_value(obj) or in_same_pos:
                             if obj == in_human_hand:
                                 in_human_hand = steak
+                                
+                                x,y,z = obj.get_position()
+                                steak.set_position([x,y,z+0.03])
+
                             elif obj == in_robot_hand:
                                 in_robot_hand = steak
 
                             # add tag saying steak is in hot plate
                             st['in_hot_plate'] = [steak]
+
+                                
 
         # but if now we have a dish, then that will always be in someones hand
         for obj, st in self.kitchen.overcooked_object_states.copy().items():
@@ -345,7 +352,7 @@ class VisionLimitEnv(LsiEnv):
                                 for sub_obj in onion.objects:
                                     # if sub_obj.get_position()[2] < 0.1:
                                     # sub_obj.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
-                                    sub_obj.set_position([x,y,z+0.07*current_idx])
+                                    sub_obj.set_position([x,y,z+0.05*current_idx])
                                     current_idx+=1
                             else:
                                 # item.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
@@ -468,11 +475,21 @@ class VisionLimitEnv(LsiEnv):
 
         # check object states
         for onion in self.kitchen.onions:
-            if onion.current_index == 1 and onion in unowned_objects:
+            for agent in self.nav_env.robots:
+                body_id = onion.get_body_ids()[0]
+                grasping = agent.is_grasping_all_arms(body_id)
+                holding_onion = IsGraspingState.TRUE in grasping
+                if holding_onion:
+                    break
+
+            if onion.current_index == 1 and onion in unowned_objects and not holding_onion:
                 # check if position below 0.1 then place back on chopping board
-                for sub_obj in onion.objects:
-                    if sub_obj.get_position()[2] < 0.1:
-                        sub_obj.states[object_states.OnTop].set_value(self.kitchen.chopping_boards[0], True, use_ray_casting_method=True)
+                # for sub_obj in onion.objects:
+                #     if sub_obj.get_position()[2] < 0.1:
+                #         sub_obj.states[object_states.OnTop].set_value(self.kitchen.chopping_boards[0], True, use_ray_casting_method=True)
+                if not onion.objects[0].states[object_states.OnTop].get_value(self.kitchen.chopping_boards[0]):
+                    onion.objects[0].states[object_states.OnTop].set_value(self.kitchen.chopping_boards[0], True, use_ray_casting_method=True)
+
                     
 
         self.log_state()
