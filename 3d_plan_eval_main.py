@@ -200,6 +200,7 @@ def setup(args):
         log_dict['log_id'] = str(random.randint(0, 100000))
         log_dict[log_dict['i']] = {}
         log_dict[log_dict['i']]['low_level_logs'] = []
+        log_dict['layout'] = kitchen.grid
 
         env = VisionLimitEnv(mdp, igibson_env, tracking_env, human, robot, kitchen, log_dict=log_dict)
         human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,

@@ -266,7 +266,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             all_objects_ids_dict = self.env.all_objects_ids_dict()
 
             transfer_dict = {'ovc_state': overcooked_state_dict, 'ids_dict': all_objects_ids_dict}
-            pprint.pprint(overcooked_state_dict)
+            # pprint.pprint(overcooked_state_dict)
 
             for i in range(1,self.log_dict['i']):
                 for j, object in enumerate(self.log_dict[i]['overcooked_state_sent']['objects']):
@@ -279,13 +279,15 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                     object.pop('in_hot_plate')
                     overcooked_state_dict['objects'][i] = object
 
+            
+
             self.log_dict['i'] += 1
             counter = self.log_dict['i']
             self.log_dict[counter] = {}
             self.log_dict[counter]['overcooked_state_sent'] = overcooked_state_dict.copy()
             self.log_dict[counter]['low_level_logs'] = []
             self.log_dict['event_start_time'] = time.time()
-            print(counter)
+            # print(counter)
 
 
             # try:
@@ -317,7 +319,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         if data is not None:
             self.awaiting_response = False
             dic = json.loads(data['data'].decode())
-            print('overcooked action: ')
+            # print('overcooked action: ')
             self.log_dict[self.log_dict['i']]['overcooked_recieved'] = dic
             self.ml_robot_action = self.from_overcooked_action(dic)
 
@@ -374,7 +376,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             
             # log every ml step
                 self.log_state()
-                print('In ml_robot_step:', self.ml_robot_action)
+                # print('In ml_robot_step:', self.ml_robot_action)
         return self.ml_robot_action
     
     def log_state(self):

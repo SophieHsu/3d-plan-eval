@@ -220,8 +220,8 @@ class ManipulationRobot(BaseRobot):
                         max_pos = self.joint_upper_limits[self.gripper_control_idx[arm]]
 
                         # Check we don't have any invalid values (i.e.: fingers should be within the limits)
-                        if not np.all((min_pos <= finger_pos) * (finger_pos <= max_pos)):
-                            logging.warning("Finger joint positions are outside of the joint limits")
+                        # if not np.all((min_pos <= finger_pos) * (finger_pos <= max_pos)):
+                        #     logging.warning("Finger joint positions are outside of the joint limits")
 
                         # Check distance from both ends of the joint limits
                         dist_from_lower_limit = finger_pos - min_pos
