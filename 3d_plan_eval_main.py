@@ -110,9 +110,9 @@ def setup(args):
 
     # if not headless:
     #     # Set a better viewing direction
-    #     igibson_env.simulator.viewer.initial_pos = [-0.3, -0.3, 1.1]
-    #     igibson_env.simulator.viewer.initial_view_direction = [0.7, 0.6, -0.4]
-    #     igibson_env.simulator.viewer.reset_viewer()
+    # igibson_env.simulator.viewer.initial_pos = [-0, 0.5, 0]
+    # igibson_env.simulator.viewer.initial_view_direction = [0,-1.57, 1.57]
+    # igibson_env.simulator.viewer.reset_viewer()
 
     # scene = EmptyScene()
     # igibson_env.simulator.import_scene(scene)
@@ -301,6 +301,9 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, env:LsiEnv, args):
     start_time = time.time()
     count = 0
     i = 0
+
+    print('press a key to begin game...')
+    temp = input()
     
     while True:
         env.update_world()

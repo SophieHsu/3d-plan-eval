@@ -655,7 +655,7 @@ class Kitchen():
                 ####################################################
                 self.onion_spawn_pos = pos
 
-                for j in range(1):
+                for j in range(2):
                     whole_obj_2 = URDFObject(name2path[name],
                                 name=name,
                                 category=name,

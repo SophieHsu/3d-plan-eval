@@ -13,6 +13,8 @@ from lsi_3d.mdp.state import AgentState, WorldState
 from lsi_3d.utils.functions import find_nearby_open_spaces, grid_transition
 from utils import grid_to_real_coord, quat2euler, real_to_grid_coord
 
+STICKY_ITEMS = False
+
 class VisionLimitEnv(LsiEnv):
     def __init__(self, mdp: LsiMdp, nav_env: iGibsonEnv, tracking_env: TrackingEnv, ig_human: iGibsonAgent, ig_robot: iGibsonAgent, kitchen: Kitchen, recalc_res=None, avoid_radius=None, log_dict={}) -> None:
         super().__init__(mdp, nav_env, tracking_env, ig_human, ig_robot, kitchen, recalc_res, avoid_radius)
@@ -314,9 +316,10 @@ class VisionLimitEnv(LsiEnv):
                             if obj == in_human_hand:
                                 in_human_hand = steak
                                 
-                                # For items floating above steak
-                                x,y,z = obj.get_position()
-                                steak.set_position([x,y,z+0.03])
+                                if STICKY_ITEMS:
+                                    # For items floating above steak
+                                    x,y,z = obj.get_position()
+                                    steak.set_position([x,y,z+0.03])
 
                             elif obj == in_robot_hand:
                                 in_robot_hand = steak
@@ -351,6 +354,7 @@ class VisionLimitEnv(LsiEnv):
                     steak = self.tracking_env.get_closest_steak(obj.get_position())
                     st['in_hot_plate'].append(steak)
                     
+                    # if STICKY_ITEMS:
                     # For items floating above dish
                     if in_human_hand == obj:
                         current_idx = 1
@@ -364,7 +368,7 @@ class VisionLimitEnv(LsiEnv):
                                     current_idx+=1
                             else:
                                 # item.states[object_states.Inside].set_value(obj, True, use_ray_casting_method=True)
-                                item.set_position([x,y,z+0.07*current_idx])
+                                item.set_position([x,y,z+0.05*current_idx])
                                 current_idx += 1
                 
                 if st['name'] == 'dish' and self.tracking_env.is_item_on_table(obj) and st['state'] != 'delivered':

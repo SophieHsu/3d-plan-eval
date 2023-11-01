@@ -150,4 +150,4 @@ class MotionControllerRobot():
         else:
             return min_theta
         
-    def pick():
+    # def pick():

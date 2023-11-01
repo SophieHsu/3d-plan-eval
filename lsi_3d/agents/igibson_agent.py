@@ -171,22 +171,22 @@ class iGibsonAgent:
         if action in 'NESW':
             self.agent_turn_one_step(env, action)
         elif action == 'F':
-            cur_x, cur_y = self.object.get_position()[:2]
-            # cur_x, cur_y = real_to_grid_coord((cur_x,cur_y))
-            goal_angle = math.atan2((self.target_y - cur_y),
-                                    (self.target_x - cur_x))
-            current_heading = self.get_current_orn_z()
-            angle_delta = self.calc_angle_distance(goal_angle, current_heading)
+            # cur_x, cur_y = self.object.get_position()[:2]
+            # # cur_x, cur_y = real_to_grid_coord((cur_x,cur_y))
+            # goal_angle = math.atan2((self.target_y - cur_y),
+            #                         (self.target_x - cur_x))
+            # current_heading = self.get_current_orn_z()
+            # angle_delta = self.calc_angle_distance(goal_angle, current_heading)
 
-            if angle_delta > 0.2:
-                while angle_delta > 0.1:
-                    self.turn_toward(env, goal_angle, angle_delta, cur_x,
-                                     cur_y)
-                    current_heading = self.get_current_orn_z()
-                    angle_delta = self.calc_angle_distance(
-                        goal_angle, current_heading)
-            else:
-                self.agent_forward_one_step(env)
+            # if angle_delta > 0.2:
+            #     while angle_delta > 0.1:
+            #         self.turn_toward(env, goal_angle, angle_delta, cur_x,
+            #                          cur_y)
+            #         current_heading = self.get_current_orn_z()
+            #         angle_delta = self.calc_angle_distance(
+            #             goal_angle, current_heading)
+            # else:
+            self.agent_forward_one_step(env)
         else:
             pass
 
@@ -419,10 +419,17 @@ class iGibsonAgent:
             done, in_hand = self.drop(
                 self.object_position,
                 tracking_env,
-                tracking_env.get_closest_chopping_board(
-                agent_pos=self.object.get_position()),
+                tracking_env.get_closest_onion(
+                    agent_pos=self.object.get_eef_position()),
                 name='onion',
-                offset=[0, 0, 0.1 + HEIGHT_OFFSET])
+                offset=[0, 0, HEIGHT_OFFSET])
+            # done, in_hand = self.drop(
+            #     self.object_position,
+            #     tracking_env,
+            #     tracking_env.get_closest_chopping_board(
+            #     agent_pos=self.object.get_position()),
+            #     name='onion',
+            #     offset=[0, 0, 0.1 + HEIGHT_OFFSET])
             if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None
@@ -434,10 +441,17 @@ class iGibsonAgent:
             done, in_hand = self.drop(
                 self.object_position,
                 tracking_env,
-                tracking_env.get_closest_pan(
-                agent_pos=self.object.get_position()),
+                tracking_env.get_closest_meat(
+                    agent_pos=self.object.get_eef_position()),
                 name='meat',
-                offset=[0, 0, 0.2])
+                offset=[0, 0, HEIGHT_OFFSET])
+            # done, in_hand = self.drop(
+            #     self.object_position,
+            #     tracking_env,
+            #     tracking_env.get_closest_pan(
+            #     agent_pos=self.object.get_position()),
+            #     name='meat',
+            #     offset=[0, 0, 0.2])
             if done or in_hand:
                 self.interact_step_index = -1
                 self.object_position = None

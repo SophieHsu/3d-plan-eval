@@ -1,0 +1,19 @@
+map_config = 'layout_2.tml'
+agent_config = ['human_agent.tml','robot_agent.tml']
+algorithm_config = 'a_star_two_agent.tml'
+order_list = ['steak','steak', 'steak']
+hl_start_state = 'None_0_onion_onion'
+recalculation_resolution = 15
+avoid_radius = 1
+
+human_start_x=2
+human_start_y=2
+
+robot_start_x=4
+robot_start_y=7
+
+ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
+
+layout="""kitchen_layouts_grid_text/steak_side_2.txt"""
+
+max_in_pan = 1

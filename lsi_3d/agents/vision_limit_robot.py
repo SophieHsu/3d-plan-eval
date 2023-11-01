@@ -418,6 +418,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             action_object = ('pickup','onion')
         elif station_key == 'K' and robot_holding_name == 'onion':
             action_object = ('drop','onion')
+            print('dropping onion')
         elif station_key == 'K' and robot_holding_name == None and self.env.tracking_env.get_closest_green_onion(self.ig_robot.object.get_position()).current_index == 0:
             action_object = ('chop','onion')
         elif station_key == 'K' and robot_holding_name == 'steak' and self.env.tracking_env.get_closest_green_onion(self.ig_robot.object.get_position()).current_index == 1:
@@ -481,6 +482,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                 )
             else:
                 print('action object is None')
+                self.take_ml_robot_step = True
             self.env.nav_env.simulator.step()
         else:
             self.continuous_motion(ml_action)
