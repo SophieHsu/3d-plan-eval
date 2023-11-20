@@ -29,7 +29,7 @@ class VisionLimitEnv(LsiEnv):
 
     def update_world(self):
         
-
+        human_in_hand_assigned = False
 
         # pans
         pans_status = self.tracking_env.get_pan_status()
@@ -137,7 +137,7 @@ class VisionLimitEnv(LsiEnv):
             else:
                 state['position'] = self.to_overcooked_grid(self.robot_state.ml_state[0:2])
             
-
+        # start mapping from igibson to overcooked
         in_human_hand = self.tracking_env.obj_in_human_hand()
         self.kitchen.update_overcooked_robot_holding()
         in_robot_hand = self.kitchen.overcooked_robot_holding
@@ -160,6 +160,7 @@ class VisionLimitEnv(LsiEnv):
             # overcooked wont allow object in same location but not holding
             self.human_state.holding = 'None'
             for obj, state in self.kitchen.overcooked_object_states.items():
+                # grab previous location to check in middle of interact
                 if state['position'] == self.to_overcooked_grid(self.human_state.ml_state[0:2]):
                     in_human_hand = obj
 
@@ -187,14 +188,16 @@ class VisionLimitEnv(LsiEnv):
         # if meat is now steak change id and object
         for object, state in self.kitchen.overcooked_object_states.items():
             # meat becomes steak human holding nothing and meat is on
-            if state['name'] == 'meat' and (self.human_state.holding == 'None' or self.robot_state.holding == 'None'):
+            if state['name'] == 'meat' or state['name'] == 'steak': # and (self.human_state.holding == 'None' or self.robot_state.holding == 'None'):
                 # if object is in same location as pan then make it a steak
                 pans = self.tracking_env.get_pan_status().items()
                 for p,objs in pans:
                     if self.tracking_env.get_position(p) == self.tracking_env.get_position(object):
                     # if p.states[object_states.Inside].get_value(object):
-                        self.kitchen.drop_meat(object)
-                        in_human_hand = None
+                        if state['name'] == 'meat':
+                            self.kitchen.drop_meat(object)
+                        if in_human_hand == object:
+                            in_human_hand = None
 
 
         # if onion is now on chopping board change state and position
@@ -229,7 +232,6 @@ class VisionLimitEnv(LsiEnv):
                         else:
                             in_robot_hand = obj
 
-        
 
             # same for garnish
             # if st['name'] == 'hot_plate':
@@ -506,6 +508,10 @@ class VisionLimitEnv(LsiEnv):
         self.log_state()
         self.log_dict_state()
         return
+    
+    def check_last_steak(self):
+        # if self.log_dict[self.log_dict['i']-1]['low_level_logs']
+        self.human_state.state_dict['human_holding']
     
     def log_dict_state(self):
         elapsed = time.time() - self.log_dict['event_start_time']

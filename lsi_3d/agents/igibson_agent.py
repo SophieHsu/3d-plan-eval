@@ -419,7 +419,7 @@ class iGibsonAgent:
             done, in_hand = self.drop(
                 self.object_position,
                 tracking_env,
-                tracking_env.get_closest_onion(
+                tracking_env.get_closest_green_onion(
                     agent_pos=self.object.get_eef_position()),
                 name='onion',
                 offset=[0, 0, HEIGHT_OFFSET])

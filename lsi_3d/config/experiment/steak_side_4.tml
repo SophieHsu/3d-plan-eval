@@ -10,7 +10,7 @@ human_start_x=2
 human_start_y=2
 
 robot_start_x=3
-robot_start_y=8
+robot_start_y=6
 
 ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
 
