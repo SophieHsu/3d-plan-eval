@@ -1,0 +1,18 @@
+[[object]]
+name = "counter"
+path = "objects/bottom_cabinet/46452/46452.urdf"
+scale = [1.04, 0.97, 0.95]
+category = "counter"
+fixed_base = true
+position = [1.0, 1.0, 1.0]
+orientation = [0, 0, 0]
+[object.avg_obj_dims]
+density = 10000
+
+[[object]]
+name = "vidalia_onion"
+path = "objects/vidalia_onion/18_1/18_1.urdf"
+scale = [2.0, 2.0, 2.0]
+category = "vidalia_onion"
+position = [0.0, 0.0, 2.0]
+orientation = [0, 0, 0]
