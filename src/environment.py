@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from config_provider import ConfigProvider
 from igibson.envs.igibson_env import iGibsonEnv
+from igibson.objects.articulated_object import URDFObject
 from object import Object
 from typing import Any, Dict
 
@@ -50,6 +51,7 @@ class iGibsonEnvironment(Environment):
         self._config = None
         self._objects = None
         self._object_load_handles = {
+            'creator': URDFObject,
             'loader': self._env.simulator.import_object,
             'pose_setter': self._env.set_pos_orn_with_z_offset
         }

@@ -1,6 +1,4 @@
 import igibson
-from igibson.objects.articulated_object import URDFObject
-import numpy as np
 import os
 
 
@@ -11,7 +9,7 @@ class Object:
         self.kwargs = kwargs
 
     def load(self, handles):
-        obj = URDFObject(
+        obj = handles['creator'](
             filename=os.path.join(igibson.ig_dataset_path, self.path),
             model_path=os.path.dirname(os.path.join(igibson.ig_dataset_path, self.path)),
             **self.kwargs,
