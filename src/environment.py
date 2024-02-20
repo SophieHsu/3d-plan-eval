@@ -70,7 +70,6 @@ class iGibsonEnvironment(Environment):
             self._config.get('object')
         ))
         self.load_environment()
-        print(self._objects)
 
     def update(self, events: Dict) -> None:
         raise NotImplementedError
