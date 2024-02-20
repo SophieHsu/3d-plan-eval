@@ -5,18 +5,15 @@ import os
 
 
 class Object:
-    def __init__(self, name, path, scale, **kwargs):
+    def __init__(self, name, path, **kwargs):
         self.name = name
         self.path = path
-        self.scale = scale
         self.kwargs = kwargs
 
     def load(self, handles):
         obj = URDFObject(
             filename=os.path.join(igibson.ig_dataset_path, self.path),
-            scale=np.array([1.04, 0.97, 0.95]) / 1.15,
             model_path=os.path.dirname(os.path.join(igibson.ig_dataset_path, self.path)),
-            fixed_base=True,
             **self.kwargs,
         )
 
