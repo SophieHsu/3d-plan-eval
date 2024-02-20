@@ -22,7 +22,3 @@ class Object:
             self.kwargs.get('orientation', None),
             self.kwargs.get('z_offset', None),
         )
-
-# read config
-# init object from config
-# load them in simulation
