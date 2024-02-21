@@ -7,6 +7,7 @@ model_path = "objects/fridge/10373"
 position = [0.0, 0.0, 0.0]
 orientation = [0.0, 0.0, 0.0]
 # TODO: update states. steak.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+[object.states]
 
 
 [[object]]
@@ -17,10 +18,12 @@ category = "plate"
 model_path = "objects/bowl/a1393437aac09108d627bfab5d10d45d"
 position = [0.0, 0.0, 0.0]
 orientation = [0.0, 0.0, 0.0]
-#TODO: obj.states[object_states.Dusty].set_value(True) obj.states[object_states.Stained].set_value(True)
 [object.states]
 Dusty =true
 Stained = true
+[object.abilities]
+dustyable = {}
+stainable = {}
 
 [[object]]
 name = "stove"
@@ -51,7 +54,10 @@ model_path = "objects/green_onion/green_onion_000"
 position = [0.0, 0.0, 0.0]
 orientation = [0.0, 0.0, 0.0]
 [object.abilities]
-#TODO: add abilities abilities {'burnable': {}, 'freezable': {}, 'cookable': {}, 'sliceable': {'slice_force': 0.0}}
+burnable = {}
+freezable = {}
+cookable = {}
+sliceable = {slice_force = 0.0}
 
 [[object]]
 name = "counter"
@@ -79,7 +85,8 @@ model_path = "objects/carving_knife/14_1"
 category = "knife"
 position = [0.0, 0.0, 0.0]
 orientation = [0.0, 0.0, 0.0]
-#TODO: abilities {'slicer': {}}
+[object.abilities]
+slicer = {}
 
 [[object]]
 name = "chopping_board"
