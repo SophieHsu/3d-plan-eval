@@ -79,7 +79,7 @@ class iGibsonEnvironment(Environment):
 
 if __name__ == '__main__':
     igibson_env = iGibsonEnv(
-        config_file=None,
+        config_file='igibson/configs/fetch_motion_planning_3d_lsi.yaml',
         mode='gui_interactive',
         # action_timestep=1.0 / 15,
         # physics_timestep=1.0 / 30,  #1.0 / 30,
