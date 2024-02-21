@@ -18,7 +18,7 @@ model_path = "objects/bowl/a1393437aac09108d627bfab5d10d45d"
 position = [0.0, 0.0, 0.0]
 orientation = [0.0, 0.0, 0.0]
 #TODO: obj.states[object_states.Dusty].set_value(True) obj.states[object_states.Stained].set_value(True)
-[onject.states]
+[object.states]
 Dusty =true
 Stained = true
 
