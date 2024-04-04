@@ -129,24 +129,20 @@ class Runner:
 
         mlp = AStarMotionPlanner(self._kitchen)
 
-        planner_config = 3
-        if planner_config == 3:
+        log_dict = {'i': 0, 'event_start_time': time.time()}
+        log_dict['log_id'] = str(random.randint(0, 100000))
+        log_dict[log_dict['i']] = {}
+        log_dict[log_dict['i']]['low_level_logs'] = []
+        log_dict['layout'] = self._kitchen.grid
 
-            log_dict = {'i': 0, 'event_start_time': time.time()}
-            log_dict['log_id'] = str(random.randint(0, 100000))
-            log_dict[log_dict['i']] = {}
-            log_dict[log_dict['i']]['low_level_logs'] = []
-            log_dict['layout'] = self._kitchen.grid
+        env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen, log_dict=log_dict)
+        human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
+                                            self._kitchen.grid, hlp, env, tracking_env, human_vr)
+        robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
+        robot_hlp.compute_mdp(filename='hi')
 
-            env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen, log_dict=log_dict)
-            human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
-                                                self._kitchen.grid, hlp, env, tracking_env, human_vr)
-            robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
-            robot_hlp.compute_mdp(filename='hi')
-
-            human_sim_agent = SteakFixedPolicyHumanAgent(env, human_agent)
-            robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, env,
-                                                robot, log_dict=log_dict)
+        human_sim_agent = SteakFixedPolicyHumanAgent(env, human_agent)
+        robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, env, robot, log_dict=log_dict)
 
         # TODO: Get rid of 4.5 offset
         h_x, h_y = human_start
