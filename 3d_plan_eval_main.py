@@ -2,6 +2,7 @@
 import argparse
 import random
 import time
+import sys
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.scenes.empty_scene import EmptyScene
 from igibson.scenes.stadium_scene import StadiumScene
@@ -269,7 +270,7 @@ def environment_setup(args, headless=None):
     return igibson_env, kitchen, configs
 
 
-def main(args):
+def main():
     # igibson_env, kitchen, configs = environment_setup(args)
     robot_agent, human_agent, lsi_env, igibson_env, kitchen = setup(args)
     human_agent.set_robot(igibson_env.robots[0])
@@ -325,9 +326,7 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, env: LsiEnv, args)
             break
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    parser = argparse.ArgumentParser()
+def set_args(parser):
     parser.add_argument(
         "--mode",
         "-m",
@@ -360,8 +359,22 @@ if __name__ == "__main__":
         help="name of config file",
     )
 
-    args = parser.parse_args()
-    print(args.kitchen)
-    main(args)
 
-exit()
+def get_args():
+    parser = argparse.ArgumentParser()
+    set_args(parser)
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    # get args
+    ARGS = get_args()
+
+    # set logging level
+    logging.basicConfig(level=logging.DEBUG)
+
+    # launch
+    main()
+
+    # exit without errors
+    sys.exit(0)
