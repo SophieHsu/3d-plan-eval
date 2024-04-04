@@ -31,9 +31,6 @@ from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 
 
-# Robot
-
-
 class Runner:
     _TIME_LIMIT_FAILURE = 1000000
 
