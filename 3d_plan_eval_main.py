@@ -221,13 +221,15 @@ def main():
 def get_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--mode', '-m',
+    parser.add_argument('--mode', '-m', type=str, dest='mode', action='store',
                         choices=['headless', 'headless_tensor', 'gui_non_interactive', 'gui_interactive', 'vr'],
-                        default='headless', help='which mode for simulation (default: gui_interactive)')
-    parser.add_argument('--kitchen', '-k', default='none', help='filepath of kitchen layout')
-    parser.add_argument('--config', '-c', type=str, action='store', default='steak.tml',
-                        dest='config', help='name of config file')
-    parser.add_argument('--practice', '-p', default=False, help='name of config file')
+                        default='headless', help='Specifies the mode for simulation (default: gui_interactive)')
+    parser.add_argument('--kitchen', '-k', type=str, dest='kitchen', action='store',
+                        default='none', help='Filepath of the kitchen layout')
+    parser.add_argument('--config', '-c', type=str, dest='config', action='store',
+                        default='steak.tml', help='Name of the config file')
+    parser.add_argument('--practice', '-p', action='store_true', dest='practice',
+                        help='Flag indicating whether it is a practice session')
 
     return parser.parse_args()
 
