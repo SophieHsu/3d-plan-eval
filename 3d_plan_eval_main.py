@@ -48,12 +48,12 @@ from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
-TIME_LIMIT_FAILURE = 1000000 # 900 # 15 mins
+TIME_LIMIT_FAILURE = 1000000  # 900 # 15 mins
+
 
 def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
-    #TODO consolidate config files
-    
-    
+    # TODO consolidate config files
+
     # if using script select random start
     if args.kitchen != 'none':
         kitchen.read_from_grid_text(args.kitchen)
@@ -67,20 +67,22 @@ def set_start_locations(args, map_config, exp_config, igibson_env, kitchen):
         kitchen.read_from_grid_text(exp_config["layout"])
         robot_start = (exp_config["robot_start_x"], exp_config["robot_start_y"])
         human_start = (exp_config["human_start_x"], exp_config["human_start_y"])
-        
+
     r_x, r_y = robot_start
     igibson_env.set_pos_orn_with_z_offset(igibson_env.robots[0],
                                           [r_x - 4.5, r_y - 4.5, 0], [0, 0, 0])
     return robot_start, human_start
 
+
 def print_grid(array):
     grid_str = ""
     for row in array:
         for element in row:
-            grid_str+= element + ' '
+            grid_str += element + ' '
         grid_str += '\n'
-    
+
     return grid_str
+
 
 def setup_log(kitchen, start_locations):
     filename = 'lsi_3d/logs/' + kitchen.kitchen_name + '_log.txt'
@@ -91,10 +93,10 @@ def setup_log(kitchen, start_locations):
     f.close()
     return True
 
-def setup(args):
 
+def setup(args):
     if args.config != 'none':
-        exp_config, map_config  = read_in_lsi_config(args.config)
+        exp_config, map_config = read_in_lsi_config(args.config)
     else:
         # exp_config, map_config = read_in_lsi_config('steak.tml')
         exp_config, map_config = read_in_lsi_config('steak.tml')
@@ -104,8 +106,8 @@ def setup(args):
         mode=args.mode,
         # action_timestep=1.0 / 15,
         # physics_timestep=1.0 / 30,  #1.0 / 30,
-        action_timestep= 1.0 / 30,
-        physics_timestep= 1.0 / 120,  #1.0 / 30,
+        action_timestep=1.0 / 30,
+        physics_timestep=1.0 / 120,  # 1.0 / 30,
         use_pb_gui=True)
 
     # if not headless:
@@ -118,7 +120,7 @@ def setup(args):
     # igibson_env.simulator.import_scene(scene)
 
     kitchen = Kitchen(igibson_env, exp_config['max_in_pan'])
-    igibson_env.simulator.scene.floor_plane_rgba = [.5,.5,.5,1]
+    igibson_env.simulator.scene.floor_plane_rgba = [.5, .5, .5, 1]
 
     robot_start, human_start = set_start_locations(args, map_config, exp_config, igibson_env, kitchen)
 
@@ -131,7 +133,7 @@ def setup(args):
     # _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
 
     order_list = exp_config['order_list']
-    
+
     config = parse_config(exp_config['ig_config_file'])
     human_bot = BehaviorRobot(**config["human"])
     human_vr = True if args.mode == 'vr' else False
@@ -139,9 +141,9 @@ def setup(args):
     # human_sim = BehaviorRobot()
     # igibson_env.simulator.import_object(human_sim)
     # igibson_env.set_pos_orn_with_z_offset(human_sim, [exp_config["human_start_x"], exp_config["human_start_y"], 0], [0, 0, 0])
-    r_x,r_y = robot_start
-    h_x,h_y = human_start
-    start_locations = ((r_x,r_y,'S'), (h_x,h_y,'S'))
+    r_x, r_y = robot_start
+    h_x, h_y = human_start
+    start_locations = ((r_x, r_y, 'S'), (h_x, h_y, 'S'))
     mdp = LsiMdp.from_config(start_locations, exp_config, kitchen.grid)
     hlp = HighLevelMdpPlanner(mdp)
     hlp.compute_mdp_policy(order_list)
@@ -153,8 +155,8 @@ def setup(args):
 
     tracking_env = TrackingEnv(igibson_env, kitchen, robot, human_bot)
     env = LsiEnv(mdp, igibson_env, tracking_env, human, robot, kitchen)
-    #robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
-    #env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
+    # robot = iGibsonAgent(igibson_env.robots[0], robot_start, 'S', "robot")
+    # env = LsiEnv(mdp, igibson_env, human, robot, kitchen)
 
     #######################################################################################
     igibson_env.simulator.import_object(human_bot)
@@ -188,15 +190,15 @@ def setup(args):
         # greedy = True is same as Human Aware MDP
         # ai_agent = agent.MediumQMdpPlanningAgent(mdp_planner, greedy=False, auto_unstuck=True)
 
-        #hlp = HighLevelMdpPlanner(mdp)
+        # hlp = HighLevelMdpPlanner(mdp)
         robot_hlp.compute_mdp(order_list)
         robot_hlp.post_mdp_setup()
         human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
         robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                           robot)
     elif planner_config == 3:
-        
-        log_dict = {'i':0, 'event_start_time':time.time()}
+
+        log_dict = {'i': 0, 'event_start_time': time.time()}
         log_dict['log_id'] = str(random.randint(0, 100000))
         log_dict[log_dict['i']] = {}
         log_dict[log_dict['i']]['low_level_logs'] = []
@@ -204,22 +206,22 @@ def setup(args):
 
         env = VisionLimitEnv(mdp, igibson_env, tracking_env, human, robot, kitchen, log_dict=log_dict)
         human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
-                             kitchen.grid, hlp, env, tracking_env, human_vr)
-        #robot_hlp = SteakKnowledgeBasePlanner(mdp, mlp, vision_limited_human=human_agent)
+                                            kitchen.grid, hlp, env, tracking_env, human_vr)
+        # robot_hlp = SteakKnowledgeBasePlanner(mdp, mlp, vision_limited_human=human_agent)
         # robot_hlp = SteakHumanSubtaskQMDPPlanner(mdp, mlp, vision_limited_human=human_agent)
         # robot_hlp.compute_mdp(orders=['steak','steak'], filename='qmdp_steak_subtask.pkl')
         # robot_hlp.precompute_future_cost()
         #
         robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
-        robot_hlp.compute_mdp(filename='hi')#orders=['steak','steak'], filename='qmdp_steak_subtask.pkl')
-        #robot_hlp = None
+        robot_hlp.compute_mdp(filename='hi')  # orders=['steak','steak'], filename='qmdp_steak_subtask.pkl')
+        # robot_hlp = None
         # robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
         # robot_hlp.post_mdp_setup()
-        
-        #robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
+
+        # robot_hlp = SteakHumanSubtaskQMDPPlanner.from_qmdp_planner_file('qmdp_steak_subtask.pkl')
         human_sim_agent = SteakFixedPolicyHumanAgent(env, human_agent)
         robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, env,
-                                          robot, log_dict=log_dict)
+                                            robot, log_dict=log_dict)
 
     # TODO: Get rid of 4.5 offset
     h_x, h_y = human_start
@@ -245,7 +247,7 @@ def environment_setup(args, headless=None):
         # action_timestep=1.0 / 15,
         # physics_timestep=1.0 / 30,  #1.0 / 30,
         action_timestep=1.0 / 30,
-        physics_timestep=1.0 / 120,  #1.0 / 30,
+        physics_timestep=1.0 / 120,  # 1.0 / 30,
         use_pb_gui=True)
 
     # if not headless:
@@ -273,6 +275,7 @@ def main(args):
     human_agent.set_robot(igibson_env.robots[0])
     main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env, args)
 
+
 def check_completion(lsi_env, start_time, kitchen):
     if lsi_env.world_state.orders == []:
         print("Orders Completed")
@@ -282,8 +285,6 @@ def check_completion(lsi_env, start_time, kitchen):
         f.write("success")
         f.close()
         return True
-    
-    
 
     elapsed = time.time() - start_time
     if elapsed > TIME_LIMIT_FAILURE:
@@ -293,18 +294,21 @@ def check_completion(lsi_env, start_time, kitchen):
         f.close()
         print('timed out')
         return True
-    
+
     return False
 
+
 SKIP_NUMBER = 30
-def main_loop(igibson_env, robot_agent, human_agent, kitchen, env:LsiEnv, args):
+
+
+def main_loop(igibson_env, robot_agent, human_agent, kitchen, env: LsiEnv, args):
     start_time = time.time()
     count = 0
     i = 0
 
     print('press a key to begin game...')
     temp = input()
-    
+
     while True:
         env.update_world()
 
@@ -312,13 +316,14 @@ def main_loop(igibson_env, robot_agent, human_agent, kitchen, env:LsiEnv, args):
 
         if not args.practice:
             robot_agent.step()
-            
+
         kitchen.step(count)
         igibson_env.simulator.step()
         count += 1
 
         if check_completion(env, start_time, kitchen):
-            break 
+            break
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
