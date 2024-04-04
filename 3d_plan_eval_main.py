@@ -10,24 +10,18 @@ from igibson.envs.igibson_env import iGibsonEnv
 from igibson.robots.behavior_robot import BehaviorRobot
 from igibson.utils.utils import parse_config
 
-from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent, SteakFixedPolicyHumanAgent
-from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
-from lsi_3d.agents.hl_qmdp_agent import HlQmdpPlanningAgent
-from lsi_3d.agents.human_agent import HumanAgent
+from lsi_3d.agents.fixed_policy_human_agent import SteakFixedPolicyHumanAgent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
 from lsi_3d.agents.vision_limit_robot import VisionLimitRobotAgent
 from lsi_3d.config.reader import read_in_lsi_config
 from lsi_3d.environment.kitchen import Kitchen
-from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.environment.vision_limit_env import VisionLimitEnv
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
 from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
-from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner
-from lsi_3d.planners.hl_human_planner import HLHumanPlanner
 from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 
