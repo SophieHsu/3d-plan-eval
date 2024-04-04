@@ -96,11 +96,7 @@ def setup_log(kitchen, start_locations):
 
 
 def setup(args):
-    if args.config != 'none':
-        exp_config, map_config = read_in_lsi_config(args.config)
-    else:
-        # exp_config, map_config = read_in_lsi_config('steak.tml')
-        exp_config, map_config = read_in_lsi_config('steak.tml')
+    exp_config, map_config = read_in_lsi_config('steak.tml')
 
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],
@@ -271,10 +267,9 @@ def environment_setup(args, headless=None):
 
 
 def main():
-    # igibson_env, kitchen, configs = environment_setup(args)
-    robot_agent, human_agent, lsi_env, igibson_env, kitchen = setup(args)
+    robot_agent, human_agent, lsi_env, igibson_env, kitchen = setup(ARGS)
     human_agent.set_robot(igibson_env.robots[0])
-    main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env, args)
+    main_loop(igibson_env, robot_agent, human_agent, kitchen, lsi_env, ARGS)
 
 
 def check_completion(lsi_env, start_time, kitchen):
@@ -348,7 +343,10 @@ def set_args(parser):
     parser.add_argument(
         "--config",
         "-c",
-        default="none",
+        type='str',
+        action='store',
+        default="steak.tml",
+        dest='config',
         help="name of config file",
     )
 
