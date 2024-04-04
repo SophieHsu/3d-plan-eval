@@ -214,8 +214,7 @@ class Runner:
 
 
 def main():
-    runner = Runner()
-    runner.run()
+    Runner().run()
 
 
 def set_args(parser):
