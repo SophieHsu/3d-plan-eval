@@ -138,14 +138,6 @@ class Runner:
             human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
             robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
                                              robot)
-        elif planner_config == 2:
-            # tracking_env.step()
-            robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
-            robot_hlp.compute_mdp(order_list)
-            robot_hlp.post_mdp_setup()
-            human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
-            robot_agent = HlQmdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
-                                              robot)
         elif planner_config == 3:
 
             log_dict = {'i': 0, 'event_start_time': time.time()}
