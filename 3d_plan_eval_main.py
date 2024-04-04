@@ -89,15 +89,15 @@ class Runner:
             use_pb_gui=True
         )
 
-        kitchen = Kitchen(self._igibson_env, exp_config['max_in_pan'])
+        self._kitchen = Kitchen(self._igibson_env, exp_config['max_in_pan'])
         self._igibson_env.simulator.scene.floor_plane_rgba = [.5, .5, .5, 1]
 
         robot_start, human_start = self._set_start_locations(exp_config)
 
         if ARGS.kitchen != 'none':
-            kitchen.setup(ARGS.kitchen)
+            self._kitchen.setup(ARGS.kitchen)
         else:
-            kitchen.setup(exp_config["layout"], exp_config["order_list"])
+            self._kitchen.setup(exp_config["layout"], exp_config["order_list"])
 
         order_list = exp_config['order_list']
 
@@ -108,7 +108,7 @@ class Runner:
         r_x, r_y = robot_start
         h_x, h_y = human_start
         start_locations = ((r_x, r_y, 'S'), (h_x, h_y, 'S'))
-        mdp = LsiMdp.from_config(start_locations, exp_config, kitchen.grid)
+        mdp = LsiMdp.from_config(start_locations, exp_config, self._kitchen.grid)
         hlp = HighLevelMdpPlanner(mdp)
         hlp.compute_mdp_policy(order_list)
         self._init_logfile(start_locations)
@@ -117,17 +117,17 @@ class Runner:
 
         robot = iGibsonAgent(self._igibson_env.robots[0], robot_start, 'S', "robot")
 
-        tracking_env = TrackingEnv(self._igibson_env, kitchen, robot, human_bot)
-        env = LsiEnv(mdp, self._igibson_env, tracking_env, human, robot, kitchen)
+        tracking_env = TrackingEnv(self._igibson_env, self._kitchen, robot, human_bot)
+        env = LsiEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen)
         self._igibson_env.simulator.import_object(human_bot)
         self._igibson_env.set_pos_orn_with_z_offset(
             human_bot, [human_start[0], human_start[1], 0.6], [0, 0, 0])
         a_star_planner = AStarPlanner(self._igibson_env)
         motion_controller = MotionControllerHuman()
         human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
-                                 kitchen.grid, hlp, env, tracking_env, human_vr)
+                                 self._kitchen.grid, hlp, env, tracking_env, human_vr)
 
-        mlp = AStarMotionPlanner(kitchen)
+        mlp = AStarMotionPlanner(self._kitchen)
 
         planner_config = 3
         if planner_config == 1:
@@ -152,11 +152,11 @@ class Runner:
             log_dict['log_id'] = str(random.randint(0, 100000))
             log_dict[log_dict['i']] = {}
             log_dict[log_dict['i']]['low_level_logs'] = []
-            log_dict['layout'] = kitchen.grid
+            log_dict['layout'] = self._kitchen.grid
 
-            env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, kitchen, log_dict=log_dict)
+            env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen, log_dict=log_dict)
             human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
-                                                kitchen.grid, hlp, env, tracking_env, human_vr)
+                                                self._kitchen.grid, hlp, env, tracking_env, human_vr)
             robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
             robot_hlp.compute_mdp(filename='hi')
 
@@ -173,7 +173,6 @@ class Runner:
         self._robot_agent = robot_agent
         self._human_agent = human_agent
         self._env = env
-        self._kitchen = kitchen
 
     def _check_completion(self, start_time):
         if not self._env.world_state.orders:
