@@ -130,15 +130,7 @@ class Runner:
         mlp = AStarMotionPlanner(self._kitchen)
 
         planner_config = 3
-        if planner_config == 1:
-            hhlp = HLHumanPlanner(mdp, mlp, False)
-            robot_hlp = HLHumanAwareMDPPlanner(mdp, hhlp)
-            robot_hlp.compute_mdp_policy(order_list)
-
-            human_sim_agent = FixedPolicyAgent(robot_hlp, mlp, mdp.num_items_for_soup)
-            robot_agent = HlMdpPlanningAgent(robot_hlp, mlp, human_sim_agent, env,
-                                             robot)
-        elif planner_config == 3:
+        if planner_config == 3:
 
             log_dict = {'i': 0, 'event_start_time': time.time()}
             log_dict['log_id'] = str(random.randint(0, 100000))
