@@ -118,14 +118,11 @@ class Runner:
         robot = iGibsonAgent(self._igibson_env.robots[0], robot_start, 'S', "robot")
 
         tracking_env = TrackingEnv(self._igibson_env, self._kitchen, robot, human_bot)
-        env = LsiEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen)
         self._igibson_env.simulator.import_object(human_bot)
         self._igibson_env.set_pos_orn_with_z_offset(
             human_bot, [human_start[0], human_start[1], 0.6], [0, 0, 0])
         a_star_planner = AStarPlanner(self._igibson_env)
         motion_controller = MotionControllerHuman()
-        human_agent = HumanAgent(human_bot, a_star_planner, motion_controller,
-                                 self._kitchen.grid, hlp, env, tracking_env, human_vr)
 
         mlp = AStarMotionPlanner(self._kitchen)
 
