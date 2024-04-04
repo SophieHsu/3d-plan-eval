@@ -1,54 +1,38 @@
 # Human
 import argparse
 import functools
-import random
-import time
-import sys
-from igibson.envs.igibson_env import iGibsonEnv
-from igibson.scenes.empty_scene import EmptyScene
-from igibson.scenes.stadium_scene import StadiumScene
-from igibson.utils.motion_planning_wrapper import MotionPlanningWrapper
-from igibson.robots.behavior_robot import BehaviorRobot
-from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 import logging
-from igibson.utils.utils import quatToXYZW, parse_config
-from transforms3d.euler import euler2quat
-import pybullet as p
-from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
-from lsi_3d.agents.vision_limit_robot import VisionLimitRobotAgent
-from lsi_3d.environment.vision_limit_env import VisionLimitEnv
-
-from lsi_3d.planners.a_star_planner import AStarPlanner
-from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
-from lsi_3d.agents.human_agent import HumanAgent
-from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
-from lsi_3d.environment.tracking_env import TrackingEnv
-from lsi_3d.planners.steak_human_subtask_qmdp_planner import SteakHumanSubtaskQMDPPlanner
-from lsi_3d.planners.steak_knowledge_base_planner import SteakKnowledgeBasePlanner
-from lsi_3d.planners.steak_mdp_planner import SteakMediumLevelMDPPlanner
-from utils import real_to_grid_coord, grid_to_real_coord
-
-from lsi_3d.environment.kitchen import Kitchen
-from igibson import object_states
-
-# Robot
-from tokenize import String
+import random
+import sys
+import time
 
 from igibson.envs.igibson_env import iGibsonEnv
-import pybullet as p
+from igibson.robots.behavior_robot import BehaviorRobot
+from igibson.utils.utils import parse_config
+
 from lsi_3d.agents.fixed_policy_human_agent import FixedPolicyAgent, SteakFixedPolicyHumanAgent
 from lsi_3d.agents.hl_mdp_planning_agent import HlMdpPlanningAgent
 from lsi_3d.agents.hl_qmdp_agent import HlQmdpPlanningAgent
+from lsi_3d.agents.human_agent import HumanAgent
+from lsi_3d.agents.igibson_agent import iGibsonAgent
+from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
+from lsi_3d.agents.vision_limit_robot import VisionLimitRobotAgent
+from lsi_3d.config.reader import read_in_lsi_config
+from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.environment.lsi_env import LsiEnv
+from lsi_3d.environment.tracking_env import TrackingEnv
+from lsi_3d.environment.vision_limit_env import VisionLimitEnv
+from lsi_3d.mdp.lsi_mdp import LsiMdp
+from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
+from lsi_3d.planners.a_star_planner import AStarPlanner
 from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
 from lsi_3d.planners.hl_human_aware_mdp import HLHumanAwareMDPPlanner
 from lsi_3d.planners.hl_human_planner import HLHumanPlanner
+from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
-from igibson.robots.behavior_robot import BehaviorRobot
-import logging
-from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.config.reader import read_in_lsi_config
-from lsi_3d.mdp.lsi_mdp import LsiMdp
+
+
+# Robot
 
 
 class Runner:
