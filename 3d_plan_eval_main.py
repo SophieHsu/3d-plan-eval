@@ -33,6 +33,8 @@ from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 
 class Runner:
     _TIME_LIMIT_FAILURE = 1000000
+    _IGIBSON_ACTION_TIMESTEP = 1. / 30.
+    _IGIBSON_PHYSICS_TIMESTEP = 1. / 120.
 
     def __init__(self):
         self._robot_agent = None
@@ -65,7 +67,6 @@ class Runner:
             self._kitchen.read_from_grid_text(ARGS.kitchen)
             open_squares = self._kitchen.get_empty_squares()
             robot_start = random.choice(open_squares)
-
             open_squares.remove(robot_start)
             human_start = random.choice(open_squares)
         else:
@@ -83,9 +84,10 @@ class Runner:
         self._igibson_env = iGibsonEnv(
             config_file=exp_config['ig_config_file'],
             mode=ARGS.mode,
-            action_timestep=1.0 / 30,
-            physics_timestep=1.0 / 120,
-            use_pb_gui=True)
+            action_timestep=self._IGIBSON_ACTION_TIMESTEP,
+            physics_timestep=self._IGIBSON_PHYSICS_TIMESTEP,
+            use_pb_gui=True
+        )
 
         kitchen = Kitchen(self._igibson_env, exp_config['max_in_pan'])
         self._igibson_env.simulator.scene.floor_plane_rgba = [.5, .5, .5, 1]
