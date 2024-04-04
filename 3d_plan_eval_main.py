@@ -132,24 +132,20 @@ class Runner:
         log_dict[log_dict['i']]['low_level_logs'] = []
         log_dict['layout'] = self._kitchen.grid
 
-        env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen, log_dict=log_dict)
-        human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
-                                            self._kitchen.grid, hlp, env, tracking_env, human_vr)
+        self._env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen, log_dict=log_dict)
+        self._human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
+                                            self._kitchen.grid, hlp, self._env, tracking_env, human_vr)
         robot_hlp = HumanSubtaskQMDPPlanner(mdp, mlp)
         robot_hlp.compute_mdp(filename='hi')
 
-        human_sim_agent = SteakFixedPolicyHumanAgent(env, human_agent)
-        robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, env, robot, log_dict=log_dict)
+        human_sim_agent = SteakFixedPolicyHumanAgent(self._env, self._human_agent)
+        self._robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, self._env, robot, log_dict=log_dict)
 
         # TODO: Get rid of 4.5 offset
         h_x, h_y = human_start
         self._igibson_env.set_pos_orn_with_z_offset(self._igibson_env.robots[1],
                                                     [h_x - 4.5, h_y - 4.5, 0.8],
                                                     [0, 0, 0])
-
-        self._robot_agent = robot_agent
-        self._human_agent = human_agent
-        self._env = env
 
     def _check_completion(self, start_time):
         if not self._env.world_state.orders:
