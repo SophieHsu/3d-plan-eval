@@ -1,4 +1,3 @@
-# Human
 import argparse
 import functools
 import logging
