@@ -4,6 +4,7 @@ import logging
 import random
 import sys
 import time
+import uuid
 
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.robots.behavior_robot import BehaviorRobot
@@ -125,13 +126,12 @@ class Runner:
         motion_controller = MotionControllerHuman()
 
         mlp = AStarMotionPlanner(self._kitchen)
-
-        log_dict = {'i': 0, 'event_start_time': time.time()}
-        log_dict['log_id'] = str(random.randint(0, 100000))
-        log_dict[log_dict['i']] = {}
-        log_dict[log_dict['i']]['low_level_logs'] = []
-        log_dict['layout'] = self._kitchen.grid
-
+        log_dict = {
+            'log_id': str(uuid.uuid4()),
+            'event_start_time': time.monotonic(),
+            0: {'low_level_logs': []},
+            'layout': self._kitchen.grid
+        }
         self._env = VisionLimitEnv(mdp, self._igibson_env, tracking_env, human, robot, self._kitchen, log_dict=log_dict)
         self._human_agent = VisionLimitHumanAgent(human_bot, a_star_planner, motion_controller,
                                             self._kitchen.grid, hlp, self._env, tracking_env, human_vr)
