@@ -217,46 +217,17 @@ def main():
     Runner().run()
 
 
-def set_args(parser):
-    parser.add_argument(
-        "--mode",
-        "-m",
-        choices=[
-            "headless", "headless_tensor", "gui_non_interactive",
-            "gui_interactive", "vr"
-        ],
-        default="headless",
-        help="which mode for simulation (default: gui_interactive)",
-    )
-
-    parser.add_argument(
-        "--kitchen",
-        "-k",
-        default="none",
-        help="filepath of kitchen layout",
-    )
-
-    parser.add_argument(
-        "--config",
-        "-c",
-        type='str',
-        action='store',
-        default="steak.tml",
-        dest='config',
-        help="name of config file",
-    )
-
-    parser.add_argument(
-        "--practice",
-        "-p",
-        default=False,
-        help="name of config file",
-    )
-
-
 def get_args():
     parser = argparse.ArgumentParser()
-    set_args(parser)
+
+    parser.add_argument('--mode', '-m',
+                        choices=['headless', 'headless_tensor', 'gui_non_interactive', 'gui_interactive', 'vr'],
+                        default='headless', help='which mode for simulation (default: gui_interactive)')
+    parser.add_argument('--kitchen', '-k', default='none', help='filepath of kitchen layout')
+    parser.add_argument('--config', '-c', type=str, action='store', default='steak.tml',
+                        dest='config', help='name of config file')
+    parser.add_argument('--practice', '-p', default=False, help='name of config file')
+
     return parser.parse_args()
 
 
