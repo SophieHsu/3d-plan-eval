@@ -189,30 +189,6 @@ def setup(args):
     return robot_agent, human_agent, env, igibson_env, kitchen
 
 
-def environment_setup(args, headless=None):
-    exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
-    configs = read_in_lsi_config('two_agent_mdp.tml')
-
-    igibson_env = iGibsonEnv(
-        config_file=exp_config['ig_config_file'],
-        mode=args.mode,
-        action_timestep=1.0 / 30,
-        physics_timestep=1.0 / 120,
-        use_pb_gui=True)
-
-    kitchen = Kitchen(igibson_env)
-
-    if args.kitchen != 'none':
-        kitchen.setup(args.kitchen)
-    else:
-        kitchen.setup(map_config["layout"])
-
-    print(map_config['layout'])
-    _, _, occupancy_grid = kitchen.read_from_grid_text(map_config["layout"])
-
-    return igibson_env, kitchen, configs
-
-
 def main():
     robot_agent, human_agent, lsi_env, igibson_env, kitchen = setup(ARGS)
     human_agent.set_robot(igibson_env.robots[0])
