@@ -17,7 +17,7 @@ from lsi_3d.utils.constants import DIRE2POSDIFF
 from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 
-class Kitchen():
+class Kitchen:
 
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
