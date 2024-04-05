@@ -14,7 +14,7 @@ from lsi_3d.agents.fixed_policy_human_agent import SteakFixedPolicyHumanAgent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
 from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
 from lsi_3d.agents.vision_limit_robot import VisionLimitRobotAgent
-from lsi_3d.config.reader import read_in_lsi_config
+from lsi_3d.config.reader import get_configs
 from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.environment.vision_limit_env import VisionLimitEnv
@@ -74,7 +74,7 @@ class Runner:
         return robot_start, human_start
 
     def _setup(self):
-        exp_config, map_config = read_in_lsi_config('steak.tml')
+        exp_config, map_config = get_configs('steak.tml')
 
         self._igibson_env = iGibsonEnv(
             config_file=exp_config['ig_config_file'],

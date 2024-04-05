@@ -31,7 +31,7 @@ from igibson.utils.utils import quatToXYZW
 from transforms3d.euler import euler2quat
 from agent import FixedMediumPlan
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.config.reader import read_in_lsi_config
+from lsi_3d.config.reader import get_configs
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.utils.enums import Mode
 from lsi_3d.utils.functions import grid_transition
@@ -460,7 +460,7 @@ def load_objects(env, obj_x_y, orientation_map, robot_x, robot_y, human):
     return bowlpans
 
 def run_example(args):
-    exp_config, alg_config, map_config, agent_configs = read_in_lsi_config('two_agent_mdp.tml')
+    exp_config, alg_config, map_config, agent_configs = get_configs('two_agent_mdp.tml')
     #layout_config = toml.load('lsi_3d/lsi_config/layout/demo_layout.tml')
     obj_x_y, orientation_map, grid = read_from_grid_text(map_config['layout'])
 
