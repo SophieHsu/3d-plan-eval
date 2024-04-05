@@ -1,23 +1,13 @@
 import os
 import toml
 
-LSI_CONFIG_ALGO_DIR = 'lsi_3d/config/algorithm'
-LSI_CONFIG_MAP_DIR = 'lsi_3d/config/map'
-LSI_CONFIG_AGENT_DIR = 'lsi_3d/config/agent'
-LSI_CONFIG_EXP_DIR = 'lsi_3d/config/experiment'
+from lsi_3d.config.constants import CONF_KEYS, CONF_DIR_NAMES
+
 
 def read_in_lsi_config(exp_config_file):
-    experiment_config = toml.load(
-        os.path.join(LSI_CONFIG_EXP_DIR, exp_config_file))
-    # algorithm_config = toml.load(
-    #     os.path.join(LSI_CONFIG_ALGO_DIR,
-    #                  experiment_config["algorithm_config"]))
+    experiment_config = toml.load(os.path.join(CONF_DIR_NAMES[CONF_KEYS.CONF_DIRS.ALGO], exp_config_file))
     map_config = toml.load(
-        os.path.join(LSI_CONFIG_MAP_DIR, experiment_config["map_config"]))
-    # agent_configs = []
-    # for agent_config_file in experiment_config["agent_config"]:
-    #     agent_config = toml.load(
-    #         os.path.join(LSI_CONFIG_AGENT_DIR, agent_config_file))
-    #     agent_configs.append(agent_config)
+        os.path.join(CONF_DIR_NAMES[CONF_KEYS.CONF_DIRS.MAP], experiment_config[CONF_KEYS.MAP_CONFIG])
+    )
 
     return experiment_config, map_config
