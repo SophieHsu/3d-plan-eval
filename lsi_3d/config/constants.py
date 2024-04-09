@@ -14,8 +14,8 @@ CONF_KEYS = Namespace(
 ROOT_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 CONF_DIR_NAMES = {
-    CONF_KEYS.CONF_DIRS.ALGO: (ROOT_DIR_PATH, 'lsi_3d', 'config', 'algorithm'),
-    CONF_KEYS.CONF_DIRS.MAP: (ROOT_DIR_PATH, 'lsi_3d', 'config', 'map'),
-    CONF_KEYS.CONF_DIRS.AGENT: (ROOT_DIR_PATH, 'lsi_3d', 'config', 'agent'),
-    CONF_KEYS.CONF_DIRS.EXP: (ROOT_DIR_PATH, 'lsi_3d', 'config', 'experiment'),
+    CONF_KEYS.CONF_DIRS.ALGO: (ROOT_DIR_PATH, 'algorithm'),
+    CONF_KEYS.CONF_DIRS.MAP: (ROOT_DIR_PATH, 'map'),
+    CONF_KEYS.CONF_DIRS.AGENT: (ROOT_DIR_PATH, 'agent'),
+    CONF_KEYS.CONF_DIRS.EXP: (ROOT_DIR_PATH, 'experiment'),
 }
