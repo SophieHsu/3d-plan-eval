@@ -121,6 +121,7 @@ class Runner:
 
         mlp = AStarMotionPlanner(self._kitchen)
         log_dict = {
+            'i': 0,  # track iteration
             'log_id': str(uuid.uuid4()),
             'event_start_time': time.monotonic(),
             0: {'low_level_logs': []},
