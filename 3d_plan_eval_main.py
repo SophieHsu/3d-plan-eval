@@ -164,7 +164,7 @@ class Runner:
 
         input('press a key to begin game...')
 
-        while self._check_completion(start_time):
+        while True:
             self._env.update_world()
 
             self._human_agent.step()
@@ -175,6 +175,9 @@ class Runner:
             self._kitchen.step(ctr)
             self._igibson_env.simulator.step()
             ctr += 1
+
+            if self._check_completion(start_time):
+                break
 
     def run(self):
         self._setup()
