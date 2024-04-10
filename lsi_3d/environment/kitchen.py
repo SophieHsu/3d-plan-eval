@@ -6,6 +6,7 @@ from math import floor
 
 import numpy as np
 import pybullet as p
+from argparse import Namespace
 
 import igibson
 from igibson import object_states
@@ -18,6 +19,45 @@ from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 
 class Kitchen:
+    OBJECTS = Namespace(
+        COUNTER='counter',
+        TABLE_V='table_v',
+        TABLE_H='table_h',
+        STOVE='stove',
+        BOWL='bowl',
+        PAN='pan',
+        SINK='sink',
+        FRIDGE='fridge',
+        BROCCOLI='broccoli',
+        STEAK='steak',
+        GREEN_ONION='green_onion',
+        TRAY='tray',
+        APPLE='apple',
+        PLATE='plate',
+        SCRUB_BRUSH='scrub_brush',
+        CHOPPING_BOARD='chopping_board',
+        KNIFE='knife',
+    )
+
+    NAME_TO_ABBR = {
+        OBJECTS.COUNTER: 'C',
+        OBJECTS.TABLE_V: 'T',
+        OBJECTS.TABLE_H: 'T',
+        OBJECTS.STOVE: 'H',
+        OBJECTS.BOWL: 'B',
+        OBJECTS.PAN: 'P',
+        OBJECTS.SINK: 'W',
+        OBJECTS.FRIDGE: 'F',
+        OBJECTS.BROCCOLI: 'F',
+        OBJECTS.STEAK: 'F',
+        OBJECTS.GREEN_ONION: 'G',
+        OBJECTS.TRAY: 'F',
+        OBJECTS.APPLE: 'F',
+        OBJECTS.PLATE: 'D',
+        OBJECTS.SCRUB_BRUSH: 'W',
+        OBJECTS.CHOPPING_BOARD: 'K',
+        OBJECTS.KNIFE: 'K',
+    }
 
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
@@ -189,13 +229,13 @@ class Kitchen:
             obj_x_y.append((name, x, y))
             if (grid[x][y] == "X"
                 or grid[x][y] == "C") and name != "vidalia_onion":
-                grid[x][y] = self.name2abbr(name)
+                grid[x][y] = self.NAME_TO_ABBR[name]
             if name == "table_h":
-                grid[x][y + 1] = self.name2abbr(name)
+                grid[x][y + 1] = self.NAME_TO_ABBR[name]
             elif name == "table_v":
-                grid[x + 1][y] = self.name2abbr(name)
+                grid[x + 1][y] = self.NAME_TO_ABBR[name]
             elif name == 'pan':
-                grid[x][y] = self.name2abbr(name)
+                grid[x][y] = self.NAME_TO_ABBR[name]
             else:
                 sum_x += x
                 sum_y += y
@@ -241,30 +281,6 @@ class Kitchen:
         self.orientation_map = orientation_map
         self.grid = grid
         return obj_x_y, orientation_map, grid
-
-    def name2abbr(self, name):
-
-        name2abbr_map = {
-            "counter": "C",
-            "table_v": "T",
-            "table_h": "T",
-            "stove": "H",
-            "bowl": "B",
-            "pan": "P",
-            "sink": "W",
-            "fridge": "F",
-            "broccoli": "F",
-            "steak": "F",
-            "green_onion": "G",
-            "tray": "F",
-            "apple": "F",
-            "plate": "D",
-            "scrub_brush": "W",
-            "chopping_board": "K",
-            "knife": "K"
-        }
-
-        return name2abbr_map[name]
 
     def load_objects(self, obj_x_y, orientation_map, order_list):
         name2path = {
