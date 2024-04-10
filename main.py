@@ -35,7 +35,7 @@ from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from igibson.robots.behavior_robot import BehaviorRobot
 import logging
 from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.config.reader import read_in_lsi_config
+from lsi_3d.config.reader import get_configs
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 
 from lsi_3d.environment.tracking_env import TrackingEnv
@@ -124,8 +124,8 @@ def setup(igibson_env, kitchen, configs, args):
     return robot_agent, human_agent, human_bot
 
 def environment_setup(args, headless=None):
-    exp_config, map_config = read_in_lsi_config('two_agent_mdp.tml')
-    configs = read_in_lsi_config('two_agent_mdp.tml')
+    exp_config, map_config = get_configs('two_agent_mdp.tml')
+    configs = get_configs('two_agent_mdp.tml')
 
     igibson_env = iGibsonEnv(
         config_file=exp_config['ig_config_file'],

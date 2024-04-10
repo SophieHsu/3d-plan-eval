@@ -1,27 +1,23 @@
-import copy
-from math import floor
-import time
-import numpy as np
-import os
-import igibson
 import math
+import os
 import random
+import time
+from math import floor
+
+import numpy as np
+import pybullet as p
+
+import igibson
 from igibson import object_states
 from igibson.objects.articulated_object import URDFObject
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
 from igibson.utils.assets_utils import get_ig_model_path
-from igibson.object_states.heat_source_or_sink import HeatSourceOrSink
-from igibson import object_states
-from utils import grid_to_real_coord, quat2euler, normalize_radians, real_to_grid_coord, to_overcooked_grid
-
-import pybullet as p
-
 from lsi_3d.utils.constants import DIRE2POSDIFF
-from igibson.objects.visual_marker import VisualMarker
+from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 
-class Kitchen():
+class Kitchen:
 
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
@@ -69,15 +65,6 @@ class Kitchen():
         self.stored_overcooked_object_states = {}
 
         self.overcooked_hot_plates_now_dish = []
-
-    # def pickup_meat(self, meat, agent_ml_state):
-    #     self.overcooked_object_states[meat] = {
-    #         "id": self.overcooked_max_id,
-    #         "name": self.get_name(meat),
-    #         "position": to_overcooked_grid(agent_ml_state[0:2]),
-    #         "state": None
-    #     }
-    #     self.overcooked_max_id += 1
 
     def drop_plate(self, plate):
         id = self.overcooked_max_id

@@ -142,3 +142,6 @@ lsi_3d/test_logs/
 *.pkl
 
 lsi_3d/logs/
+
+# IDE files (JetBrains)
+.idea/
