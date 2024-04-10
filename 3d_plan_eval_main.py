@@ -85,14 +85,14 @@ class Runner:
         )
 
         self._kitchen = Kitchen(self._igibson_env, exp_config['max_in_pan'])
-        self._igibson_env.simulator.scene.floor_plane_rgba = [.5, .5, .5, 1]
-
-        robot_start, human_start = self._set_start_locations(exp_config)
-
         if ARGS.kitchen != 'none':
             self._kitchen.setup(ARGS.kitchen)
         else:
             self._kitchen.setup(exp_config["layout"], exp_config["order_list"])
+
+        self._igibson_env.simulator.scene.floor_plane_rgba = [.5, .5, .5, 1]
+
+        robot_start, human_start = self._set_start_locations(exp_config)
 
         order_list = exp_config['order_list']
 
@@ -137,7 +137,6 @@ class Runner:
         self._robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, self._env, robot, log_dict=log_dict)
 
         # TODO: Get rid of 4.5 offset
-        h_x, h_y = human_start
         self._igibson_env.set_pos_orn_with_z_offset(self._igibson_env.robots[1],
                                                     [h_x - 4.5, h_y - 4.5, 0.8],
                                                     [0, 0, 0])
