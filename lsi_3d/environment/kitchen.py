@@ -290,16 +290,12 @@ class Kitchen:
             "table_h":
                 os.path.join(igibson.ig_dataset_path,
                              "objects/breakfast_table/26670/26670.urdf"),
-            #"table_h" : os.path.join(igibson.ig_dataset_path, "objects/breakfast_table/1b4e6f9dd22a8c628ef9d976af675b86/1b4e6f9dd22a8c628ef9d976af675b86.urdf"),
             "table_v":
                 os.path.join(igibson.ig_dataset_path,
                              "objects/breakfast_table/26670/26670.urdf"),
             "stove":
                 os.path.join(igibson.ig_dataset_path,
                              "objects/stove/101940/101940.urdf"),
-            # "stove":
-            # os.path.join(igibson.ig_dataset_path,
-            #              "objects/stove/102019/102019.urdf"),
             "bowl":
                 os.path.join(
                     igibson.ig_dataset_path,
@@ -349,14 +345,10 @@ class Kitchen:
                 os.path.join(igibson.ig_dataset_path,
                              "objects/apple/00_0/00_0.urdf"),
             "plate":
-
                 os.path.join(
                     igibson.ig_dataset_path,
                     "objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf"
-                    # "objects/bowl/56803af65db53307467ca2ad6571afff/56803af65db53307467ca2ad6571afff.urdf"
                 ),
-            # os.path.join(igibson.ig_dataset_path,
-            #              "objects/plate/plate_000/plate_000.urdf"),
             "scrub_brush":
                 os.path.join(
                     igibson.ig_dataset_path,
@@ -404,7 +396,7 @@ class Kitchen:
             "sink": (0, 0, 0.1),
             "fridge": (0, 0, 0.2),
             "vidalia_onion": (0.15, -0.1, 1.3),
-            "steak": (0, 0, 0.9),  #(0.23, -0.1, 1.25),
+            "steak": (0, 0, 0.9),  # (0.23, -0.1, 1.25),
             "tray": (0, 0, 0.9),
             "apple": (0, 0.2, 1.0),
             "broccoli": (0, 0.2, 0.6),
@@ -418,25 +410,6 @@ class Kitchen:
             "large_bowl": (0, 0, 0),
             "steak_bowl": (0, 0, 0)
         }
-
-        # name2abl = {
-        #     "counter": None,
-        #     "table_v": None,
-        #     "table_h": None,
-        #     "stove": None,
-        #     "bowl": {
-        #         "dustyable": {},
-        #         "stainable": {}
-        #     },
-        #     "pan": None,
-        #     "sink": None,
-        #     "fridge": {
-        #         "coldSource": {
-        #             "temperature": 7.0,
-        #             "requires_inside": True,
-        #         }
-        #     }
-        # }
 
         name2abl = {
             "counter": None,
@@ -509,7 +482,6 @@ class Kitchen:
             # pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
             if name == "fridge":
-                # obj = URDFObject(name2path[name], scale=name2scale_map[name]/1.15, model_path="/".join(name2path[name].split("/")[:-1]), category="fridge")
                 obj = URDFObject(name2path["counter"], avg_obj_dims={'density': 10000},
                                  scale=name2scale_map["counter"] / 1.15,
                                  model_path="/".join(
@@ -518,7 +490,6 @@ class Kitchen:
 
                 self.env.simulator.import_object(obj)
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
-                # obj.states[object_states.Open].set_value(True)
 
                 self.fridges.append(obj)
 
@@ -532,9 +503,6 @@ class Kitchen:
                             category="vidalia_onion")
                         self.env.simulator.import_object(onion)
                         onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
-                        # pos[0], pos[1] = self.sample_position(pos[0], pos[1], 0.1)
-                        # pos[2] = 1.1
-                        # self.env.set_pos_orn_with_z_offset(onion, pos)
                         self.onions.append(onion)
                         body_ids = onion.get_body_ids()
                         p.changeDynamics(body_ids[0], -1, mass=0.001)
@@ -652,7 +620,6 @@ class Kitchen:
                 #     part_obj.set_position(new_pos)
                 pos[2] += 0.05
                 self.env.set_pos_orn_with_z_offset(whole_obj, tuple(pos), orn)
-                #multiplexed_obj.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
                 self.onions.append(multiplexed_obj)
                 body_ids = multiplexed_obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.001)
@@ -702,12 +669,6 @@ class Kitchen:
                     for i, (part_obj, _) in enumerate(object_parts):
                         part_obj.set_position([201 + 2 * j, 90, 1])
 
-                    # multiplexed_obj.set_position([0, 0, 0.72])
-                    # for i, (part_obj, _) in enumerate(object_parts):
-                    #     # self.env.set_pos_orn_with_z_offset(part_obj, tuple(pos), orn)
-                    #     new_pos = pos
-                    #     new_pos[2] += 0.07 * ((-1)**i)
-                    #     part_obj.set_position(new_pos)
                     pos[2] += 0.05
                     self.env.set_pos_orn_with_z_offset(whole_obj_2, tuple([200, 100, 1]), orn)
                     self.onions.append(multiplexed_obj_2)
@@ -715,57 +676,6 @@ class Kitchen:
                     p.changeDynamics(body_ids[0], -1, mass=0.001)
 
             #######################################################
-            # whole_obj_3 = URDFObject(name2path[name],
-            #             name=name,
-            #             category=name,
-            #             scale=name2scale_map[name] / 1.15,
-            #             model_path="/".join(
-            #                 name2path[name].split("/")[:-1]),
-            #             abilities=name2abl[name])
-
-            # object_parts = []
-            # # Check the parts that compose the apple and create URDF objects of them
-            # for i, part in enumerate(whole_obj_3.metadata["object_parts"]):
-            #     part_category = part["category"]
-            #     part_model = part["model"]
-            #     # Scale the offset accordingly
-            #     part_pos = part["pos"] * whole_obj_3.scale
-            #     part_orn = part["orn"]
-            #     part_model_path = get_ig_model_path(part_category, part_model)
-            #     part_filename = os.path.join(part_model_path, part_model + ".urdf")
-            #     part_obj_name = whole_obj_3.name + "_part_{}".format(i)
-            #     part_obj = URDFObject(
-            #         part_filename,
-            #         name=part_obj_name,
-            #         category=part_category,
-            #         model_path=part_model_path,
-            #         scale=whole_obj_3.scale,
-            #     )
-            #     object_parts.append((part_obj, (part_pos, part_orn)))
-
-            # # Group the apple parts into a single grouped object
-            # grouped_parts_obj_2 = ObjectGrouper(object_parts)
-
-            # # Create a multiplexed object: either the full apple, or the parts
-            # multiplexed_obj_2 = ObjectMultiplexer(whole_obj_3.name + "_multiplexer", [whole_obj_3, grouped_parts_obj_2], 0)
-
-            # # Finally, load the multiplexed object
-            # self.env.simulator.import_object(multiplexed_obj_2)
-            # whole_obj_3.set_position([133, 1, 1])
-            # for i, (part_obj, _) in enumerate(object_parts):
-            #     part_obj.set_position([133, 10, 1])
-
-            # # multiplexed_obj.set_position([0, 0, 0.72])
-            # # for i, (part_obj, _) in enumerate(object_parts):
-            # #     # self.env.set_pos_orn_with_z_offset(part_obj, tuple(pos), orn)
-            # #     new_pos = pos
-            # #     new_pos[2] += 0.07 * ((-1)**i)
-            # #     part_obj.set_position(new_pos)
-            # pos[2] += 0.05
-            # self.env.set_pos_orn_with_z_offset(whole_obj_3, tuple([200,100,1]), orn)
-            # self.onions.append(multiplexed_obj_2)
-            # body_ids = multiplexed_obj_2.get_body_ids()
-            # p.changeDynamics(body_ids[0], -1, mass=0.001)
             elif 'counter' in name:
                 obj = URDFObject(name2path[name],
                                  name=name,
@@ -865,22 +775,6 @@ class Kitchen:
 
             if real_to_grid_coord(counter.get_position()) == self.where_grid_is('D')[0]:
                 self.dish_station = counter
-            # for steak order
-            # if name in ("apple", "green_onion", "broccoli", "steak"):
-            #     self.food_obj.append(obj)
-            #     obj.states[object_states.Temperature].get_value(),
-            #     obj.states[object_states.Temperature].set_value(7)
-
-            # if "plate" in name:
-            #     if object_states.Dusty in obj.states:
-            #         obj.states[object_states.Dusty].set_value(True)
-
-            #     if object_states.Stained in obj.states:
-            #         obj.states[object_states.Stained].set_value(True)
-            # if name == "sink":
-            #     obj.states[object_states.ToggledOn].set_value(False)
-            # if name == "chopping_board":
-            #     obj.states[object_states.OnTop].set_value(obj, self.static_objs[-1])
 
         try:
             for obj in self.static_objs.keys():
@@ -1114,24 +1008,6 @@ class Kitchen:
                     if not onion.states[object_states.OnTop].get_value(self.onion_counter, use_ray_casting_method=True):
                         onion.states[object_states.OnTop].set_value(self.onion_counter, True,
                                                                     use_ray_casting_method=True)
-                    # x,y = grid_to_real_coord(self.onion_counter.get_position())
-                    # onion.set_position([x,y,1.1])
-
-        # to check if onion is on chopping board
-        # for onion in self.onions:
-        #     holding_onion = False
-        #     for agent in self.env.robots:
-        #         body_id = onion.get_body_ids()[0]
-        #         grasping = agent.is_grasping_all_arms(body_id)
-        #         holding_onion = IsGraspingState.TRUE in grasping
-        #         if holding_onion:
-        #             break
-        #     if not holding_onion:
-        #         if onion.current_index == 1:
-        #             if not onion.states[object_states.OnTop].get_value(self.chopping_boards[0]):
-        #                 onion.objects[0].states[object_states.OnTop].set_value(self.chopping_boards[0], True, use_ray_casting_method=True)
-        #             # x,y = grid_to_real_coord(self.onion_counter.get_position())
-        #             # onion.set_position([x,y,1.1])
 
         for obj, state in self.overcooked_object_states.items():
             if state['name'] == 'hot_plate':
@@ -1146,14 +1022,7 @@ class Kitchen:
                     if sink not in self.ready_sinks:
                         self.ready_sinks.append(sink)
 
-            # also check world
-            # for plate in self.plates:
-            #     if plate.states[object_states.OnTop].get_value(sink):
-            #         self.rinse_sink(sink)
-
         for sink, time in self.rinsing_sinks.copy().items():
-            # if time == None:
-            #     time = time.time()
 
             if time > 5:
                 self.rinsing_sinks.pop(sink)
@@ -1161,7 +1030,6 @@ class Kitchen:
 
         for meat in self.meats.copy():
             for pan in self.pans:
-                # if meat.states[object_states.Cooked].get_value():
                 if meat.states[object_states.Inside].get_value(pan):
                     self.steaks.append(meat)
                     self.meats.remove(meat)
@@ -1173,7 +1041,6 @@ class Kitchen:
                 self.robot_carrying_steak = False
                 self.steak_bowl.set_position([110, 110, 1])
                 self.robot_stash_steak_bowl = None
-                # self.in_robot_hand.clear()
 
             if self.robot_stash_dish is None:
                 # stash items far away
@@ -1204,7 +1071,7 @@ class Kitchen:
             b_x, b_y, b_z = self.env.robots[0].get_eef_position()
             self.large_bowl.set_position([b_x, b_y, b_z + 0.12])
         elif self.robot_carrying_steak:
-            if self.robot_stash_steak_bowl == None:
+            if self.robot_stash_steak_bowl is None:
                 plate = [x for x in self.in_robot_hand if 'plate' in x[1].name][0][1]
                 self.robot_stash_steak_bowl = plate
                 plate.set_position([80, 80, 1])
@@ -1229,9 +1096,6 @@ class Kitchen:
                 else:
                     obj[-1].set_position(self.env.robots[0].get_eef_position())
 
-                #
-                # obj[-1].set_position((x,y,z+(0.12*in_robot_hand_id)))
-
                 in_robot_hand_id += 1
 
         plate_in_dish_station = False
@@ -1248,11 +1112,8 @@ class Kitchen:
                 pos = plat.get_position()
                 if pos[0] > 100:
                     plate = plat
-            # self.env.set_pos_orn_with_z_offset(plate, self.bowl_spawn_pos, [0,0,0])
             if plate is not None:
                 plate.states[object_states.OnTop].set_value(self.dish_station, True, use_ray_casting_method=True)
-            # body_ids = plate.get_body_ids()
-            # p.changeDynamics(body_ids[0], -1, mass=0.001)
 
         # if knife not in human hand then make sure on chopping counter
         for knife in self.knives:
@@ -1275,7 +1136,6 @@ class Kitchen:
             if self.init_knife_pos is not None and not holding_knife and not knife.states[
                 object_states.OnTop].get_value(self.chopping_counter):
                 knife.set_position(self.init_knife_pos)
-                # knife.states[object_states.OnTop].set_value(self.chopping_counter, True, use_ray_casting_method=True)
 
         onion_in_onion_station = False
         for o in self.onions:
