@@ -137,7 +137,6 @@ class Runner:
         self._robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, self._env, robot, log_dict=log_dict)
 
         # TODO: Get rid of 4.5 offset
-        h_x, h_y = human_start
         self._igibson_env.set_pos_orn_with_z_offset(self._igibson_env.robots[1],
                                                     [h_x - 4.5, h_y - 4.5, 0.8],
                                                     [0, 0, 0])
