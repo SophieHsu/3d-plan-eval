@@ -221,9 +221,9 @@ class Kitchen:
         sum_x, sum_y, count = 0, 0, 0  # for calculation of center mass (excluding table)
         orientation_map = dict()
 
-        raw_str = self.grid2raw(filepath)
+        grid_objects = self.get_grid_objects(filepath)
         grid = [['X'] * self.WIDTH for _ in range(self.HEIGHT)]
-        for line in raw_str.strip().split("\n"):
+        for line in grid_objects.strip().split("\n"):
             if len(line) == 0:
                 break
             name, x, y = line.split()
@@ -786,7 +786,7 @@ class Kitchen:
             print("****** Error *******")
             # pass
 
-    def grid2raw(self, filepath):
+    def get_grid_objects(self, filepath):
         with open(filepath, 'r') as fh:
             grid_rows = fh.read().strip().split('\n')
             grid = [list(each) for each in grid_rows]
