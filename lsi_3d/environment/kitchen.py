@@ -37,6 +37,7 @@ class Kitchen:
         SCRUB_BRUSH='scrub_brush',
         CHOPPING_BOARD='chopping_board',
         KNIFE='knife',
+        EMPTY='empty',
     )
 
     NAME_TO_ABBR = {
@@ -57,6 +58,7 @@ class Kitchen:
         OBJECTS.SCRUB_BRUSH: 'W',
         OBJECTS.CHOPPING_BOARD: 'K',
         OBJECTS.KNIFE: 'K',
+        OBJECTS.EMPTY: 'X',
     }
 
     def __init__(self, env, max_in_pan, rinse_time=5):
@@ -220,7 +222,7 @@ class Kitchen:
         orientation_map = dict()
 
         raw_str = self.grid2raw(filepath)
-        grid = [["X"] * self.WIDTH for _ in range(self.HEIGHT)]
+        grid = [['X'] * self.WIDTH for _ in range(self.HEIGHT)]
         for line in raw_str.strip().split("\n"):
             if len(line) == 0:
                 break
@@ -785,55 +787,38 @@ class Kitchen:
             # pass
 
     def grid2raw(self, filepath):
-        grid = open(filepath, "r").read().strip().split("\n")
-        self.HEIGHT = len(grid[0])
-        self.WIDTH = len(grid[0])
-        grid = [list(each) for each in grid]
-        abbr2name = {
-            "X": "space",
-            "H": "stove",
-            "C": "counter",
-            "B": "bowl",
-            "P": "pan",
-            "F": "fridge",
-            "T": "table",
-            "W": "sink",
-            "K": "chopping_board",
-            "G": "green_onion",
-            "D": "plate"
-        }
-        return_str = ""
-        for x in range(len(grid)):
-            for y in range(len(grid[0])):
-                if grid[x][y] == "X":
-                    continue
-                elif grid[x][y] == "T":
-                    if y + 1 < self.WIDTH and grid[x][y + 1] == "T":
-                        grid[x][y + 1] = "X"
-                        return_str += "{} {} {}\n".format("table_h", x, y)
-                    else:
-                        grid[x + 1][y] = "X"
-                        return_str += "{} {} {}\n".format("table_v", x, y)
-                else:
-                    name = abbr2name[grid[x][y]]
-                    if name == "bowl":
-                        return_str += "{} {} {}\n".format("counter", x, y)
-                        # return_str += "{} {} {}\n".format("vidalia_onion", x, y)
-                    if name == "pan":
-                        return_str += "{} {} {}\n".format("stove", x, y)
-                    if name == "stove":
-                        return_str += "{} {} {}\n".format("pan", x, y)
-                    if name == "chopping_board":
-                        return_str += "{} {} {}\n".format("counter", x, y)
-                        return_str += "{} {} {}\n".format("knife", x, y)
-                    if name == "green_onion":
-                        return_str += "{} {} {}\n".format("counter", x, y)
-                    if name == "plate":
-                        return_str += "{} {} {}\n".format("counter", x, y)
+        with open(filepath, 'r') as fh:
+            grid_rows = fh.read().strip().split('\n')
+            grid = [list(each) for each in grid_rows]
+            self.HEIGHT = len(grid)
+            self.WIDTH = len(grid[0])
 
-                    return_str += "{} {} {}\n".format(name, x, y)
+            object_mapping = {
+                self.NAME_TO_ABBR[self.OBJECTS.BOWL]: [self.OBJECTS.COUNTER],
+                self.NAME_TO_ABBR[self.OBJECTS.PAN]: [self.OBJECTS.STOVE],
+                self.NAME_TO_ABBR[self.OBJECTS.STOVE]: [self.OBJECTS.PAN],
+                self.NAME_TO_ABBR[self.OBJECTS.CHOPPING_BOARD]: [self.OBJECTS.COUNTER, self.OBJECTS.KNIFE],
+                self.NAME_TO_ABBR[self.OBJECTS.GREEN_ONION]: [self.OBJECTS.COUNTER],
+                self.NAME_TO_ABBR[self.OBJECTS.PLATE]: [self.OBJECTS.COUNTER],
+            }
 
-        return return_str
+            object_locs = []
+            for row_idx, row in enumerate(grid):
+                for col_idx, cell in enumerate(row):
+                    if cell == self.NAME_TO_ABBR[self.OBJECTS.EMPTY]:  # ignore empty space
+                        continue
+                    if cell == self.NAME_TO_ABBR[self.OBJECTS.TABLE_V]:  # add table
+                        if col_idx + 1 < self.WIDTH and grid[row_idx][col_idx + 1] == cell:  # check table orientation
+                            grid[row_idx][col_idx + 1] = self.NAME_TO_ABBR[self.OBJECTS.EMPTY]
+                            object_locs.append((self.OBJECTS.TABLE_H, row_idx, col_idx))
+                        else:
+                            grid[row_idx + 1][col_idx] = self.NAME_TO_ABBR[self.OBJECTS.EMPTY]
+                            object_locs.append((self.OBJECTS.TABLE_V, row_idx, col_idx))
+                    else:  # other objects
+                        object_locs.extend(object_mapping.get(cell, []))  # add related objects
+                        object_locs.append((cell, row_idx, col_idx))  # add current object
+
+        return object_locs
 
     def sample_position(self, x, y, range):
         x_range = random.uniform(x - range, x + range)
