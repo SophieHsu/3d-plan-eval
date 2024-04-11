@@ -31,6 +31,7 @@ class Kitchen:
         BROCCOLI='broccoli',
         STEAK='steak',
         GREEN_ONION='green_onion',
+        VIDALIA_ONION='vidalia_onion',
         TRAY='tray',
         APPLE='apple',
         PLATE='plate',
@@ -217,72 +218,49 @@ class Kitchen:
             self.interact_objs[pan] = False
 
     def read_from_grid_text(self, filepath):
-        obj_x_y = []
+        object_locs = []
         sum_x, sum_y, count = 0, 0, 0  # for calculation of center mass (excluding table)
-        orientation_map = dict()
+        orientation_map = {}
+        grid = [[self.NAME_TO_ABBR[self.OBJECTS.EMPTY]] * self.WIDTH for _ in range(self.HEIGHT)]
 
-        grid_objects = self.get_grid_objects(filepath)
-        grid = [['X'] * self.WIDTH for _ in range(self.HEIGHT)]
-        for line in grid_objects.strip().split("\n"):
-            if len(line) == 0:
-                break
-            name, x, y = line.split()
-            x, y = int(x), int(y)
-            obj_x_y.append((name, x, y))
-            if (grid[x][y] == "X"
-                or grid[x][y] == "C") and name != "vidalia_onion":
+        for name, x, y in self.get_grid_objects(filepath):
+            object_locs.append((name, x, y))
+            if grid[x][y] in [
+                self.NAME_TO_ABBR[self.OBJECTS.EMPTY],
+                self.NAME_TO_ABBR[self.OBJECTS.COUNTER]
+            ] and name != self.OBJECTS.VIDALIA_ONION:
                 grid[x][y] = self.NAME_TO_ABBR[name]
-            if name == "table_h":
+            if name == self.OBJECTS.TABLE_H:
                 grid[x][y + 1] = self.NAME_TO_ABBR[name]
-            elif name == "table_v":
+            elif name == self.OBJECTS.TABLE_V:
                 grid[x + 1][y] = self.NAME_TO_ABBR[name]
-            elif name == 'pan':
+            elif name == self.OBJECTS.PAN:
                 grid[x][y] = self.NAME_TO_ABBR[name]
             else:
                 sum_x += x
                 sum_y += y
                 count += 1
-        if count == 0:
-            count = 1
+
+        count = max(count, 1)  # ensure count is at least 1 to avoid division by zero
         center_x, center_y = sum_x / count, sum_y / count
 
-        for name, x, y in obj_x_y:
-            if name == "table_h":
-                orientation_map[(name, x, y)] = (0, 0, 1.5707)
-            elif name == "table_v":
-                orientation_map[(name, x, y)] = (0, 0, 0)
+        for name, x, y in object_locs:
+            if name == self.OBJECTS.TABLE_H:
+                orientation_map[(name, x, y)] = (0., 0., np.pi / 2.)
+            elif name == self.OBJECTS.TABLE_V:
+                orientation_map[(name, x, y)] = (0., 0., 0.)
             else:
-                ori = 0  # if ori > 0 then it's facing left/right, otherwise it's facing up/down
-                ori += self.ori_filter(grid, x + 1, y) + self.ori_filter(
-                    grid, x - 1, y)  # upper and lower neighbor
-                ori -= self.ori_filter(grid, x, y + 1) + self.ori_filter(
-                    grid, x, y - 1)  # left and right neighbor
-                orientation_map[(name, x, y)] = self.get_orientation(
-                    center_x, center_y, x, y, ori)
+                ori = self.ori_filter(grid, x + 1, y) + \
+                      self.ori_filter(grid, x - 1, y) - \
+                      self.ori_filter(grid, x, y + 1) - \
+                      self.ori_filter(grid, x, y - 1)
+                orientation_map[(name, x, y)] = self.get_orientation(center_x, center_y, x, y, ori)
 
-            # TODO: complete this
-            if name == 'fridge':
-                self.tile_location['F'] = (x, y)
-            elif name == 'stove':
-                self.tile_location['S'] = (x, y)
-            elif 'pan' in name:
-                self.tile_location['P'] = (x, y)
-            elif name == 'bowl':
-                self.tile_location['B'] = (x, y)
-            elif name == 'plate':
-                self.tile_location['D'] = (x, y)
-            elif 'green_onion' in name:
-                self.tile_location['G'] = (x, y)
-            elif 'chopping_board' in name:
-                self.tile_location['K'] = (x, y)
-            elif 'sink' in name:
-                self.tile_location['W'] = (x, y)
-            elif name == 'table_h' or name == 'table_v':
-                self.tile_location['T'] = (x, y)
+            self.tile_location[self.NAME_TO_ABBR[self.OBJECTS.TABLE_H]] = (x, y)
 
         self.orientation_map = orientation_map
         self.grid = grid
-        return obj_x_y, orientation_map, grid
+        return object_locs, orientation_map, grid
 
     def load_objects(self, obj_x_y, orientation_map, order_list):
         name2path = {
