@@ -1,12 +1,12 @@
 import math
+
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.objects.articulated_object import URDFObject
-from lsi_3d.environment.kitchen import Kitchen
-from lsi_3d.agents.agent import Agent
 from lsi_3d.agents.igibson_agent import iGibsonAgent
+from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.environment.tracking_env import TrackingEnv
-from lsi_3d.mdp.state import AgentState, SoupState, WorldState
 from lsi_3d.mdp.lsi_mdp import LsiMdp
+from lsi_3d.mdp.state import AgentState, WorldState
 from lsi_3d.utils.functions import find_nearby_open_spaces, norm_orn_to_cardinal, orn_to_cardinal, quat2euler
 from utils import grid_to_real_coord, normalize_radians, real_to_grid_coord
 
@@ -31,7 +31,7 @@ class LsiEnv(object):
                  recalc_res=None,
                  avoid_radius=None) -> None:
 
-        #self.joint_hl_state = mdp.hl_start_state
+        # self.joint_hl_state = mdp.hl_start_state
         self.kitchen = kitchen
         self.nav_env = nav_env
         self.tracking_env = tracking_env
@@ -55,7 +55,7 @@ class LsiEnv(object):
             real_onions = max([len(i) for i in list(pans_status)])
 
         if not any(list(self.tracking_env.kitchen.interact_objs.values())):
-            self.world_state.in_pot = real_onions # + self.world_state.sim_in_pot
+            self.world_state.in_pot = real_onions  # + self.world_state.sim_in_pot
 
         if self.world_state.in_pot > self.mdp.num_items_for_soup:
             self.world_state.in_pot = self.mdp.num_items_for_soup
@@ -65,7 +65,7 @@ class LsiEnv(object):
         for b in self.kitchen.bowls:
             if self.tracking_env.is_item_on_table(b):
                 order_list.pop()
-                
+
         self.world_state.orders = order_list
 
         self.update_joint_ml_state()
@@ -77,7 +77,7 @@ class LsiEnv(object):
             self.robot_state.holding = 'None'
 
         return
-    
+
     def update_human_world_state(self):
         self.update_joint_ml_state()
         self.human_state.holding = self.tracking_env.get_human_holding()
@@ -127,7 +127,7 @@ class LsiEnv(object):
         return hl_state
 
     def update_joint_ml_state(self):
-        
+
         human_ml_state = self.get_ml_state(self.ig_human)
         # print('human ml state:', human_ml_state)
         robot_ml_state = self.get_ml_state(self.ig_robot)
@@ -173,7 +173,7 @@ class LsiEnv(object):
             self.soup_states[0].onions_in_soup = self.in_pot
 
         return self
-    
+
     def transform_end_location(self, loc):
         # objects = self.igibson_env.simulator.scene.get_objects()
         objects = self.tracking_env.kitchen.static_objs
@@ -185,7 +185,7 @@ class LsiEnv(object):
             if type(objects[o]) == list:
                 for o_loc in objects[o]:
                     if o_loc == loc: selected_object = o
-                        # pos = grid_to_real_coord(loc)
+                    # pos = grid_to_real_coord(loc)
             elif objects[o] == loc:
                 selected_object = o
 
@@ -197,11 +197,11 @@ class LsiEnv(object):
         pos[0] = pos[0] + math.cos(ori)
         pos[1] = pos[1] + math.sin(ori)
         opposite_facing = normalize_radians(ori + math.pi)
-        row,col = real_to_grid_coord(pos[0:2])
+        row, col = real_to_grid_coord(pos[0:2])
         card_facing = norm_orn_to_cardinal(opposite_facing)
 
         return (row, col, card_facing)
-    
+
     def sort_locations(self, locations, agent_location):
         if len(agent_location) == 3:
             agent_location = agent_location[0:2]
@@ -220,9 +220,10 @@ class LsiEnv(object):
             return arrival_loc
         elif action == "drop" and object == "onion":
             pan_status = self.tracking_env.get_pan_status()
-            min_onions_left = self.mdp.num_items_for_soup + 1 
+            min_onions_left = self.mdp.num_items_for_soup + 1
             agent_location_real = grid_to_real_coord(agent_location)
-            pans_sorted = sorted(self.kitchen.pans, key=lambda pan: (self.tracking_env.get_pan_enum_status(pan), math.dist(pan.get_position()[0:2], agent_location_real)))
+            pans_sorted = sorted(self.kitchen.pans, key=lambda pan: (
+            self.tracking_env.get_pan_enum_status(pan), math.dist(pan.get_position()[0:2], agent_location_real)))
             location = pans_sorted[0].get_position()
             # for pan in self.kitchen.pans:
             #     onions = len(pan_status[pan])
