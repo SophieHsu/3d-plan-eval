@@ -262,7 +262,7 @@ class Kitchen:
         self.grid = grid
         return object_locs, orientation_map, grid
 
-    def load_objects(self, obj_x_y, orientation_map, order_list):
+    def load_objects(self, object_poses, orientation_map, order_list):
         name2path = {
             "counter":
                 os.path.join(igibson.ig_dataset_path,
@@ -448,18 +448,17 @@ class Kitchen:
             (0, 0, -1.5707): (shift_l, 0),
         }
 
-        for name, x, y in obj_x_y:
+        for name, x, y in object_poses:
             obj = None
             orn = orientation_map[(name, x, y)]
             shift = name2shift_map[name]
-            if name == "counter":
+            if name == self.OBJECTS.COUNTER:
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
-            elif name == "fridge":
+            elif name == self.OBJECTS.FRIDGE:
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
 
-            # pos = [x+shift[0]+0.5, y+shift[1]+0.5, 0+shift[2]]
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
             if name == "fridge":
                 obj = URDFObject(name2path["counter"], avg_obj_dims={'density': 10000},
