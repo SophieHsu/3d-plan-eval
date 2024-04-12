@@ -262,6 +262,21 @@ class Kitchen:
         self.grid = grid
         return object_locs, orientation_map, grid
 
+    def load_object(self, object_props):
+        obj = URDFObject(
+            filename=object_props['file_name'],
+            avg_obj_dims={'density': object_props['density']},
+            scale=object_props['scale'] / object_props['scale_factor'],
+            model_path="/".join(object_props['model_uri'].split('/')[:-1]),
+            category=object_props['category'],
+            fixed_base=object_props['fixed_base'],
+        )
+
+        self.env.simulator.import_object(obj)
+        self.env.set_pos_orn_with_z_offset(obj, tuple(object_props['pose']), object_props['orn'])
+
+        return obj
+
     def load_objects(self, object_poses, orientation_map, order_list):
         name2path = {
             "counter":
