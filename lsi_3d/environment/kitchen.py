@@ -265,15 +265,14 @@ class Kitchen:
     def load_object(self, object_props):
         obj = URDFObject(
             filename=object_props['file_name'],
-            avg_obj_dims={'density': object_props['density']},
+            avg_obj_dims={'density': object_props['density']} if object_props['density'] is not None else None,
             scale=object_props['scale'] / object_props['scale_factor'],
-            model_path="/".join(object_props['model_uri'].split('/')[:-1]),
+            model_path=object_props['model_uri'],
             category=object_props['category'],
             fixed_base=object_props['fixed_base'],
         )
 
         self.env.simulator.import_object(obj)
-        self.env.set_pos_orn_with_z_offset(obj, tuple(object_props['pose']), object_props['orn'])
 
         return obj
 
@@ -475,97 +474,106 @@ class Kitchen:
                 shift = (x_shift, y_shift, 0)
 
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
-            if name == "fridge":
-                obj = URDFObject(name2path["counter"], avg_obj_dims={'density': 10000},
-                                 scale=name2scale_map["counter"] / 1.15,
-                                 model_path="/".join(
-                                     name2path["counter"].split("/")[:-1]),
-                                 category="counter", fixed_base=True)
-
-                self.env.simulator.import_object(obj)
-                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
-
-                self.fridges.append(obj)
+            if name == 'fridge':
+                fridge_obj = self.load_object({
+                    'file_name': name2path['counter'],
+                    'density': 10000,
+                    'scale': name2scale_map['counter'],
+                    'scale_factor': 1.15,
+                    'model_uri': '/'.join(name2path['counter'].split('/')[:-1]),
+                    'category': 'counter',
+                    'fixed_base': True,
+                })
+                self.fridges.append(fridge_obj)
+                self.env.set_pos_orn_with_z_offset(obj, pos, orn)
 
                 if 'onion' in order_list:
                     for _ in range(10):
-                        onion = URDFObject(
-                            name2path["vidalia_onion"],
-                            scale=name2scale_map["vidalia_onion"] / 1.15,
-                            model_path="/".join(
-                                name2path["vidalia_onion"].split("/")[:-1]),
-                            category="vidalia_onion")
-                        self.env.simulator.import_object(onion)
-                        onion.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
-                        self.onions.append(onion)
-                        body_ids = onion.get_body_ids()
+                        onion_obj = self.load_object({
+                            'file_name': name2path['vidalia_onion'],
+                            'density': 10000,
+                            'scale': name2scale_map['vidalia_onion'],
+                            'scale_factor': 1.15,
+                            'model_uri': '/'.join(name2path['vidalia_onion'].split('/')[:-1]),
+                            'category': 'vidalia_onion',
+                            'fixed_base': False,
+                        })
+                        onion_obj.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+                        body_ids = onion_obj.get_body_ids()
                         p.changeDynamics(body_ids[0], -1, mass=0.001)
                 if 'steak' in order_list:
                     for _ in range(7):
-                        steak = URDFObject(
-                            name2path["steak"],
-                            scale=name2scale_map["steak"] / 1.15,
-                            model_path="/".join(
-                                name2path["steak"].split("/")[:-1]),
-                            category="steak")
-                        self.env.simulator.import_object(steak)
-                        steak.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
-
-                        self.meats.append(steak)
-                        body_ids = steak.get_body_ids()
+                        steak_obj = self.load_object({
+                            'file_name': name2path['steak'],
+                            'density': 10000,
+                            'scale': name2scale_map['steak'],
+                            'scale_factor': 1.15,
+                            'model_uri': '/'.join(name2path['steak'].split('/')[:-1]),
+                            'category': 'steak',
+                            'fixed_base': False,
+                        })
+                        steak_obj.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
+                        self.meats.append(steak_obj)
+                        body_ids = steak_obj.get_body_ids()
                         p.changeDynamics(body_ids[0], -1, mass=0.001)
 
             elif name == 'plate':
-                obj = URDFObject(name2path[name],
-                                 name=name,
-                                 category=name,
-                                 scale=name2scale_map[name] / 1.15,
-                                 # avg_obj_dims={'density': 10000},
-                                 model_path="/".join(
-                                     name2path[name].split("/")[:-1]))
-                self.env.simulator.import_object(obj)
+                plate_obj = self.load_object({
+                    'file_name': name2path[name],
+                    'density': None,
+                    'scale': name2scale_map[name],
+                    'scale_factor': 1.15,
+                    'model_uri': '/'.join(name2path[name].split('/')[:-1]),
+                    'category': 'counter',
+                    'fixed_base': False,
+                })
                 self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
                 self.bowl_spawn_pos = pos
 
                 for i in range(3):
-                    obj2 = URDFObject(name2path[name],
-                                      name=name,
-                                      category=name,
-                                      scale=name2scale_map[name] / 1.15,
-                                      # avg_obj_dims={'density': 10000},
-                                      model_path="/".join(
-                                          name2path[name].split("/")[:-1]))
-                    self.env.simulator.import_object(obj2)
-                    self.env.set_pos_orn_with_z_offset(obj2, tuple([200 + 5 * i, 200, 1]), orn)
-                    obj2.states[object_states.Dusty].set_value(True)
-                    obj2.states[object_states.Stained].set_value(True)
-                    self.plates.append(obj2)
+                    other_plate_obj = self.load_object({
+                        'file_name': name2path[name],
+                        'density': None,
+                        'scale': name2scale_map[name],
+                        'scale_factor': 1.15,
+                        'model_uri': '/'.join(name2path[name].split('/')[:-1]),
+                        'category': 'counter',
+                        'fixed_base': False,
+                    })
+                    self.env.set_pos_orn_with_z_offset(other_plate_obj, tuple([200 + 5 * i, 200, 1]), orn)
+                    other_plate_obj.states[object_states.Dusty].set_value(True)
+                    other_plate_obj.states[object_states.Stained].set_value(True)
+                    self.plates.append(other_plate_obj)
             elif name == "stove":
-                obj = URDFObject(name2path[name],
-                                 scale=name2scale_map[name] / 1.15,
-                                 model_path="/".join(
-                                     name2path[name].split("/")[:-1]),
-                                 category="stove")
-                self.env.simulator.import_object(obj)
-                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
-                obj.states[object_states.ToggledOn].set_value(False)
-                self.stove = obj
+                stove_obj = self.load_object({
+                        'file_name': name2path[name],
+                        'density': None,
+                        'scale': name2scale_map[name],
+                        'scale_factor': 1.15,
+                        'model_uri': '/'.join(name2path[name].split('/')[:-1]),
+                        'category': 'counter',
+                        'fixed_base': False,
+                    })
+                self.env.set_pos_orn_with_z_offset(stove_obj, tuple(pos), orn)
+                stove_obj.states[object_states.ToggledOn].set_value(False)
+                self.stove = stove_obj
 
             elif name == "pan":
-                obj = URDFObject(name2path[name],
-                                 name=name,
-                                 category=name,
-                                 scale=name2scale_map[name] / 1.15,
-                                 model_path="/".join(
-                                     name2path[name].split("/")[:-1]))
+                pan_obj = self.load_object({
+                    'file_name': name2path[name],
+                    'density': None,
+                    'scale': name2scale_map[name],
+                    'scale_factor': 1.15,
+                    'model_uri': '/'.join(name2path[name].split('/')[:-1]),
+                    'category': 'counter',
+                    'fixed_base': False,
+                })
                 rotated_basis = self.get_rotated_basis(orn)
                 translated_pos = self.translate_loc(
                     rotated_basis, tuple([x - 4.5, y - 4.5, 0]), shift)
-                self.env.simulator.import_object(obj)
-                self.env.set_pos_orn_with_z_offset(obj, translated_pos, orn)
+                self.env.set_pos_orn_with_z_offset(pan_obj, translated_pos, orn)
             elif name == "green_onion":
                 # Create an URDF object of an apple, but doesn't load it in the simulator
-                model_path = name2path[name]
                 whole_obj = URDFObject(name2path[name],
                                        name=name,
                                        category=name,
@@ -606,12 +614,6 @@ class Kitchen:
                 for i, (part_obj, _) in enumerate(object_parts):
                     part_obj.set_position([101 + i, 100, -100])
 
-                # multiplexed_obj.set_position([0, 0, 0.72])
-                # for i, (part_obj, _) in enumerate(object_parts):
-                #     # self.env.set_pos_orn_with_z_offset(part_obj, tuple(pos), orn)
-                #     new_pos = pos
-                #     new_pos[2] += 0.07 * ((-1)**i)
-                #     part_obj.set_position(new_pos)
                 pos[2] += 0.05
                 self.env.set_pos_orn_with_z_offset(whole_obj, tuple(pos), orn)
                 self.onions.append(multiplexed_obj)
