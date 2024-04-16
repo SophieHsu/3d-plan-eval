@@ -22,7 +22,7 @@ class KitchenObject:
         return self._obj
 
     def load(self, *args):
-        self._params.obj_handlers.import_obj(self._obj)
+        raise NotImplementedError()
 
 
 class Fridge(KitchenObject):
