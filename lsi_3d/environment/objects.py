@@ -1,6 +1,9 @@
+import os
 from argparse import Namespace
 from igibson.objects.articulated_object import URDFObject
 from igibson import object_states
+from igibson.utils.assets_utils import get_ig_model_path
+from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
 
 
 class KitchenObject:
@@ -92,3 +95,66 @@ class Pan(KitchenObject):
     def load(self):
         self._params.obj_handlers.import_obj(self.obj)
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+
+
+class GreenOnion(KitchenObject):
+    class GreenOnionPart(KitchenObject):
+        def __init__(self, **kwargs):
+            super().__init__()
+            self._params = Namespace(**kwargs)
+
+        def load(self):
+            pass
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._params = Namespace(**kwargs)
+        self._multiplexed_obj = None
+
+    def _get_object_parts(self):
+        object_parts = []
+        for i, part in enumerate(self.obj.metadata['object_parts']):
+            part_category = part['category']
+            part_model = part['model']
+            # Scale the offset accordingly
+            part_pos = part['pos'] * self.obj.scale
+            part_orn = part['orn']
+            part_model_path = get_ig_model_path(part_category, part_model)
+            part_filename = os.path.join(part_model_path, '{}.urdf'.format(part_model))
+            part_obj_name = '{}_part_{}'.format(self.obj.name, i)
+            part_obj = self.GreenOnionPart(
+                filename=part_filename,
+                name=part_obj_name,
+                category=part_category,
+                model_uri=part_model_path,
+                scale=self.obj.scale
+            )
+            object_parts.append((part_obj, (part_pos, part_orn)))
+
+        return object_parts
+
+    @property
+    def multiplexed_obj(self):
+        return self._multiplexed_obj
+
+    def load(self):
+        object_parts = self._get_object_parts()
+        grouped_parts_obj = ObjectGrouper(object_parts)
+        self._multiplexed_obj = ObjectMultiplexer(
+            '{}_multiplexer'.format(self.obj.name),
+            [self.obj, grouped_parts_obj],
+            0
+        )
+
+        self._params.obj_handlers.import_obj(self._multiplexed_obj)
+        self.obj.set_position([100, 100, -100])
+        for i, (part, _) in enumerate(object_parts):
+            part.obj.set_position([101 + i, 100, -100])
+
+        pos_z = self._params.pos[2] + .05
+        self._params.obj_handlers.set_pos_orn(
+            self._obj,
+            [self._params.pos[0], self._params.pos[1], pos_z],
+            self._params.orn
+        )
+        self._params.change_pb_dynamics(self._multiplexed_obj.get_body_ids()[0], -1, mass=self._params.mass)
