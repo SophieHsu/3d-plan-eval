@@ -30,5 +30,4 @@ class Fridge(KitchenObject):
         obj = self.create_urdf_object()
         obj_handlers.import_obj(obj)
         obj_handlers.set_pos_orn(obj, self._params.pos, self._params.orn)
-        obj_handlers.
 
