@@ -28,7 +28,6 @@ class KitchenObject:
 class Fridge(KitchenObject):
     def __init__(self, **kwargs):
         super().__init__()
-
         self._params = Namespace(**kwargs)
 
     def load(self):
@@ -39,7 +38,18 @@ class Fridge(KitchenObject):
 class Onion(KitchenObject):
     def __init__(self, **kwargs):
         super().__init__()
+        self._params = Namespace(**kwargs)
 
+    def load(self):
+        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
+        self._params.obj_handlers.import_obj(self._obj)
+        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.change_pb_dynamics(self._obj.get_body_ids()[0], -1, mass=self._params.mass)
+
+
+class Steak(KitchenObject):
+    def __init__(self, **kwargs):
+        super().__init__()
         self._params = Namespace(**kwargs)
 
     def load(self):
