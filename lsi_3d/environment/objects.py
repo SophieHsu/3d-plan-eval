@@ -41,8 +41,8 @@ class Onion(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.import_obj(self._obj)
+        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
         self._params.obj_handlers.change_pb_dynamics(self._obj.get_body_ids()[0], -1, mass=self._params.mass)
 
@@ -53,8 +53,23 @@ class Steak(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
+        self._params.obj_handlers.import_obj(self._obj)
+        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
+        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.change_pb_dynamics(self._obj.get_body_ids()[0], -1, mass=self._params.mass)
+
+
+class Plate(KitchenObject):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._params = Namespace(**kwargs)
+
+    def load(self):
         self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.import_obj(self._obj)
         self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
-        self._params.obj_handlers.change_pb_dynamics(self._obj.get_body_ids()[0], -1, mass=self._params.mass)
+        if self._params.dusty:
+            self._obj.states[object_states.Dusty].set_value(True)
+        if self._params.stained:
+            self._obj.states[object_states.Stained].set_value(True)
 
