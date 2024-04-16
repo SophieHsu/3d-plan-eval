@@ -65,7 +65,6 @@ class Plate(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.import_obj(self._obj)
         self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
         if self._params.dusty:
@@ -80,7 +79,6 @@ class Stove(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.import_obj(self._obj)
         self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
         self._obj.states[object_states.ToggledOn].set_value(False)
