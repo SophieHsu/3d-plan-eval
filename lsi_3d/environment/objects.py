@@ -83,3 +83,12 @@ class Stove(KitchenObject):
         self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
         self._obj.states[object_states.ToggledOn].set_value(False)
 
+
+class Pan(KitchenObject):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._params = Namespace(**kwargs)
+
+    def load(self):
+        self._params.obj_handlers.import_obj(self._obj)
+        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
