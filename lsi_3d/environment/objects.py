@@ -153,7 +153,7 @@ class GreenOnion(KitchenObject):
         pos_z = self._params.pos[2] + .05
         self._params.obj_handlers.set_pos_orn(
             self._obj,
-            [self._params.pos[0], self._params.pos[1], pos_z],
+            tuple([self._params.pos[0], self._params.pos[1], pos_z]),
             self._params.orn
         )
         self._params.change_pb_dynamics(self._multiplexed_obj.get_body_ids()[0], -1, mass=self._params.mass)
