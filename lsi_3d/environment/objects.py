@@ -116,7 +116,6 @@ class GreenOnion(KitchenObject):
         for i, part in enumerate(self.obj.metadata['object_parts']):
             part_category = part['category']
             part_model = part['model']
-            # Scale the offset accordingly
             part_pos = part['pos'] * self.obj.scale
             part_orn = part['orn']
             part_model_path = get_ig_model_path(part_category, part_model)
