@@ -31,8 +31,8 @@ class Fridge(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._params.obj_handlers.import_obj(self._obj)
-        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.import_obj(self.obj)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
 
 
 class Onion(KitchenObject):
@@ -41,10 +41,10 @@ class Onion(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._params.obj_handlers.import_obj(self._obj)
-        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
-        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
-        self._params.obj_handlers.change_pb_dynamics(self._obj.get_body_ids()[0], -1, mass=self._params.mass)
+        self._params.obj_handlers.import_obj(self.obj)
+        self.obj.states[object_states.OnTop].set_value(self.obj, True, use_ray_casting_method=True)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
 
 
 class Steak(KitchenObject):
@@ -53,10 +53,10 @@ class Steak(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._params.obj_handlers.import_obj(self._obj)
-        self._obj.states[object_states.OnTop].set_value(self._obj, True, use_ray_casting_method=True)
-        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
-        self._params.obj_handlers.change_pb_dynamics(self._obj.get_body_ids()[0], -1, mass=self._params.mass)
+        self._params.obj_handlers.import_obj(self.obj)
+        self.obj.states[object_states.OnTop].set_value(self.obj, True, use_ray_casting_method=True)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
 
 
 class Plate(KitchenObject):
@@ -65,12 +65,12 @@ class Plate(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._params.obj_handlers.import_obj(self._obj)
-        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.import_obj(self.obj)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
         if self._params.dusty:
-            self._obj.states[object_states.Dusty].set_value(True)
+            self.obj.states[object_states.Dusty].set_value(True)
         if self._params.stained:
-            self._obj.states[object_states.Stained].set_value(True)
+            self.obj.states[object_states.Stained].set_value(True)
 
 
 class Stove(KitchenObject):
@@ -79,9 +79,9 @@ class Stove(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._params.obj_handlers.import_obj(self._obj)
-        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
-        self._obj.states[object_states.ToggledOn].set_value(False)
+        self._params.obj_handlers.import_obj(self.obj)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self.obj.states[object_states.ToggledOn].set_value(False)
 
 
 class Pan(KitchenObject):
@@ -90,5 +90,5 @@ class Pan(KitchenObject):
         self._params = Namespace(**kwargs)
 
     def load(self):
-        self._params.obj_handlers.import_obj(self._obj)
-        self._params.obj_handlers.set_pos_orn(self._obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.import_obj(self.obj)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
