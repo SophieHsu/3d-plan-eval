@@ -36,6 +36,7 @@ CONF_KEYS = SimpleNamespace(
     MODEL_PATH='model_path',
     CATEGORY='category',
     FIXED_BASE='fixed_base',
+    ABILITIES='abilities',
 )
 
 OBJECT_CONFIG = SimpleNamespace(**{
@@ -85,4 +86,21 @@ OBJECT_CONFIG = SimpleNamespace(**{
         CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/frying_pan/36_0/36_0.urdf')),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.PAN,
     },
+    OBJECT_KEYS.GREEN_ONION: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/green_onion/green_onion_000/green_onion_000.urdf'),
+        CONF_KEYS.SCALE: np.array([0.1, 0.1, 0.1]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path,
+            'objects/green_onion/green_onion_000/green_onion_000.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.GREEN_OBJECT,
+        CONF_KEYS.ABILITIES: {
+            'burnable': {},
+            'freezable': {},
+            'cookable': {},
+            'sliceable': {
+                "slice_force": .0
+            }
+        }
+    }
 })
