@@ -102,5 +102,69 @@ OBJECT_CONFIG = SimpleNamespace(**{
                 "slice_force": .0
             }
         }
-    }
+    },
+    OBJECT_KEYS.BOWL: {
+        CONF_KEYS.FILENAME: os.path.join(
+            ig_dataset_path,
+            'objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf'
+        ),
+        CONF_KEYS.SCALE: np.array([0.8, 0.8, 0.8]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path,
+            'objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.BOWL,
+        CONF_KEYS.ABILITIES: {
+                'dustyable': {},
+                'stainable': {}
+            }
+    },
+    OBJECT_KEYS.SINK: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/sink/kitchen_sink/kitchen_sink.urdf'),
+        CONF_KEYS.SCALE: np.array([1.2, 1.25, 1.25]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path,
+            'objects/sink/kitchen_sink/kitchen_sink.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.SINK,
+    },
+    OBJECT_KEYS.CHOPPING_BOARD: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/chopping_board/10_0/10_0.urdf'),
+        CONF_KEYS.SCALE: np.array([1.2, 1.2, 1.2]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/chopping_board/10_0/10_0.urdf')),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.CHOPPING_BOARD,
+    },
+    OBJECT_KEYS.KNIFE: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/carving_knife/14_1/14_1.urdf'),
+        CONF_KEYS.SCALE: np.array([1, 1, 1]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/carving_knife/14_1/14_1.urdf')),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.KNIFE,
+        CONF_KEYS.ABILITIES: {
+                'slicer': {}
+            }
+    },
+    OBJECT_KEYS.LARGE_BOWL: {
+        CONF_KEYS.FILENAME: os.path.join(
+            ig_dataset_path,
+            'objects/bowl/5aad71b5e6cb3967674684c50f1db165/5aad71b5e6cb3967674684c50f1db165.urdf'
+        ),
+        CONF_KEYS.SCALE: np.array([0.5, 0.5, 0.5]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path,
+            'objects/bowl/5aad71b5e6cb3967674684c50f1db165/5aad71b5e6cb3967674684c50f1db165.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.LARGE_BOWL,
+    },
+    OBJECT_KEYS.STEAK_BOWL: {
+        CONF_KEYS.FILENAME: os.path.join(
+            ig_dataset_path,
+            'objects/bowl/7d7bdea515818eb844638317e9e4ff18/7d7bdea515818eb844638317e9e4ff18.urdf'
+        ),
+        CONF_KEYS.SCALE: np.array([0.5, 0.5, 0.5]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path,
+            'objects/bowl/7d7bdea515818eb844638317e9e4ff18/7d7bdea515818eb844638317e9e4ff18.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.STEAK_BOWL,
+    },
 })
