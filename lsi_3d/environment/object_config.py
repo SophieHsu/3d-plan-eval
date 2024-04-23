@@ -73,4 +73,16 @@ OBJECT_CONFIG = SimpleNamespace(**{
         )),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.PLATE,
     },
+    OBJECT_KEYS.STOVE: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/stove/101940/101940.urdf'),
+        CONF_KEYS.SCALE: np.array([1.1, 1, 1]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/stove/101940/101940.urdf')),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.STOVE,
+    },
+    OBJECT_KEYS.PAN: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/frying_pan/36_0/36_0.urdf'),
+        CONF_KEYS.SCALE: np.array([1.3, 1.3, 1]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/frying_pan/36_0/36_0.urdf')),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.PAN,
+    },
 })
