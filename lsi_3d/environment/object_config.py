@@ -93,7 +93,7 @@ OBJECT_CONFIG = SimpleNamespace(**{
             ig_dataset_path,
             'objects/green_onion/green_onion_000/green_onion_000.urdf'
         )),
-        CONF_KEYS.CATEGORY: OBJECT_KEYS.GREEN_OBJECT,
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.GREEN_ONION,
         CONF_KEYS.ABILITIES: {
             'burnable': {},
             'freezable': {},
