@@ -24,3 +24,13 @@ OBJECT_KEYS = SimpleNamespace(
     KNIFE='KNIFE',
     ONION='ONION'
 )
+
+CONF_KEYS = SimpleNamespace(
+    FILENAME='filename',
+    DENSITY='density',
+    SCALE='scale',
+    SCALE_FACTOR='scale_factor',
+    MODEL_PATH='model_path',
+    CATEGORY='category',
+    FIXED_BASE='fixed_base',
+)
