@@ -53,7 +53,6 @@ OBJECT_CONFIG = SimpleNamespace(**{
         CONF_KEYS.SCALE: np.array([2.0, 2.0, 2.0]) / 1.15,
         CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/vidalia_onion/18_1/18_1.urdf')),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.VIDALIA_ONION,
-        CONF_KEYS.FIXED_BASE: False,
     },
     OBJECT_KEYS.STEAK: {
         CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/steak/steak_000/steak_000.urdf'),
@@ -61,7 +60,6 @@ OBJECT_CONFIG = SimpleNamespace(**{
         CONF_KEYS.SCALE: np.array([2.0, 2.0, 2.0]) / 1.15,
         CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/steak/steak_000/steak_000.urdf')),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.STEAK,
-        CONF_KEYS.FIXED_BASE: False,
     },
     OBJECT_KEYS.PLATE: {
         CONF_KEYS.FILENAME: os.path.join(
@@ -74,6 +72,5 @@ OBJECT_CONFIG = SimpleNamespace(**{
             'objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf'
         )),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.PLATE,
-        CONF_KEYS.FIXED_BASE: False,
     },
 })
