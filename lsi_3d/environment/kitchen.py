@@ -2,8 +2,8 @@ import math
 import os
 import random
 import time
-from math import floor
 from argparse import Namespace
+from math import floor
 
 import numpy as np
 import pybullet as p
@@ -11,11 +11,8 @@ import pybullet as p
 import igibson
 from igibson import object_states
 from igibson.objects.articulated_object import URDFObject
-from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
+from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
-from igibson.utils.assets_utils import get_ig_model_path
-from lsi_3d.utils.constants import DIRE2POSDIFF
-from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS, OBJECT_CONFIG
 from lsi_3d.environment.objects import (
     Fridge,
@@ -25,8 +22,11 @@ from lsi_3d.environment.objects import (
     Stove,
     Pan,
     GreenOnion,
-    Counter
+    Counter,
+    OtherKitchenObject
 )
+from lsi_3d.utils.constants import DIRE2POSDIFF
+from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 
 class Kitchen:
@@ -523,16 +523,7 @@ class Kitchen:
                 Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER]).load()
 
             else:
-                obj = URDFObject(name2path[name],
-                                 name=name,
-                                 category=name,
-                                 scale=name2scale_map[name] / 1.15,
-                                 # avg_obj_dims={'density': 10000},
-                                 model_path="/".join(
-                                     name2path[name].split("/")[:-1]),
-                                 abilities=name2abl[name])
-                self.env.simulator.import_object(obj)
-                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
+                OtherKitchenObject(**OBJECT_CONFIG[name]).load()
 
             if name not in ("bowl", "pan", "vidalia_onion", "steak", "plate", "chopping_board", "knife", "green_onion"):
                 self.static_objs[obj] = (x, y)
