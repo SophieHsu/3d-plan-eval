@@ -352,7 +352,6 @@ class Kitchen:
             "tray": (0, 0, 0.9),
             "apple": (0, 0.2, 1.0),
             "broccoli": (0, 0.2, 0.6),
-            "green_onion": (0, -0.2, 0.6),
             "green_onion": (0, 0, 1.25),
             "plate": (0, 0, 1.15),
             "scrub_brush": (0, 0, 1.3),
