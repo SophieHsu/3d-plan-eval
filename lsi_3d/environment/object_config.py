@@ -198,4 +198,22 @@ OBJECT_CONFIG = {
         CONF_KEYS.CATEGORY: OBJECT_KEYS.STEAK_BOWL,
         CONF_KEYS.NAME: OBJECT_KEYS.STEAK_BOWL,
     },
+    OBJECT_KEYS.TABLE_H: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/breakfast_table/26670/26670.urdf'),
+        CONF_KEYS.SCALE: np.array([1.2, 1.2, 1.3]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path, 'objects/breakfast_table/26670/26670.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.TABLE_H,
+        CONF_KEYS.NAME: OBJECT_KEYS.TABLE_H,
+    },
+    OBJECT_KEYS.TABLE_V: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/breakfast_table/26670/26670.urdf'),
+        CONF_KEYS.SCALE: np.array([1.2, 1.2, 1.3]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path, 'objects/breakfast_table/26670/26670.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.TABLE_V,
+        CONF_KEYS.NAME: OBJECT_KEYS.TABLE_V,
+    },
 }
