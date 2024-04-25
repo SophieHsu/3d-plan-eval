@@ -33,7 +33,6 @@ CONF_KEYS = SimpleNamespace(
     FILENAME='filename',
     DENSITY='density',
     SCALE='scale',
-    SCALE_FACTOR='scale_factor',
     MODEL_PATH='model_path',
     CATEGORY='category',
     FIXED_BASE='fixed_base',
@@ -62,7 +61,7 @@ OBJECT_ABBRS = {
     OBJECT_KEYS.EMPTY: 'X',
 }
 
-OBJECT_CONFIG = SimpleNamespace(**{
+OBJECT_CONFIG = {
     OBJECT_KEYS.COUNTER: {
         CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/bottom_cabinet/46452/46452.urdf'),
         CONF_KEYS.DENSITY: 10000,
@@ -199,4 +198,4 @@ OBJECT_CONFIG = SimpleNamespace(**{
         CONF_KEYS.CATEGORY: OBJECT_KEYS.STEAK_BOWL,
         CONF_KEYS.NAME: OBJECT_KEYS.STEAK_BOWL,
     },
-})
+}

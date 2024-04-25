@@ -4,6 +4,7 @@ from igibson.objects.articulated_object import URDFObject
 from igibson import object_states
 from igibson.utils.assets_utils import get_ig_model_path
 from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
+from lsi_3d.environment.object_config import CONF_KEYS
 
 
 class KitchenObject:
@@ -15,12 +16,16 @@ class KitchenObject:
     def obj(self):
         if self._obj is None:
             self._obj = URDFObject(
-                filename=self._params.filename,
-                avg_obj_dims={'density': self._params.density},
-                scale=self._params.scale,
-                model_path=self._params.model_path,
-                category=self._params.category,
-                fixed_base=self._params.fixed_base,
+                **vars(self._params),
+                filename=getattr(self._params, CONF_KEYS.FILENAME),
+                scale=getattr(self._params, CONF_KEYS.SCALE),
+                model_path=getattr(self._params, CONF_KEYS.MODEL_PATH),
+                category=getattr(self._params, CONF_KEYS.CATEGORY),
+                fixed_base=getattr(self._params, CONF_KEYS.FIXED_BASE, False),
+                abilities=getattr(self._params, CONF_KEYS.ABILITIES),
+                avg_obj_dims={
+                    'density': getattr(self._params, CONF_KEYS.DENSITY)
+                } if hasattr(self._params, CONF_KEYS.DENSITY) else None,
             )
         return self._obj
 
