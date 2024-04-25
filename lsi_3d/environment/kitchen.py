@@ -413,20 +413,18 @@ class Kitchen:
                 self.onions.append(vidalia_onion.obj)
 
             else:
-                other = OtherKitchenObject(**OBJECT_CONFIG[name], obj_handlers=obj_handlers, pos=pos, orn=orn)
+                other = OtherKitchenObject(
+                    **OBJECT_CONFIG[name],
+                    obj_handlers=obj_handlers,
+                    pos=pos,
+                    orn=orn,
+                    static=name not in self._DYNAMIC_OBJECTS
+                )
                 other.load()
                 if name == OBJECT_KEYS.SINK:
                     self.sinks.append(other.obj)
                 if name == OBJECT_KEYS.TABLE_H or name == OBJECT_KEYS.TABLE_V:
                     self.table = other.obj
-
-            if name not in self._DYNAMIC_OBJECTS:
-                self.static_objs[obj] = (x, y)
-
-            if name == "table_h":
-                self.static_objs[obj] = [(x, y), (x, y + 1)]
-            if name == "table_v":
-                self.static_objs[obj] = [(x, y), (x + 1, y)]
 
         bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
         bowl.load()
@@ -451,14 +449,6 @@ class Kitchen:
 
             if real_to_grid_coord(counter.get_position()) == self.where_grid_is('D')[0]:
                 self.dish_station = counter
-
-        try:
-            for obj in self.static_objs.keys():
-                p.changeDynamics(obj.get_body_ids()[0], -1,
-                                 mass=800)  # mass=500
-        except:
-            print("****** Error *******")
-            # pass
 
     def get_grid_objects(self, filepath):
         with open(filepath, 'r') as fh:

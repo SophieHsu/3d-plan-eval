@@ -182,6 +182,8 @@ class OtherKitchenObject(KitchenObject):
     def load(self):
         self._params.obj_handlers.import_obj(self.obj)
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        if self._params.static:
+            self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=800)
 
 
 class Bowl(KitchenObject):
