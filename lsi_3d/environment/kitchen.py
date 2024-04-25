@@ -387,6 +387,8 @@ class Kitchen:
 
             else:
                 OtherKitchenObject(**OBJECT_CONFIG[name], obj_handlers=obj_handlers, pos=pos, orn=orn).load()
+                if name == OBJECT_KEYS.SINK:
+                    self.sinks.append(obj)
 
             if name not in self._DYNAMIC_OBJECTS:
                 self.static_objs[obj] = (x, y)
@@ -405,8 +407,7 @@ class Kitchen:
                 self.chopping_boards.append(obj)
                 body_ids = obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=100)
-            if name == "sink":
-                self.sinks.append(obj)
+
             if name == "knife":
                 self.knives.append(obj)
                 self.init_knife_pos = None
