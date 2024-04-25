@@ -24,7 +24,7 @@ from lsi_3d.environment.objects import (
     GreenOnion,
     Counter,
     OtherKitchenObject,
-    Bowl
+    OtherBowl
 )
 from lsi_3d.utils.constants import DIRE2POSDIFF
 from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
@@ -572,11 +572,11 @@ class Kitchen:
                 body_ids = obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.01)
 
-        bowl = Bowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
+        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
         bowl.load()
         self.large_bowl = bowl.obj
 
-        bowl = Bowl(**OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL], away_pos=[275, 275, 1])
+        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL], away_pos=[275, 275, 1])
         bowl.load()
         self.steak_bowl = bowl.obj
 

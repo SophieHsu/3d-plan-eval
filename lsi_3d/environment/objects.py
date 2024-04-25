@@ -181,7 +181,7 @@ class OtherKitchenObject(KitchenObject):
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
 
 
-class Bowl(KitchenObject):
+class OtherBowl(KitchenObject):
     def __init__(self, **kwargs):
         super().__init__()
         self._params = Namespace(**kwargs)
