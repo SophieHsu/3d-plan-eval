@@ -25,7 +25,8 @@ OBJECT_KEYS = SimpleNamespace(
     SCRUB_BRUSH='scrub_brush',
     CHOPPING_BOARD='shopping_board',
     KNIFE='knife',
-    ONION='onion'
+    ONION='onion',
+    EMPTY='empty'
 )
 
 CONF_KEYS = SimpleNamespace(
