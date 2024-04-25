@@ -478,6 +478,7 @@ class Kitchen:
                 )
                 plate.load()
                 self.bowl_spawn_pos = pos
+                self.plates.append(plate.obj)
 
                 for idx in range(3):
                     other_plate = Plate(
@@ -499,6 +500,7 @@ class Kitchen:
             elif name == OBJECT_KEYS.PAN:
                 pan = Pan(
                     **OBJECT_CONFIG[OBJECT_KEYS.PAN],
+                    obj_handlers=obj_handlers,
                     pos=self.translate_loc(self.get_rotated_basis(orn), tuple([x - 4.5, y - 4.5, 0]), shift),
                     orn=orn
                 )
@@ -532,19 +534,25 @@ class Kitchen:
                     self.onions.append(green_onion_extra.multiplexed_obj)
 
             elif OBJECT_KEYS.COUNTER in name:
-                Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER]).load()
+                Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], obj_handlers=obj_handlers, pos=pos, orn=orn).load()
+
+            elif name == OBJECT_KEYS.BOWL:
+                bowl = Plate(
+                    **OBJECT_CONFIG[OBJECT_KEYS.BOWL],
+                    obj_handlers=obj_handlers,
+                    pos=pos,
+                    orn=orn,
+                    dusty=True,
+                    stained=True,
+                    mass=.01
+                )
+                bowl.load()
 
             else:
-                OtherKitchenObject(**OBJECT_CONFIG[name]).load()
+                OtherKitchenObject(**OBJECT_CONFIG[name], obj_handlers=obj_handlers, pos=pos, orn=orn).load()
 
             if name not in self._DYNAMIC_OBJECTS:
                 self.static_objs[obj] = (x, y)
-            if name == "bowl":
-                obj.states[object_states.Dusty].set_value(True)
-                obj.states[object_states.Stained].set_value(True)
-                self.bowls.append(obj)
-                body_ids = obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1, mass=0.01)
 
             if name == "vidalia_onion":
                 self.onions.append(obj)
@@ -564,8 +572,6 @@ class Kitchen:
                 p.changeDynamics(body_ids[0], -1, mass=100)
             if name == "sink":
                 self.sinks.append(obj)
-            if name == "plate":
-                self.plates.append(obj)
             if name == "knife":
                 self.knives.append(obj)
                 self.init_knife_pos = None
