@@ -23,7 +23,8 @@ from lsi_3d.environment.objects import (
     Pan,
     GreenOnion,
     Counter,
-    OtherKitchenObject
+    OtherKitchenObject,
+    Bowl
 )
 from lsi_3d.utils.constants import DIRE2POSDIFF
 from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
@@ -571,29 +572,13 @@ class Kitchen:
                 body_ids = obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.01)
 
-        name = "large_bowl"
-        large_bowl = URDFObject(name2path[name],
-                                name=name,
-                                category=name,
-                                scale=name2scale_map[name] / 1.15,
-                                # avg_obj_dims={'density': 10000},
-                                model_path="/".join(
-                                    name2path[name].split("/")[:-1]))
-        self.env.simulator.import_object(large_bowl)
-        large_bowl.set_position([300, 300, 1])
-        self.large_bowl = large_bowl
+        bowl = Bowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
+        bowl.load()
+        self.large_bowl = bowl.obj
 
-        name = "steak_bowl"
-        steak_bowl = URDFObject(name2path[name],
-                                name=name,
-                                category=name,
-                                scale=name2scale_map[name] / 1.15,
-                                # avg_obj_dims={'density': 10000},
-                                model_path="/".join(
-                                    name2path[name].split("/")[:-1]))
-        self.env.simulator.import_object(steak_bowl)
-        steak_bowl.set_position([275, 275, 1])
-        self.steak_bowl = steak_bowl
+        bowl = Bowl(**OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL], away_pos=[275, 275, 1])
+        bowl.load()
+        self.steak_bowl = bowl.obj
 
         # remove chopping board location from counters
 
