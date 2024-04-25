@@ -3,10 +3,10 @@ import os
 import random
 import time
 from math import floor
+from argparse import Namespace
 
 import numpy as np
 import pybullet as p
-from argparse import Namespace
 
 import igibson
 from igibson import object_states
@@ -16,7 +16,16 @@ from igibson.robots.manipulation_robot import IsGraspingState
 from igibson.utils.assets_utils import get_ig_model_path
 from lsi_3d.utils.constants import DIRE2POSDIFF
 from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
-from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS
+from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS, OBJECT_CONFIG
+from lsi_3d.environment.objects import (
+    Fridge,
+    Onion,
+    Steak,
+    Plate,
+    Stove,
+    Pan,
+    GreenOnion
+)
 
 
 class Kitchen:
@@ -431,204 +440,84 @@ class Kitchen:
                 shift = (x_shift, y_shift, 0)
 
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
-            if name == 'fridge':
-                fridge_obj = self.load_object({
-                    'file_name': name2path['counter'],
-                    'density': 10000,
-                    'scale': name2scale_map['counter'],
-                    'scale_factor': 1.15,
-                    'model_uri': '/'.join(name2path['counter'].split('/')[:-1]),
-                    'category': 'counter',
-                    'fixed_base': True,
-                })
-                self.fridges.append(fridge_obj)
-                self.env.set_pos_orn_with_z_offset(obj, pos, orn)
 
-                if 'onion' in order_list:
+            obj_handlers = Namespace(
+                import_object=self.env.simulator.import_object,
+                set_pos_orn=self.env.set_pos_orn_with_z_offset,
+                change_pb_dynamics=p.changeDynamics,
+            )
+
+            if name == OBJECT_KEYS.FRIDGE:
+                fridge = Fridge(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], pos=pos, orn=orn, obj_handlers=obj_handlers)
+                fridge.load()
+                self.fridges.append(fridge.obj)
+
+                if OBJECT_KEYS.ONION in order_list:
                     for _ in range(10):
-                        onion_obj = self.load_object({
-                            'file_name': name2path['vidalia_onion'],
-                            'density': 10000,
-                            'scale': name2scale_map['vidalia_onion'],
-                            'scale_factor': 1.15,
-                            'model_uri': '/'.join(name2path['vidalia_onion'].split('/')[:-1]),
-                            'category': 'vidalia_onion',
-                            'fixed_base': False,
-                        })
-                        onion_obj.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
-                        body_ids = onion_obj.get_body_ids()
-                        p.changeDynamics(body_ids[0], -1, mass=0.001)
-                if 'steak' in order_list:
+                        onion = Onion(**OBJECT_CONFIG[OBJECT_KEYS.VIDALIA_ONION], obj_handlers=obj_handlers, mass=.001)
+                        onion.load(fridge.obj)
+                        self.onions.append(onion.obj)
+                if OBJECT_KEYS.STEAK in order_list:
                     for _ in range(7):
-                        steak_obj = self.load_object({
-                            'file_name': name2path['steak'],
-                            'density': 10000,
-                            'scale': name2scale_map['steak'],
-                            'scale_factor': 1.15,
-                            'model_uri': '/'.join(name2path['steak'].split('/')[:-1]),
-                            'category': 'steak',
-                            'fixed_base': False,
-                        })
-                        steak_obj.states[object_states.OnTop].set_value(obj, True, use_ray_casting_method=True)
-                        self.meats.append(steak_obj)
-                        body_ids = steak_obj.get_body_ids()
-                        p.changeDynamics(body_ids[0], -1, mass=0.001)
+                        steak = Steak(**OBJECT_CONFIG[OBJECT_KEYS.STEAK], obj_handlers=obj_handlers, mass=.001)
+                        steak.load(fridge.obj)
+                        self.meats.append(steak.obj)
 
-            elif name == 'plate':
-                plate_obj = self.load_object({
-                    'file_name': name2path[name],
-                    'density': None,
-                    'scale': name2scale_map[name],
-                    'scale_factor': 1.15,
-                    'model_uri': '/'.join(name2path[name].split('/')[:-1]),
-                    'category': 'counter',
-                    'fixed_base': False,
-                })
-                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
+            elif name == OBJECT_KEYS.PLATE:
+                plate = Plate(**OBJECT_CONFIG[OBJECT_KEYS.PLATE], obj_handlers=obj_handlers, pos=pos, orn=orn)
+                plate.load()
                 self.bowl_spawn_pos = pos
 
-                for i in range(3):
-                    other_plate_obj = self.load_object({
-                        'file_name': name2path[name],
-                        'density': None,
-                        'scale': name2scale_map[name],
-                        'scale_factor': 1.15,
-                        'model_uri': '/'.join(name2path[name].split('/')[:-1]),
-                        'category': 'counter',
-                        'fixed_base': False,
-                    })
-                    self.env.set_pos_orn_with_z_offset(other_plate_obj, tuple([200 + 5 * i, 200, 1]), orn)
-                    other_plate_obj.states[object_states.Dusty].set_value(True)
-                    other_plate_obj.states[object_states.Stained].set_value(True)
-                    self.plates.append(other_plate_obj)
-            elif name == "stove":
-                stove_obj = self.load_object({
-                        'file_name': name2path[name],
-                        'density': None,
-                        'scale': name2scale_map[name],
-                        'scale_factor': 1.15,
-                        'model_uri': '/'.join(name2path[name].split('/')[:-1]),
-                        'category': 'counter',
-                        'fixed_base': False,
-                    })
-                self.env.set_pos_orn_with_z_offset(stove_obj, tuple(pos), orn)
-                stove_obj.states[object_states.ToggledOn].set_value(False)
-                self.stove = stove_obj
-
-            elif name == "pan":
-                pan_obj = self.load_object({
-                    'file_name': name2path[name],
-                    'density': None,
-                    'scale': name2scale_map[name],
-                    'scale_factor': 1.15,
-                    'model_uri': '/'.join(name2path[name].split('/')[:-1]),
-                    'category': 'counter',
-                    'fixed_base': False,
-                })
-                rotated_basis = self.get_rotated_basis(orn)
-                translated_pos = self.translate_loc(
-                    rotated_basis, tuple([x - 4.5, y - 4.5, 0]), shift)
-                self.env.set_pos_orn_with_z_offset(pan_obj, translated_pos, orn)
-            elif name == "green_onion":
-                # Create an URDF object of an apple, but doesn't load it in the simulator
-                whole_obj = URDFObject(name2path[name],
-                                       name=name,
-                                       category=name,
-                                       scale=name2scale_map[name] / 1.15,
-                                       model_path="/".join(
-                                           name2path[name].split("/")[:-1]),
-                                       abilities=name2abl[name])
-
-                object_parts = []
-                # Check the parts that compose the apple and create URDF objects of them
-                for i, part in enumerate(whole_obj.metadata["object_parts"]):
-                    part_category = part["category"]
-                    part_model = part["model"]
-                    # Scale the offset accordingly
-                    part_pos = part["pos"] * whole_obj.scale
-                    part_orn = part["orn"]
-                    part_model_path = get_ig_model_path(part_category, part_model)
-                    part_filename = os.path.join(part_model_path, part_model + ".urdf")
-                    part_obj_name = whole_obj.name + "_part_{}".format(i)
-                    part_obj = URDFObject(
-                        part_filename,
-                        name=part_obj_name,
-                        category=part_category,
-                        model_path=part_model_path,
-                        scale=whole_obj.scale,
+                for idx in range(3):
+                    other_plate = Plate(
+                        **OBJECT_CONFIG[OBJECT_KEYS.PLATE],
+                        obj_handlers=obj_handlers,
+                        pos=[200 + 5 * idx, 200, 1],
+                        orn=orn,
+                        dusty=True,
+                        stained=True
                     )
-                    object_parts.append((part_obj, (part_pos, part_orn)))
+                    other_plate.load()
+                    self.plates.append(other_plate)
 
-                # Group the apple parts into a single grouped object
-                grouped_parts_obj = ObjectGrouper(object_parts)
+            elif name == OBJECT_KEYS.STOVE:
+                stove = Stove(**OBJECT_CONFIG[OBJECT_KEYS.STOVE], obj_handlers=obj_handlers, pos=pos, orn=orn)
+                stove.load()
+                self.stove = stove.obj
 
-                # Create a multiplexed object: either the full apple, or the parts
-                multiplexed_obj = ObjectMultiplexer(whole_obj.name + "_multiplexer", [whole_obj, grouped_parts_obj], 0)
+            elif name == OBJECT_KEYS.PAN:
+                Pan(
+                    **OBJECT_CONFIG[OBJECT_KEYS.PAN],
+                    pos=self.translate_loc(self.get_rotated_basis(orn), tuple([x - 4.5, y - 4.5, 0]), shift),
+                    orn=orn
+                ).load()
 
-                # Finally, load the multiplexed object
-                self.env.simulator.import_object(multiplexed_obj)
-                whole_obj.set_position([100, 100, -100])
-                for i, (part_obj, _) in enumerate(object_parts):
-                    part_obj.set_position([101 + i, 100, -100])
-
-                pos[2] += 0.05
-                self.env.set_pos_orn_with_z_offset(whole_obj, tuple(pos), orn)
-                self.onions.append(multiplexed_obj)
-                body_ids = multiplexed_obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1, mass=0.001)
-
-                ####################################################
+            elif name == OBJECT_KEYS.GREEN_ONION:
+                pos = [pos[0], pos[1], pos[2] + .05]
+                green_onion = GreenOnion(
+                    **OBJECT_CONFIG[OBJECT_KEYS.GREEN_ONION],
+                    obj_handlers=obj_handlers,
+                    pos=pos,
+                    orn=orn,
+                    mass=.001,
+                    away_pos=[100, 100, -100]
+                )
+                green_onion.load()
+                self.onions.append(green_onion.multiplexed_obj)
                 self.onion_spawn_pos = pos
 
                 for j in range(2):
-                    whole_obj_2 = URDFObject(name2path[name],
-                                             name=name,
-                                             category=name,
-                                             scale=name2scale_map[name] / 1.15,
-                                             model_path="/".join(
-                                                 name2path[name].split("/")[:-1]),
-                                             abilities=name2abl[name])
+                    green_onion_extra = GreenOnion(
+                        **OBJECT_CONFIG[OBJECT_KEYS.GREEN_ONION],
+                        obj_handlers=obj_handlers,
+                        pos=[200, 100, 1],
+                        orn=orn,
+                        mass=.001,
+                        away_pos=[200 + 2 * j, 100, 1]
+                    )
+                    green_onion_extra.load()
+                    self.onions.append(green_onion_extra.multiplexed_obj)
 
-                    object_parts = []
-                    # Check the parts that compose the apple and create URDF objects of them
-                    for i, part in enumerate(whole_obj_2.metadata["object_parts"]):
-                        part_category = part["category"]
-                        part_model = part["model"]
-                        # Scale the offset accordingly
-                        part_pos = part["pos"] * whole_obj_2.scale
-                        part_orn = part["orn"]
-                        part_model_path = get_ig_model_path(part_category, part_model)
-                        part_filename = os.path.join(part_model_path, part_model + ".urdf")
-                        part_obj_name = whole_obj_2.name + "_part_{}".format(i)
-                        part_obj = URDFObject(
-                            part_filename,
-                            name=part_obj_name,
-                            category=part_category,
-                            model_path=part_model_path,
-                            scale=whole_obj_2.scale,
-                        )
-                        object_parts.append((part_obj, (part_pos, part_orn)))
-
-                    # Group the apple parts into a single grouped object
-                    grouped_parts_obj_2 = ObjectGrouper(object_parts)
-
-                    # Create a multiplexed object: either the full apple, or the parts
-                    multiplexed_obj_2 = ObjectMultiplexer(whole_obj_2.name + "_multiplexer",
-                                                          [whole_obj_2, grouped_parts_obj_2], 0)
-
-                    # Finally, load the multiplexed object
-                    self.env.simulator.import_object(multiplexed_obj_2)
-                    whole_obj_2.set_position([200 + 2 * j, 100, 1])
-                    for i, (part_obj, _) in enumerate(object_parts):
-                        part_obj.set_position([201 + 2 * j, 90, 1])
-
-                    pos[2] += 0.05
-                    self.env.set_pos_orn_with_z_offset(whole_obj_2, tuple([200, 100, 1]), orn)
-                    self.onions.append(multiplexed_obj_2)
-                    body_ids = multiplexed_obj_2.get_body_ids()
-                    p.changeDynamics(body_ids[0], -1, mass=0.001)
-
-            #######################################################
             elif 'counter' in name:
                 obj = URDFObject(name2path[name],
                                  name=name,
