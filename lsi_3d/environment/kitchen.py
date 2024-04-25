@@ -30,6 +30,8 @@ from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 
 class Kitchen:
+    _DYNAMIC_OBJECTS = [OBJECT_KEYS.BOWL, OBJECT_KEYS.PAN, OBJECT_KEYS.VIDALIA_ONION, OBJECT_KEYS.STEAK,
+                       OBJECT_KEYS.PLATE, OBJECT_KEYS.CHOPPING_BOARD, OBJECT_KEYS.KNIFE, OBJECT_KEYS.GREEN_ONION]
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
         self.map = None
@@ -465,7 +467,14 @@ class Kitchen:
                         self.meats.append(steak.obj)
 
             elif name == OBJECT_KEYS.PLATE:
-                plate = Plate(**OBJECT_CONFIG[OBJECT_KEYS.PLATE], obj_handlers=obj_handlers, pos=pos, orn=orn)
+                plate = Plate(
+                    **OBJECT_CONFIG[OBJECT_KEYS.PLATE],
+                    obj_handlers=obj_handlers,
+                    pos=pos,
+                    orn=orn,
+                    dusty=True,
+                    stained=True
+                )
                 plate.load()
                 self.bowl_spawn_pos = pos
 
@@ -487,11 +496,13 @@ class Kitchen:
                 self.stove = stove.obj
 
             elif name == OBJECT_KEYS.PAN:
-                Pan(
+                pan = Pan(
                     **OBJECT_CONFIG[OBJECT_KEYS.PAN],
                     pos=self.translate_loc(self.get_rotated_basis(orn), tuple([x - 4.5, y - 4.5, 0]), shift),
                     orn=orn
-                ).load()
+                )
+                pan.load()
+                self.pans.append(pan.obj)
 
             elif name == OBJECT_KEYS.GREEN_ONION:
                 pos = [pos[0], pos[1], pos[2] + .05]
@@ -525,16 +536,14 @@ class Kitchen:
             else:
                 OtherKitchenObject(**OBJECT_CONFIG[name]).load()
 
-            if name not in ("bowl", "pan", "vidalia_onion", "steak", "plate", "chopping_board", "knife", "green_onion"):
+            if name not in self._DYNAMIC_OBJECTS:
                 self.static_objs[obj] = (x, y)
-            if name == "bowl" or name == "plate":
+            if name == "bowl":
                 obj.states[object_states.Dusty].set_value(True)
                 obj.states[object_states.Stained].set_value(True)
                 self.bowls.append(obj)
                 body_ids = obj.get_body_ids()
                 p.changeDynamics(body_ids[0], -1, mass=0.01)
-            if name == "pan":
-                self.pans.append(obj)
 
             if name == "vidalia_onion":
                 self.onions.append(obj)
