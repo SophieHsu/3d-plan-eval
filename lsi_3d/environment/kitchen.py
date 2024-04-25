@@ -16,32 +16,10 @@ from igibson.robots.manipulation_robot import IsGraspingState
 from igibson.utils.assets_utils import get_ig_model_path
 from lsi_3d.utils.constants import DIRE2POSDIFF
 from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
-from lsi_3d.environment.object_config import OBJECT_KEYS
+from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS
 
 
 class Kitchen:
-
-    NAME_TO_ABBR = {
-        OBJECTS.COUNTER: 'C',
-        OBJECTS.TABLE_V: 'T',
-        OBJECTS.TABLE_H: 'T',
-        OBJECTS.STOVE: 'H',
-        OBJECTS.BOWL: 'B',
-        OBJECTS.PAN: 'P',
-        OBJECTS.SINK: 'W',
-        OBJECTS.FRIDGE: 'F',
-        OBJECTS.BROCCOLI: 'F',
-        OBJECTS.STEAK: 'F',
-        OBJECTS.GREEN_ONION: 'G',
-        OBJECTS.TRAY: 'F',
-        OBJECTS.APPLE: 'F',
-        OBJECTS.PLATE: 'D',
-        OBJECTS.SCRUB_BRUSH: 'W',
-        OBJECTS.CHOPPING_BOARD: 'K',
-        OBJECTS.KNIFE: 'K',
-        OBJECTS.EMPTY: 'X',
-    }
-
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
         self.map = None
@@ -201,21 +179,21 @@ class Kitchen:
         object_locs = []
         sum_x, sum_y, count = 0, 0, 0  # for calculation of center mass (excluding table)
         orientation_map = {}
-        grid = [[self.NAME_TO_ABBR[OBJECT_KEYS.EMPTY]] * self.WIDTH for _ in range(self.HEIGHT)]
+        grid = [[OBJECT_ABBRS[OBJECT_KEYS.EMPTY]] * self.WIDTH for _ in range(self.HEIGHT)]
 
         for name, x, y in self.get_grid_objects(filepath):
             object_locs.append((name, x, y))
             if grid[x][y] in [
-                self.NAME_TO_ABBR[OBJECT_KEYS.EMPTY],
-                self.NAME_TO_ABBR[OBJECT_KEYS.COUNTER]
+                OBJECT_ABBRS[OBJECT_KEYS.EMPTY],
+                OBJECT_ABBRS[OBJECT_KEYS.COUNTER]
             ] and name != OBJECT_KEYS.VIDALIA_ONION:
-                grid[x][y] = self.NAME_TO_ABBR[name]
+                grid[x][y] = OBJECT_ABBRS[name]
             if name == OBJECT_KEYS.TABLE_H:
-                grid[x][y + 1] = self.NAME_TO_ABBR[name]
+                grid[x][y + 1] = OBJECT_ABBRS[name]
             elif name == OBJECT_KEYS.TABLE_V:
-                grid[x + 1][y] = self.NAME_TO_ABBR[name]
+                grid[x + 1][y] = OBJECT_ABBRS[name]
             elif name == OBJECT_KEYS.PAN:
-                grid[x][y] = self.NAME_TO_ABBR[name]
+                grid[x][y] = OBJECT_ABBRS[name]
             else:
                 sum_x += x
                 sum_y += y
@@ -236,7 +214,7 @@ class Kitchen:
                       self.ori_filter(grid, x, y - 1)
                 orientation_map[(name, x, y)] = self.get_orientation(center_x, center_y, x, y, ori)
 
-            self.tile_location[self.NAME_TO_ABBR[OBJECT_KEYS.TABLE_H]] = (x, y)
+            self.tile_location[OBJECT_ABBRS[OBJECT_KEYS.TABLE_H]] = (x, y)
 
         self.orientation_map = orientation_map
         self.grid = grid
@@ -768,25 +746,25 @@ class Kitchen:
             self.WIDTH = len(grid[0])
 
             object_mapping = {
-                self.NAME_TO_ABBR[OBJECT_KEYS.BOWL]: [OBJECT_KEYS.COUNTER],
-                self.NAME_TO_ABBR[OBJECT_KEYS.PAN]: [OBJECT_KEYS.STOVE],
-                self.NAME_TO_ABBR[OBJECT_KEYS.STOVE]: [OBJECT_KEYS.PAN],
-                self.NAME_TO_ABBR[OBJECT_KEYS.CHOPPING_BOARD]: [OBJECT_KEYS.COUNTER, OBJECT_KEYS.KNIFE],
-                self.NAME_TO_ABBR[OBJECT_KEYS.GREEN_ONION]: [OBJECT_KEYS.COUNTER],
-                self.NAME_TO_ABBR[OBJECT_KEYS.PLATE]: [OBJECT_KEYS.COUNTER],
+                OBJECT_ABBRS[OBJECT_KEYS.BOWL]: [OBJECT_KEYS.COUNTER],
+                OBJECT_ABBRS[OBJECT_KEYS.PAN]: [OBJECT_KEYS.STOVE],
+                OBJECT_ABBRS[OBJECT_KEYS.STOVE]: [OBJECT_KEYS.PAN],
+                OBJECT_ABBRS[OBJECT_KEYS.CHOPPING_BOARD]: [OBJECT_KEYS.COUNTER, OBJECT_KEYS.KNIFE],
+                OBJECT_ABBRS[OBJECT_KEYS.GREEN_ONION]: [OBJECT_KEYS.COUNTER],
+                OBJECT_ABBRS[OBJECT_KEYS.PLATE]: [OBJECT_KEYS.COUNTER],
             }
 
             object_locs = []
             for row_idx, row in enumerate(grid):
                 for col_idx, cell in enumerate(row):
-                    if cell == self.NAME_TO_ABBR[OBJECT_KEYS.EMPTY]:  # ignore empty space
+                    if cell == OBJECT_ABBRS[OBJECT_KEYS.EMPTY]:  # ignore empty space
                         continue
-                    if cell == self.NAME_TO_ABBR[OBJECT_KEYS.TABLE_V]:  # add table
+                    if cell == OBJECT_ABBRS[OBJECT_KEYS.TABLE_V]:  # add table
                         if col_idx + 1 < self.WIDTH and grid[row_idx][col_idx + 1] == cell:  # check table orientation
-                            grid[row_idx][col_idx + 1] = self.NAME_TO_ABBR[OBJECT_KEYS.EMPTY]
+                            grid[row_idx][col_idx + 1] = OBJECT_ABBRS[OBJECT_KEYS.EMPTY]
                             object_locs.append((OBJECT_KEYS.TABLE_H, row_idx, col_idx))
                         else:
-                            grid[row_idx + 1][col_idx] = self.NAME_TO_ABBR[OBJECT_KEYS.EMPTY]
+                            grid[row_idx + 1][col_idx] = OBJECT_ABBRS[OBJECT_KEYS.EMPTY]
                             object_locs.append((OBJECT_KEYS.TABLE_V, row_idx, col_idx))
                     else:  # other objects
                         object_locs.extend(object_mapping.get(cell, []))  # add related objects

@@ -41,6 +41,27 @@ CONF_KEYS = SimpleNamespace(
     NAME='name'
 )
 
+OBJECT_ABBRS = {
+    OBJECT_KEYS.COUNTER: 'C',
+    OBJECT_KEYS.TABLE_V: 'T',
+    OBJECT_KEYS.TABLE_H: 'T',
+    OBJECT_KEYS.STOVE: 'H',
+    OBJECT_KEYS.BOWL: 'B',
+    OBJECT_KEYS.PAN: 'P',
+    OBJECT_KEYS.SINK: 'W',
+    OBJECT_KEYS.FRIDGE: 'F',
+    OBJECT_KEYS.BROCCOLI: 'F',
+    OBJECT_KEYS.STEAK: 'F',
+    OBJECT_KEYS.GREEN_ONION: 'G',
+    OBJECT_KEYS.TRAY: 'F',
+    OBJECT_KEYS.APPLE: 'F',
+    OBJECT_KEYS.PLATE: 'D',
+    OBJECT_KEYS.SCRUB_BRUSH: 'W',
+    OBJECT_KEYS.CHOPPING_BOARD: 'K',
+    OBJECT_KEYS.KNIFE: 'K',
+    OBJECT_KEYS.EMPTY: 'X',
+}
+
 OBJECT_CONFIG = SimpleNamespace(**{
     OBJECT_KEYS.COUNTER: {
         CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/bottom_cabinet/46452/46452.urdf'),
