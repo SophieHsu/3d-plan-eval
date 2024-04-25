@@ -16,10 +16,10 @@ class KitchenObject:
     def obj(self):
         if self._obj is None:
             self._obj = URDFObject(
-                **vars(self._params),
                 filename=getattr(self._params, CONF_KEYS.FILENAME),
                 scale=getattr(self._params, CONF_KEYS.SCALE),
                 model_path=getattr(self._params, CONF_KEYS.MODEL_PATH),
+                name=getattr(self._params, CONF_KEYS.NAME),
                 category=getattr(self._params, CONF_KEYS.CATEGORY),
                 fixed_base=getattr(self._params, CONF_KEYS.FIXED_BASE, False),
                 abilities=getattr(self._params, CONF_KEYS.ABILITIES),
@@ -48,10 +48,9 @@ class Onion(KitchenObject):
         super().__init__()
         self._params = Namespace(**kwargs)
 
-    def load(self):
+    def load(self, ref_obj):
         self._params.obj_handlers.import_obj(self.obj)
-        self.obj.states[object_states.OnTop].set_value(self.obj, True, use_ray_casting_method=True)
-        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self.obj.states[object_states.OnTop].set_value(ref_obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
 
 
@@ -60,10 +59,9 @@ class Steak(KitchenObject):
         super().__init__()
         self._params = Namespace(**kwargs)
 
-    def load(self):
+    def load(self, ref_obj):
         self._params.obj_handlers.import_obj(self.obj)
-        self.obj.states[object_states.OnTop].set_value(self.obj, True, use_ray_casting_method=True)
-        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self.obj.states[object_states.OnTop].set_value(ref_obj, True, use_ray_casting_method=True)
         self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
 
 
