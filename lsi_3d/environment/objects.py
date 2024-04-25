@@ -149,14 +149,13 @@ class GreenOnion(KitchenObject):
         )
 
         self._params.obj_handlers.import_obj(self._multiplexed_obj)
-        self.obj.set_position([100, 100, -100])
+        self.obj.set_position(self._params.away_pos)
         for i, (part, _) in enumerate(object_parts):
-            part.obj.set_position([101 + i, 100, -100])
+            part.obj.set_position([
+                self._params.away_pos[0] + i + 1,
+                self._params.away_pos[1],
+                self._params.away_pos[2]
+            ])
 
-        pos_z = self._params.pos[2] + .05
-        self._params.obj_handlers.set_pos_orn(
-            self.obj,
-            [self._params.pos[0], self._params.pos[1], pos_z],
-            self._params.orn
-        )
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
         self._params.change_pb_dynamics(self._multiplexed_obj.get_body_ids()[0], -1, mass=self._params.mass)
