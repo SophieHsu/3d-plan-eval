@@ -41,6 +41,7 @@ class Fridge(KitchenObject):
     def load(self):
         self._params.obj_handlers.import_obj(self.obj)
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=800)
 
 
 class Onion(KitchenObject):
@@ -88,6 +89,7 @@ class Stove(KitchenObject):
         self._params.obj_handlers.import_obj(self.obj)
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
         self.obj.states[object_states.ToggledOn].set_value(False)
+        self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=800)
 
 
 class Pan(KitchenObject):
@@ -169,6 +171,7 @@ class Counter(KitchenObject):
     def load(self):
         self._params.obj_handlers.import_obj(self.obj)
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=800)
 
 
 class OtherKitchenObject(KitchenObject):
