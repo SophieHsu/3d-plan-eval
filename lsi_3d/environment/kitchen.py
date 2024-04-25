@@ -250,29 +250,7 @@ class Kitchen:
     def load_objects(self, object_poses, orientation_map, order_list):
 
 
-        name2scale_map = {
-            "counter": np.array([1.04, 0.97, 0.95]),
-            "table_h": np.array([1.2, 1.2, 1.3]),
-            "table_v": np.array([1.2, 1.2, 1.3]),
-            "stove": np.array([1.1, 1, 1]),
-            "bowl": np.array([0.8, 0.8, 0.8]),
-            "pan": np.array([1.3, 1.3, 1]),
-            "steak": np.array([0.1, 0.1, 0.1]),
-            "broccoli": np.array([0.1, 0.1, 0.1]),
-            "green_onion": np.array([0.1, 0.1, 0.1]),
-            "tray": np.array([0.1, 0.1, 0.1]),
-            "sink": np.array([1.2, 1.25, 1.25]),
-            "fridge": np.array([1.5, 1.2, 1.2]),
-            "vidalia_onion": np.array([2.0, 2.0, 2.0]),
-            "apple": np.array([0.1, 0.1, 0.1]),
-            "plate": np.array([0.8, 0.8, 0.8]),  # np.array([0.01, 0.01, 0.01]),
-            "scrub_brush": np.array([0.01, 0.01, 0.01]),
-            "chopping_board": np.array([1.2, 1.2, 1.2]),
-            "knife": np.array([1, 1, 1]),
-            "onion": np.array([1.0, 1.0, 1.0]),
-            "large_bowl": np.array([0.5, 0.5, 0.5]),
-            "steak_bowl": np.array([0.5, 0.5, 0.5])
-        }
+
 
         name2shift_map = {
             "counter": (0, 0, 0),
