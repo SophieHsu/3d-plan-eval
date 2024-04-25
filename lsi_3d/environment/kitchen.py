@@ -24,7 +24,8 @@ from lsi_3d.environment.objects import (
     Plate,
     Stove,
     Pan,
-    GreenOnion
+    GreenOnion,
+    Counter
 )
 
 
@@ -518,17 +519,9 @@ class Kitchen:
                     green_onion_extra.load()
                     self.onions.append(green_onion_extra.multiplexed_obj)
 
-            elif 'counter' in name:
-                obj = URDFObject(name2path[name],
-                                 name=name,
-                                 category=name,
-                                 scale=name2scale_map[name] / 1.15,
-                                 avg_obj_dims={'density': 10000},
-                                 model_path="/".join(
-                                     name2path[name].split("/")[:-1]),
-                                 abilities=name2abl[name])
-                self.env.simulator.import_object(obj)
-                self.env.set_pos_orn_with_z_offset(obj, tuple(pos), orn)
+            elif OBJECT_KEYS.COUNTER in name:
+                Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER]).load()
+
             else:
                 obj = URDFObject(name2path[name],
                                  name=name,
