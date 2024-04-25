@@ -234,20 +234,6 @@ class Kitchen:
         self.grid = grid
         return object_locs, orientation_map, grid
 
-    def load_object(self, object_props):
-        obj = URDFObject(
-            filename=object_props['file_name'],
-            avg_obj_dims={'density': object_props['density']} if object_props['density'] is not None else None,
-            scale=object_props['scale'] / object_props['scale_factor'],
-            model_path=object_props['model_uri'],
-            category=object_props['category'],
-            fixed_base=object_props['fixed_base'],
-        )
-
-        self.env.simulator.import_object(obj)
-
-        return obj
-
     def load_objects(self, object_poses, orientation_map, order_list):
         name2shift_map = {
             "counter": (0, 0, 0),
