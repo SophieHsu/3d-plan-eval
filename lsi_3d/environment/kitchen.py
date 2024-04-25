@@ -369,7 +369,9 @@ class Kitchen:
                     self.onions.append(green_onion_extra.multiplexed_obj)
 
             elif OBJECT_KEYS.COUNTER in name:
-                Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], obj_handlers=obj_handlers, pos=pos, orn=orn).load()
+                counter = Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], obj_handlers=obj_handlers, pos=pos, orn=orn)
+                counter.load()
+                self.counters.append(counter.obj)
 
             elif name == OBJECT_KEYS.BOWL:
                 bowl = Plate(
@@ -399,8 +401,6 @@ class Kitchen:
             if name == "table_v":
                 self.table = obj
                 self.static_objs[obj] = [(x, y), (x + 1, y)]
-            if name == "counter":
-                self.counters.append(obj)
             if name == "chopping_board":
                 self.chopping_boards.append(obj)
                 body_ids = obj.get_body_ids()
