@@ -181,6 +181,21 @@ class OtherKitchenObject(KitchenObject):
         self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
 
 
+class Bowl(KitchenObject):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._params = Namespace(**kwargs)
+
+    def load(self):
+        self._params.obj_handlers.import_obj(self.obj)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        if self._params.dusty:
+            self.obj.states[object_states.Dusty].set_value(True)
+        if self._params.stained:
+            self.obj.states[object_states.Stained].set_value(True)
+        self._params.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
+
+
 class OtherBowl(KitchenObject):
     def __init__(self, **kwargs):
         super().__init__()
