@@ -32,7 +32,8 @@ from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 class Kitchen:
     _DYNAMIC_OBJECTS = [OBJECT_KEYS.BOWL, OBJECT_KEYS.PAN, OBJECT_KEYS.VIDALIA_ONION, OBJECT_KEYS.STEAK,
-                       OBJECT_KEYS.PLATE, OBJECT_KEYS.CHOPPING_BOARD, OBJECT_KEYS.KNIFE, OBJECT_KEYS.GREEN_ONION]
+                        OBJECT_KEYS.PLATE, OBJECT_KEYS.CHOPPING_BOARD, OBJECT_KEYS.KNIFE, OBJECT_KEYS.GREEN_ONION]
+
     def __init__(self, env, max_in_pan, rinse_time=5):
         self.env = env
         self.map = None
