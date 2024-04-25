@@ -16,9 +16,9 @@ class KitchenObject:
         if self._obj is None:
             self._obj = URDFObject(
                 filename=self._params.filename,
-                avg_obj_dims=self._params.avg_obj_dims,
-                scale=self._params.scale / self._params.scale_factor,
-                model_path=self._params.model_uri,
+                avg_obj_dims={'density': self._params.density},
+                scale=self._params.scale,
+                model_path=self._params.model_path,
                 category=self._params.category,
                 fixed_base=self._params.fixed_base,
             )
@@ -125,7 +125,7 @@ class GreenOnion(KitchenObject):
                 filename=part_filename,
                 name=part_obj_name,
                 category=part_category,
-                model_uri=part_model_path,
+                model_path=part_model_path,
                 scale=self.obj.scale
             )
             object_parts.append((part_obj, (part_pos, part_orn)))
