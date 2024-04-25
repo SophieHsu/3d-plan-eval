@@ -248,10 +248,6 @@ class Kitchen:
         return obj
 
     def load_objects(self, object_poses, orientation_map, order_list):
-
-
-
-
         name2shift_map = {
             "counter": (0, 0, 0),
             "table_v": (0.5, 0, 0),
@@ -274,55 +270,6 @@ class Kitchen:
             "onion": (0.15, -0.1, 0),
             "large_bowl": (0, 0, 0),
             "steak_bowl": (0, 0, 0)
-        }
-
-        name2abl = {
-            "counter": None,
-            "table_v": None,
-            "table_h": None,
-            "stove": None,
-            "bowl": {
-                "dustyable": {},
-                "stainable": {}
-            },
-            "pan": None,
-            "sink": None,
-            "fridge": {
-                "coldSource": {
-                    "temperature": 7.0,
-                    "requires_inside": True,
-                }
-            },
-            "steak": None,
-            "tray": None,
-            "apple": None,
-            "broccoli": None,
-            "green_onion": {
-                "burnable": {},
-                "freezable": {},
-                "cookable": {},
-                "sliceable": {
-                    "slice_force": 0.0
-                }
-            },
-            "plate1": {
-                "dustyable": {},
-                "stainable": {}
-            },
-            "plate2": {
-                "dustyable": {},
-                "stainable": {}
-            },
-            "scrub_brush": {
-                "soakable": {},
-                "cleaningTool": {}
-            },
-            "chopping_board": None,
-            "knife": {
-                "slicer": {}
-            },
-            "large_bowl": None,
-            "steak_bowl": None
         }
 
         shift_l = 0.1
