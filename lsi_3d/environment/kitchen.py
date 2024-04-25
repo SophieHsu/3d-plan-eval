@@ -417,15 +417,15 @@ class Kitchen:
                 other.load()
                 if name == OBJECT_KEYS.SINK:
                     self.sinks.append(other.obj)
+                if name == OBJECT_KEYS.TABLE_H or name == OBJECT_KEYS.TABLE_V:
+                    self.table = other.obj
 
             if name not in self._DYNAMIC_OBJECTS:
                 self.static_objs[obj] = (x, y)
 
             if name == "table_h":
-                self.table = obj
                 self.static_objs[obj] = [(x, y), (x, y + 1)]
             if name == "table_v":
-                self.table = obj
                 self.static_objs[obj] = [(x, y), (x + 1, y)]
 
         bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
