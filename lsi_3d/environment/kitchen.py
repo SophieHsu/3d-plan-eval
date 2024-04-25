@@ -1,5 +1,4 @@
 import math
-import os
 import random
 import time
 from argparse import Namespace
@@ -8,9 +7,7 @@ from math import floor
 import numpy as np
 import pybullet as p
 
-import igibson
 from igibson import object_states
-from igibson.objects.articulated_object import URDFObject
 from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
 from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS, OBJECT_CONFIG
@@ -24,7 +21,10 @@ from lsi_3d.environment.objects import (
     GreenOnion,
     Counter,
     OtherKitchenObject,
-    OtherBowl
+    OtherBowl,
+    Knife,
+    ChoppingBoard,
+    VidaliaOnion
 )
 from lsi_3d.utils.constants import DIRE2POSDIFF
 from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
@@ -385,34 +385,48 @@ class Kitchen:
                 )
                 bowl.load()
 
+            elif name == OBJECT_KEYS.KNIFE:
+                knife = Knife(**OBJECT_CONFIG[OBJECT_KEYS.KNIFE], obj_handlers=obj_handlers, pos=pos, orn=orn, mass=.01)
+                knife.load()
+                self.knives.append(knife.obj)
+
+            elif name == OBJECT_KEYS.CHOPPING_BOARD:
+                chopping_board = ChoppingBoard(
+                    **OBJECT_CONFIG[OBJECT_KEYS.CHOPPING_BOARD],
+                    obj_handlers=obj_handlers,
+                    pos=pos,
+                    orn=orn,
+                    mass=100
+                )
+                chopping_board.load()
+                self.chopping_boards.append(chopping_board.obj)
+
+            elif name == OBJECT_KEYS.VIDALIA_ONION:
+                vidalia_onion = VidaliaOnion(
+                    **OBJECT_CONFIG[OBJECT_KEYS.VIDALIA_ONION],
+                    obj_handlers=obj_handlers,
+                    pos=pos,
+                    orn=orn,
+                    mass=.001
+                )
+                vidalia_onion.load()
+                self.onions.append(vidalia_onion.obj)
+
             else:
-                OtherKitchenObject(**OBJECT_CONFIG[name], obj_handlers=obj_handlers, pos=pos, orn=orn).load()
+                other = OtherKitchenObject(**OBJECT_CONFIG[name], obj_handlers=obj_handlers, pos=pos, orn=orn)
+                other.load()
                 if name == OBJECT_KEYS.SINK:
-                    self.sinks.append(obj)
+                    self.sinks.append(other.obj)
 
             if name not in self._DYNAMIC_OBJECTS:
                 self.static_objs[obj] = (x, y)
 
-            if name == "vidalia_onion":
-                self.onions.append(obj)
-                body_ids = obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1, mass=0.001)
             if name == "table_h":
                 self.table = obj
                 self.static_objs[obj] = [(x, y), (x, y + 1)]
             if name == "table_v":
                 self.table = obj
                 self.static_objs[obj] = [(x, y), (x + 1, y)]
-            if name == "chopping_board":
-                self.chopping_boards.append(obj)
-                body_ids = obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1, mass=100)
-
-            if name == "knife":
-                self.knives.append(obj)
-                self.init_knife_pos = None
-                body_ids = obj.get_body_ids()
-                p.changeDynamics(body_ids[0], -1, mass=0.01)
 
         bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
         bowl.load()
