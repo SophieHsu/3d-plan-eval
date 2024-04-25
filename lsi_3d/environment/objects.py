@@ -204,3 +204,14 @@ class OtherBowl(KitchenObject):
     def load(self):
         self._params.obj_handlers.import_obj(self.obj)
         self.obj.set_position(self._params.away_pos)
+
+
+class Knife(KitchenObject):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._params = Namespace(**kwargs)
+
+    def load(self):
+        self._params.obj_handlers.import_obj(self.obj)
+        self._params.obj_handlers.set_pos_orn(self.obj, self._params.pos, self._params.orn)
+        self._params.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
