@@ -10,7 +10,7 @@ import pybullet as p
 from igibson import object_states
 from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
-from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS, OBJECT_CONFIG
+from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS, OBJECT_ABBR_MAP, OBJECT_CONFIG
 from lsi_3d.environment.objects import (
     Fridge,
     Onion,
@@ -500,7 +500,7 @@ class Kitchen:
                             object_locs.append((OBJECT_KEYS.TABLE_V, row_idx, col_idx))
                     else:  # other objects
                         object_locs.extend(object_mapping.get(cell, []))  # add related objects
-                        object_locs.append((cell, row_idx, col_idx))  # add current object
+                        object_locs.append((OBJECT_ABBR_MAP[cell], row_idx, col_idx))  # add current object
 
         return object_locs
 

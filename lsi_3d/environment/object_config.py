@@ -63,6 +63,8 @@ OBJECT_ABBRS = {
     OBJECT_KEYS.EMPTY: 'X',
 }
 
+OBJECT_ABBR_MAP = {value: key for key, value in OBJECT_ABBRS.items()}
+
 OBJECT_CONFIG = {
     OBJECT_KEYS.COUNTER: {
         CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/bottom_cabinet/46452/46452.urdf'),
