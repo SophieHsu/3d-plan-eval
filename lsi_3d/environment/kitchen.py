@@ -499,7 +499,10 @@ class Kitchen:
                             grid[row_idx + 1][col_idx] = OBJECT_ABBRS[OBJECT_KEYS.EMPTY]
                             object_locs.append((OBJECT_KEYS.TABLE_V, row_idx, col_idx))
                     else:  # other objects
-                        object_locs.extend(object_mapping.get(cell, []))  # add related objects
+                        object_locs.extend(list(map(
+                            lambda o: (o, row_idx, col_idx),
+                            object_mapping.get(cell, [])
+                        )))  # add related objects
                         object_locs.append((OBJECT_ABBR_MAP[cell], row_idx, col_idx))  # add current object
 
         return object_locs
