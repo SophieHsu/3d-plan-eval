@@ -289,17 +289,18 @@ class Kitchen:
             if name == OBJECT_KEYS.FRIDGE:
                 fridge = Fridge(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], pos=pos, orn=orn, obj_handlers=obj_handlers)
                 fridge.load()
-                self.fridges.append(fridge.obj)
+                obj = fridge
+                self.fridges.append(obj)
 
                 if OBJECT_KEYS.ONION in order_list:
                     for _ in range(10):
                         onion = Onion(**OBJECT_CONFIG[OBJECT_KEYS.VIDALIA_ONION], obj_handlers=obj_handlers, mass=.001)
-                        onion.load(fridge.obj)
+                        onion.load(obj)
                         self.onions.append(onion.obj)
                 if OBJECT_KEYS.STEAK in order_list:
                     for _ in range(7):
                         steak = Steak(**OBJECT_CONFIG[OBJECT_KEYS.STEAK], obj_handlers=obj_handlers, mass=.001)
-                        steak.load(fridge.obj)
+                        steak.load(obj)
                         self.meats.append(steak.obj)
 
             elif name == OBJECT_KEYS.PLATE:
@@ -312,8 +313,10 @@ class Kitchen:
                     stained=True
                 )
                 plate.load()
+                obj = plate.obj
                 self.bowl_spawn_pos = pos
-                self.plates.append(plate.obj)
+                self.plates.append(obj)
+                self.bowls.append(obj)
 
                 for idx in range(3):
                     other_plate = Plate(
@@ -330,7 +333,8 @@ class Kitchen:
             elif name == OBJECT_KEYS.STOVE:
                 stove = Stove(**OBJECT_CONFIG[OBJECT_KEYS.STOVE], obj_handlers=obj_handlers, pos=pos, orn=orn)
                 stove.load()
-                self.stove = stove.obj
+                obj = stove.obj
+                self.stove = obj
 
             elif name == OBJECT_KEYS.PAN:
                 pan = Pan(
@@ -340,7 +344,8 @@ class Kitchen:
                     orn=orn
                 )
                 pan.load()
-                self.pans.append(pan.obj)
+                obj = pan.obj
+                self.pans.append(obj)
 
             elif name == OBJECT_KEYS.GREEN_ONION:
                 pos = [pos[0], pos[1], pos[2] + .05]
@@ -353,7 +358,8 @@ class Kitchen:
                     away_pos=[100, 100, -100]
                 )
                 green_onion.load()
-                self.onions.append(green_onion.multiplexed_obj)
+                obj = green_onion.multiplexed_obj
+                self.onions.append(obj)
                 self.onion_spawn_pos = pos
 
                 for j in range(2):
@@ -371,7 +377,8 @@ class Kitchen:
             elif OBJECT_KEYS.COUNTER in name:
                 counter = Counter(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], obj_handlers=obj_handlers, pos=pos, orn=orn)
                 counter.load()
-                self.counters.append(counter.obj)
+                obj = counter.obj
+                self.counters.append(obj)
 
             elif name == OBJECT_KEYS.BOWL:
                 bowl = Plate(
@@ -383,12 +390,15 @@ class Kitchen:
                     stained=True,
                     mass=.01
                 )
+                obj = bowl.obj
                 bowl.load()
+                self.bowls.append(obj)
 
             elif name == OBJECT_KEYS.KNIFE:
                 knife = Knife(**OBJECT_CONFIG[OBJECT_KEYS.KNIFE], obj_handlers=obj_handlers, pos=pos, orn=orn, mass=.01)
                 knife.load()
-                self.knives.append(knife.obj)
+                obj = knife.obj
+                self.knives.append(obj)
 
             elif name == OBJECT_KEYS.CHOPPING_BOARD:
                 chopping_board = ChoppingBoard(
@@ -399,7 +409,8 @@ class Kitchen:
                     mass=100
                 )
                 chopping_board.load()
-                self.chopping_boards.append(chopping_board.obj)
+                obj = chopping_board.obj
+                self.chopping_boards.append(obj)
 
             elif name == OBJECT_KEYS.VIDALIA_ONION:
                 vidalia_onion = VidaliaOnion(
@@ -410,7 +421,8 @@ class Kitchen:
                     mass=.001
                 )
                 vidalia_onion.load()
-                self.onions.append(vidalia_onion.obj)
+                obj = vidalia_onion.obj
+                self.onions.append(obj)
 
             else:
                 other = OtherKitchenObject(
@@ -421,10 +433,18 @@ class Kitchen:
                     static=name not in self._DYNAMIC_OBJECTS
                 )
                 other.load()
+                obj = other.obj
                 if name == OBJECT_KEYS.SINK:
-                    self.sinks.append(other.obj)
+                    self.sinks.append(obj)
                 if name == OBJECT_KEYS.TABLE_H or name == OBJECT_KEYS.TABLE_V:
-                    self.table = other.obj
+                    self.table = obj
+
+            if name not in self._DYNAMIC_OBJECTS:
+                self.static_objs[obj] = (x, y)
+            if name == OBJECT_KEYS.TABLE_H:
+                self.static_objs[obj] = [(x, y), (x, y + 1)]
+            if name == OBJECT_KEYS.TABLE_H:
+                self.static_objs[obj] = [(x, y), (x + 1, y)]
 
         bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
         bowl.load()
