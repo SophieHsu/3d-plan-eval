@@ -19,10 +19,10 @@ class KitchenObject:
                 filename=getattr(self._params, CONF_KEYS.FILENAME),
                 scale=getattr(self._params, CONF_KEYS.SCALE),
                 model_path=getattr(self._params, CONF_KEYS.MODEL_PATH),
-                name=getattr(self._params, CONF_KEYS.NAME),
+                name=getattr(self._params, CONF_KEYS.NAME, None),
                 category=getattr(self._params, CONF_KEYS.CATEGORY),
                 fixed_base=getattr(self._params, CONF_KEYS.FIXED_BASE, False),
-                abilities=getattr(self._params, CONF_KEYS.ABILITIES),
+                abilities=getattr(self._params, CONF_KEYS.ABILITIES, None),
                 avg_obj_dims={
                     'density': getattr(self._params, CONF_KEYS.DENSITY)
                 } if hasattr(self._params, CONF_KEYS.DENSITY) else None,
