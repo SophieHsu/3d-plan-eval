@@ -7,8 +7,8 @@ from igibson import ig_dataset_path
 OBJECT_KEYS = SimpleNamespace(
     COUNTER='counter',
     TABLE='table',
-    TABLE_V='table',
-    TABLE_H='table',
+    TABLE_V='table_v',
+    TABLE_H='table_h',
     STOVE='stove',
     BOWL='bowl',
     COLOR_BOWL='color_bowl',
