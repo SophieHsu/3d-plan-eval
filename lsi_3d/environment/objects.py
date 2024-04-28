@@ -133,7 +133,7 @@ class GreenOnion(KitchenObject):
                 model_path=part_model_path,
                 scale=self.obj.scale
             )
-            object_parts.append((part_obj, (part_pos, part_orn)))
+            object_parts.append((part_obj.obj, (part_pos, part_orn)))
 
         return object_parts
 
@@ -153,7 +153,7 @@ class GreenOnion(KitchenObject):
         self._params.obj_handlers.import_obj(self._multiplexed_obj)
         self.obj.set_position(self._params.away_pos)
         for i, (part, _) in enumerate(object_parts):
-            part.obj.set_position([
+            part.set_position([
                 self._params.away_pos[0] + i + 1,
                 self._params.away_pos[1],
                 self._params.away_pos[2]
