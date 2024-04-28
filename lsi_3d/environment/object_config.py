@@ -230,4 +230,13 @@ OBJECT_CONFIG = {
         CONF_KEYS.NAME: OBJECT_KEYS.SCRUB_BRUSH,
         CONF_KEYS.ABILITIES: {"soakable": {}, "cleaningTool": {}}
     },
+    OBJECT_KEYS.APPLE: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/apple/00_0/00_0.urdf'),
+        CONF_KEYS.SCALE: np.array([0.1, 0.1, 0.1]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path, 'objects/apple/00_0/00_0.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.APPLE,
+        CONF_KEYS.NAME: OBJECT_KEYS.APPLE,
+    },
 }
