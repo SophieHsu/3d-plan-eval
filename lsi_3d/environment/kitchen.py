@@ -228,7 +228,7 @@ class Kitchen:
                       self.ori_filter(grid, x, y - 1)
                 orientation_map[(name, x, y)] = self.get_orientation(center_x, center_y, x, y, ori)
 
-            self.tile_location[OBJECT_ABBRS[OBJECT_KEYS.TABLE_H]] = (x, y)
+            self.tile_location[OBJECT_ABBRS[name]] = (x, y)
 
         self.orientation_map = orientation_map
         self.grid = grid
