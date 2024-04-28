@@ -220,4 +220,14 @@ OBJECT_CONFIG = {
         CONF_KEYS.CATEGORY: OBJECT_KEYS.TABLE_V,
         CONF_KEYS.NAME: OBJECT_KEYS.TABLE_V,
     },
+    OBJECT_KEYS.SCRUB_BRUSH: {
+        CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/scrub_brush/scrub_brush_000/scrub_brush_000.urdf'),
+        CONF_KEYS.SCALE: np.array([0.01, 0.01, 0.01]) / 1.15,
+        CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
+            ig_dataset_path, 'objects/scrub_brush/scrub_brush_000/scrub_brush_000.urdf'
+        )),
+        CONF_KEYS.CATEGORY: OBJECT_KEYS.SCRUB_BRUSH,
+        CONF_KEYS.NAME: OBJECT_KEYS.SCRUB_BRUSH,
+        CONF_KEYS.ABILITIES: {"soakable": {}, "cleaningTool": {}}
+    },
 }
