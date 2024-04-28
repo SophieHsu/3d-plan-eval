@@ -281,7 +281,7 @@ class Kitchen:
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
 
             obj_handlers = Namespace(
-                import_object=self.env.simulator.import_object,
+                import_obj=self.env.simulator.import_object,
                 set_pos_orn=self.env.set_pos_orn_with_z_offset,
                 change_pb_dynamics=p.changeDynamics,
             )
