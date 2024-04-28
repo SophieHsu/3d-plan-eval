@@ -267,6 +267,12 @@ class Kitchen:
             (0, 0, -1.5707): (shift_l, 0),
         }
 
+        obj_handlers = Namespace(
+            import_obj=self.env.simulator.import_object,
+            set_pos_orn=self.env.set_pos_orn_with_z_offset,
+            change_pb_dynamics=p.changeDynamics,
+        )
+
         for name, x, y in object_poses:
             obj = None
             orn = orientation_map[(name, x, y)]
@@ -280,11 +286,6 @@ class Kitchen:
 
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
 
-            obj_handlers = Namespace(
-                import_obj=self.env.simulator.import_object,
-                set_pos_orn=self.env.set_pos_orn_with_z_offset,
-                change_pb_dynamics=p.changeDynamics,
-            )
 
             if name == OBJECT_KEYS.FRIDGE:
                 fridge = Fridge(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], pos=pos, orn=orn, obj_handlers=obj_handlers)
@@ -446,11 +447,11 @@ class Kitchen:
             if name == OBJECT_KEYS.TABLE_H:
                 self.static_objs[obj] = [(x, y), (x + 1, y)]
 
-        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], away_pos=[300, 200, 1])
+        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], obj_handlers=obj_handlers, away_pos=[300, 200, 1])
         bowl.load()
         self.large_bowl = bowl.obj
 
-        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL], away_pos=[275, 275, 1])
+        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL], obj_handlers=obj_handlers, away_pos=[275, 275, 1])
         bowl.load()
         self.steak_bowl = bowl.obj
 
