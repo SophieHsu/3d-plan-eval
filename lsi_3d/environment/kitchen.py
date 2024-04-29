@@ -287,11 +287,10 @@ class Kitchen:
 
             pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
 
-
             if name == OBJECT_KEYS.FRIDGE:
                 fridge = Fridge(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], pos=pos, orn=orn, obj_handlers=obj_handlers)
                 fridge.load()
-                obj = fridge
+                obj = fridge.obj
                 self.fridges.append(obj)
 
                 if OBJECT_KEYS.ONION in order_list:
