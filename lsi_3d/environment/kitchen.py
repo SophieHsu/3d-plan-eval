@@ -193,9 +193,10 @@ class Kitchen:
         object_locs = []
         sum_x, sum_y, count = 0, 0, 0  # for calculation of center mass (excluding table)
         orientation_map = {}
+        grid_items = self.get_grid_objects(filepath)
         grid = [[OBJECT_ABBRS[OBJECT_KEYS.EMPTY]] * self.WIDTH for _ in range(self.HEIGHT)]
 
-        for name, x, y in self.get_grid_objects(filepath):
+        for name, x, y in grid_items:
             object_locs.append((name, x, y))
             if grid[x][y] in [
                 OBJECT_ABBRS[OBJECT_KEYS.EMPTY],
