@@ -488,8 +488,9 @@ class Kitchen:
             }
 
             object_locs = []
-            for row_idx, row in enumerate(grid):
-                for col_idx, cell in enumerate(row):
+            for row_idx in range(len(grid)):
+                for col_idx in range(len(grid[row_idx])):
+                    cell = grid[row_idx][col_idx]
                     if cell == OBJECT_ABBRS[OBJECT_KEYS.EMPTY]:  # ignore empty space
                         continue
                     if cell == OBJECT_ABBRS[OBJECT_KEYS.TABLE_V]:  # add table
