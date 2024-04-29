@@ -400,6 +400,7 @@ class Kitchen:
                 knife.load()
                 obj = knife.obj
                 self.knives.append(obj)
+                self.init_knife_pos = None
 
             elif name == OBJECT_KEYS.CHOPPING_BOARD:
                 chopping_board = ChoppingBoard(
