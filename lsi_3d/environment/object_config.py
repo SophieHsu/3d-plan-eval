@@ -83,8 +83,7 @@ OBJECT_CONFIG = {
     },
     OBJECT_KEYS.STEAK: {
         CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/steak/steak_000/steak_000.urdf'),
-        CONF_KEYS.DENSITY: 10000,
-        CONF_KEYS.SCALE: np.array([2.0, 2.0, 2.0]) / 1.15,
+        CONF_KEYS.SCALE: np.array([0.1, 0.1, 0.1]) / 1.15,
         CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(ig_dataset_path, 'objects/steak/steak_000/steak_000.urdf')),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.STEAK,
     },
