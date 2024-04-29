@@ -475,7 +475,7 @@ class Kitchen:
         with open(filepath, 'r') as fh:
             grid_rows = fh.read().strip().split('\n')
             grid = [list(each) for each in grid_rows]
-            self.HEIGHT = len(grid)
+            self.HEIGHT = len(grid[0])
             self.WIDTH = len(grid[0])
 
             object_mapping = {
