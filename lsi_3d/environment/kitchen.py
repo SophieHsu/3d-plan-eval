@@ -329,7 +329,7 @@ class Kitchen:
                         stained=True
                     )
                     other_plate.load()
-                    self.plates.append(other_plate)
+                    self.plates.append(other_plate.obj)
 
             elif name == OBJECT_KEYS.STOVE:
                 stove = Stove(**OBJECT_CONFIG[OBJECT_KEYS.STOVE], obj_handlers=obj_handlers, pos=pos, orn=orn)
