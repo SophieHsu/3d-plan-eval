@@ -137,9 +137,6 @@ class TrackingEnv():
         status = self.get_pan_status()
         onions_in_pan = len(status[pan])
 
-        # returns zero for almost full pan which should be chosen first
-        # returns 1 for empty pan, then 2 for full pan
-
         if self.kitchen.interact_objs[pan]:
             return 3
         elif onions_in_pan >= self.kitchen.onions_for_soup:
@@ -158,7 +155,7 @@ class TrackingEnv():
                     num_cooked_onions += 1
                 else:
                     num_uncooked_onions += 1
-        return (num_cooked_onions, num_uncooked_onions)
+        return num_cooked_onions, num_uncooked_onions
 
     def is_item_on_table(self, item):
         val = item.states[object_states.OnTop].get_value(self.kitchen.table)
@@ -216,16 +213,6 @@ class TrackingEnv():
             if IsGraspingState.TRUE in grasping:
                 return obj
         return None
-    
-    # def get_obj_in_robot_hand(self):
-    #     all_objs = self.kitchen.onions + self.kitchen.pans + self.kitchen.bowls + self.kitchen.meats + self.kitchen.plates + self.kitchen.hot_plates + self.kitchen.steaks
-    #     for obj in all_objs:
-    #         body_id = obj.get_body_ids()[0]
-    #         grasping = self.robot.object.is_grasping_all_arms(body_id)
-    #         if IsGraspingState.TRUE in grasping:
-    #             return obj
-    #     return None
-        # return self.kitchen.in_human_hand
 
     def get_human_holding(self):
         for obj in self.kitchen.onions:
@@ -276,11 +263,6 @@ class TrackingEnv():
             if o.states[object_states.OnTop].get_value(pan):
                 o.set_position([0, 0, 0])
 
-    # def open_fridge(self):
-    #     fridge = self.kitchen.fridges[0]
-    #     print(fridge.states)
-    #     fridge.states[object_states.Open].set_value(True)
-
     def set_in_robot_hand(self, name, obj):
         if [name, obj] not in self.kitchen.in_robot_hand:
             self.kitchen.in_robot_hand.append([name, obj])
@@ -300,14 +282,6 @@ class TrackingEnv():
             pos[-1] += counter * 0.01
             self.set_position(item[1], pos)
             self.set_orientation(item[1], [0, 0, 0, 1])
-
-    # def get_closest_onion(self, agent_pos=None, on_pan=False):
-    #     closest_onion = None
-    #     min_dist = 10000
-    #     if agent_pos is None:
-    #         position = self.human._parts["right_hand"].get_position()
-    #     else:
-    #         position = agent_pos
 
     def distance_to_object(self, object, position):
         object_position = self.get_real_position(object)[0:2]
