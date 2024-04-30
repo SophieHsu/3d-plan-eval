@@ -105,10 +105,10 @@ class LsiEnv(object):
         self.human_state.update_hl_state(next_hl_state, self.world_state)
 
     def update_human_sim_hl_state(self, next_hl_state, action_object):
-        '''
+        """
         Update hl state by updated in_pot and orders for world
         and holding for specific agent
-        '''
+        """
         self.world_state.update(next_hl_state, action_object)
         self.human_sim_state.update_hl_state(next_hl_state, self.world_state)
 
@@ -200,7 +200,7 @@ class LsiEnv(object):
         row, col = real_to_grid_coord(pos[0:2])
         card_facing = norm_orn_to_cardinal(opposite_facing)
 
-        return (row, col, card_facing)
+        return row, col, card_facing
 
     def sort_locations(self, locations, agent_location):
         if len(agent_location) == 3:
@@ -225,18 +225,7 @@ class LsiEnv(object):
             pans_sorted = sorted(self.kitchen.pans, key=lambda pan: (
             self.tracking_env.get_pan_enum_status(pan), math.dist(pan.get_position()[0:2], agent_location_real)))
             location = pans_sorted[0].get_position()
-            # for pan in self.kitchen.pans:
-            #     onions = len(pan_status[pan])
-            #     onions_left = self.mdp.num_items_for_soup - onions
 
-            #     if onions_left < min_onions_left and onions_left > 0:
-            #         best_pan = pan
-            #         min_onions_left = onions_left
-
-            # if best_pan is not None:
-            #     location = best_pan.get_position()
-
-            # location = self.tracking_env.get_closest_pan().get_position()
         elif action == "pickup" and object == "dish":
             # find empty bowl
             bowls = self.tracking_env.get_bowls_dist_sort(is_human)
