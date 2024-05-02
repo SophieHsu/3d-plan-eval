@@ -99,7 +99,7 @@ OBJECT_CONFIG = {
         )),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.PLATE,
         CONF_KEYS.NAME: OBJECT_KEYS.PLATE,
-        CONF_KEYS.ABILITIS: {
+        CONF_KEYS.ABILITIES: {
                 "dustyable": {},
                 "stainable": {}
             },
