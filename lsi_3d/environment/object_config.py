@@ -92,13 +92,17 @@ OBJECT_CONFIG = {
             ig_dataset_path,
             'objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf'
         ),
-        CONF_KEYS.SCALE: np.array([2.0, 2.0, 2.0]) / 1.15,
+        CONF_KEYS.SCALE: np.array([0.8, 0.8, 0.8]) / 1.15,
         CONF_KEYS.MODEL_PATH: os.path.dirname(os.path.join(
             ig_dataset_path,
             'objects/bowl/a1393437aac09108d627bfab5d10d45d/a1393437aac09108d627bfab5d10d45d.urdf'
         )),
         CONF_KEYS.CATEGORY: OBJECT_KEYS.PLATE,
-        CONF_KEYS.NAME: OBJECT_KEYS.PLATE
+        CONF_KEYS.NAME: OBJECT_KEYS.PLATE,
+        CONF_KEYS.ABILITIS: {
+                "dustyable": {},
+                "stainable": {}
+            },
     },
     OBJECT_KEYS.STOVE: {
         CONF_KEYS.FILENAME: os.path.join(ig_dataset_path, 'objects/stove/101940/101940.urdf'),
