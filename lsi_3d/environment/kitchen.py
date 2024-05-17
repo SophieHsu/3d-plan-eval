@@ -11,6 +11,7 @@ from igibson import object_states
 from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
 from lsi_3d.environment.object_config import (
+    OBJECT_AWAY_POSES_OFFSETS,
     OBJECT_KEYS,
     OBJECT_ABBRS,
     OBJECT_ABBR_MAP,
@@ -338,7 +339,7 @@ class Kitchen:
                     pos=pos,
                     orn=orn,
                     mass=.001,
-                    away_pos=[100, 100, -100]
+                    away_pos=OBJECT_AWAY_POSES_OFFSETS[name]
                 )
                 green_onion.load()
                 obj = green_onion.multiplexed_obj
@@ -346,13 +347,15 @@ class Kitchen:
                 self.onion_spawn_pos = pos
 
                 for j in range(2):
+                    away_pos = OBJECT_AWAY_POSES_OFFSETS[name]
+                    away_pos = [away_pos[0] + 2 * (j + 1), away_pos[1], away_pos[2]]
                     green_onion_extra = GreenOnion(
                         **OBJECT_CONFIG[OBJECT_KEYS.GREEN_ONION],
                         obj_handlers=obj_handlers,
                         pos=[200, 100, 1],
                         orn=orn,
                         mass=.001,
-                        away_pos=[200 + 2 * j, 100, 1]
+                        away_pos=away_pos
                     )
                     green_onion_extra.load()
                     self.onions.append(green_onion_extra.multiplexed_obj)
@@ -430,11 +433,19 @@ class Kitchen:
             if name == OBJECT_KEYS.TABLE_H:
                 self.static_objs[obj] = [(x, y), (x + 1, y)]
 
-        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL], obj_handlers=obj_handlers, away_pos=[300, 200, 1])
+        bowl = OtherBowl(
+            **OBJECT_CONFIG[OBJECT_KEYS.LARGE_BOWL],
+            obj_handlers=obj_handlers,
+            away_pos=OBJECT_AWAY_POSES_OFFSETS[OBJECT_KEYS.LARGE_BOWL]
+        )
         bowl.load()
         self.large_bowl = bowl.obj
 
-        bowl = OtherBowl(**OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL], obj_handlers=obj_handlers, away_pos=[275, 275, 1])
+        bowl = OtherBowl(
+            **OBJECT_CONFIG[OBJECT_KEYS.STEAK_BOWL],
+            obj_handlers=obj_handlers,
+            away_pos=OBJECT_AWAY_POSES_OFFSETS[OBJECT_KEYS.STEAK_BOWL]
+        )
         bowl.load()
         self.steak_bowl = bowl.obj
 
