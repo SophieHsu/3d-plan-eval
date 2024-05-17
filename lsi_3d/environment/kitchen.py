@@ -38,6 +38,7 @@ from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
 
 
 class Kitchen:
+    _POS_OFFSET = 4.5
     _DYNAMIC_OBJECTS = [OBJECT_KEYS.BOWL, OBJECT_KEYS.PAN, OBJECT_KEYS.VIDALIA_ONION, OBJECT_KEYS.STEAK,
                         OBJECT_KEYS.PLATE, OBJECT_KEYS.CHOPPING_BOARD, OBJECT_KEYS.KNIFE, OBJECT_KEYS.GREEN_ONION]
 
@@ -268,7 +269,7 @@ class Kitchen:
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
 
-            pos = [x + shift[0] - 4.5, y + shift[1] - 4.5, 0 + shift[2]]
+            pos = [x + shift[0] - self._POS_OFFSET, y + shift[1] - self._POS_OFFSET, 0 + shift[2]]
 
             if name == OBJECT_KEYS.FRIDGE:
                 fridge = Fridge(**OBJECT_CONFIG[OBJECT_KEYS.COUNTER], pos=pos, orn=orn, obj_handlers=obj_handlers)
