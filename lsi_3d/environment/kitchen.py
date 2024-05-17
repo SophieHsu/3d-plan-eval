@@ -10,7 +10,13 @@ import pybullet as p
 from igibson import object_states
 from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
-from lsi_3d.environment.object_config import OBJECT_KEYS, OBJECT_ABBRS, OBJECT_ABBR_MAP, OBJECT_CONFIG
+from lsi_3d.environment.object_config import (
+    OBJECT_KEYS,
+    OBJECT_ABBRS,
+    OBJECT_ABBR_MAP,
+    OBJECT_CONFIG,
+    OBJECT_TRANSLATIONS
+)
 from lsi_3d.environment.objects import (
     Fridge,
     Onion,
@@ -236,30 +242,6 @@ class Kitchen:
         return object_locs, orientation_map, grid
 
     def load_objects(self, object_poses, orientation_map, order_list):
-        name2shift_map = {
-            "counter": (0, 0, 0),
-            "table_v": (0.5, 0, 0),
-            "table_h": (0, 0.5, 0),
-            "stove": (0, 0, 0),
-            "bowl": (0, 0, 1.1),
-            "pan": (0.23, 0.24, 1.24),  # shift height
-            "sink": (0, 0, 0.1),
-            "fridge": (0, 0, 0.2),
-            "vidalia_onion": (0.15, -0.1, 1.3),
-            "steak": (0, 0, 0.9),  # (0.23, -0.1, 1.25),
-            "tray": (0, 0, 0.9),
-            "apple": (0, 0.2, 1.0),
-            "broccoli": (0, 0.2, 0.6),
-            "green_onion": (0, 0, 1.25),
-            "plate": (0, 0, 1.15),
-            "scrub_brush": (0, 0, 1.3),
-            "chopping_board": (0, 0, 1.2),
-            "knife": (0, 0.3, 1.4),
-            "onion": (0.15, -0.1, 0),
-            "large_bowl": (0, 0, 0),
-            "steak_bowl": (0, 0, 0)
-        }
-
         shift_l = 0.1
         mapping = {
             (0, 0, 3.1415926): (0, -shift_l),
@@ -277,7 +259,7 @@ class Kitchen:
         for name, x, y in object_poses:
             obj = None
             orn = orientation_map[(name, x, y)]
-            shift = name2shift_map[name]
+            shift = OBJECT_TRANSLATIONS[name]
             if name == OBJECT_KEYS.COUNTER:
                 x_shift, y_shift = mapping[orn]
                 shift = (x_shift, y_shift, 0)
