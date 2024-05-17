@@ -1,17 +1,11 @@
 import math
-from utils import quat2euler
-import numpy as np
-from igibson.objects.visual_marker import VisualMarker
-import pybullet as p
-from igibson.external.pybullet_tools.utils import (
-    get_max_limits,
-    get_min_limits,
-    get_sample_fn,
-    joints_from_names,
-    set_joint_positions,
-)
 
-class MotionControllerRobot():
+import numpy as np
+
+from utils import quat2euler
+
+
+class MotionControllerRobot:
 
     def __init__(self, robot, planner, occupancy_grid):
         self.robot = robot
@@ -84,9 +78,6 @@ class MotionControllerRobot():
                         selected_vel = vel
             id += 1
 
-        # for i in range(0, len(path), 3):
-        #     p.addUserDebugLine([path[i][0], path[i][1], 1.0], [path[i][0], path[i][1] + 0.01, 1.0], [1,0,0], lifeTime=1.0)
-
         return selected_vel
 
     def predict_path(self, x, y, theta, vl, vr):
@@ -98,7 +89,7 @@ class MotionControllerRobot():
             y_predict = None
             theta_predict = None
             t = self.dt * step
-            if (round(vl, 3) == round(vr, 3)):
+            if round(vl, 3) == round(vr, 3):
                 x_predict = x + vl * t * math.cos(theta)
                 y_predict = y + vl * t * math.sin(theta)
                 theta_predict = theta
@@ -149,5 +140,3 @@ class MotionControllerRobot():
             return -min_theta
         else:
             return min_theta
-        
-    # def pick():
