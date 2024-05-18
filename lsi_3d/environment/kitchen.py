@@ -93,7 +93,7 @@ class Kitchen:
         self.overcooked_hot_plates_now_dish = []
 
     def execute_action(self, action, target, **kwargs):
-        ACTION_EXECUTORS[action](target, self, **kwargs)
+        ACTION_EXECUTORS[action].execute(target, self, **kwargs)
 
     def drop_plate(self, plate):
         id = self.overcooked_max_id
