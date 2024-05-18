@@ -64,3 +64,9 @@ class ChopCommandExecutor(ActionExecutor):
             **state_args
         }
 
+
+ACTION_EXECUTORS = {
+    ACTION_COMMANDS.DROP: DropCommandExecutor(),
+    ACTION_COMMANDS.HEAT: HeatCommandCommandExecutor(),
+    ACTION_COMMANDS.CHOP: ChopCommandExecutor(),
+}
