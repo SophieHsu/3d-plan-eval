@@ -142,7 +142,7 @@ class VisionLimitEnv(LsiEnv):
                     # if plate is in sink and its state is none, change to 0
                     p_state = self.kitchen.overcooked_object_states[p]
                     if p_state['state'] is None:
-                        self.kitchen.execute_action(ACTION_COMMANDS.DROP, p)
+                        self.kitchen.execute_action(ACTION_COMMANDS.DROP, p, name='hot_plate')
                     elif s in self.world_state.state_dict['sink_states']['ready'] and p_state['state'] < 2:
                         self.kitchen.heat_plate(p)
 
@@ -151,7 +151,7 @@ class VisionLimitEnv(LsiEnv):
                     # if plate is in same location as sink and sink is in ready sinks then heat it
                     p_state = self.kitchen.overcooked_object_states[plate]
                     if p_state['state'] is None:
-                        self.kitchen.execute_action(ACTION_COMMANDS.DROP, plate)
+                        self.kitchen.execute_action(ACTION_COMMANDS.DROP, plate, name='hot_plate')
                     elif p_state['state'] < 2:
                         self.kitchen.heat_plate(p)
 
@@ -181,7 +181,7 @@ class VisionLimitEnv(LsiEnv):
                     o_state = self.kitchen.overcooked_object_states[object]
                     if self.tracking_env.get_position(b) == self.tracking_env.get_position(object):
                         if o_state['state'] is None:
-                            self.kitchen.execute_action(ACTION_COMMANDS.DROP, object)
+                            self.kitchen.execute_action(ACTION_COMMANDS.DROP, object, name='garnish')
                         elif object.current_index == 1 and o_state['state'] < 2:
                             self.kitchen.execute_action(ACTION_COMMANDS.CHOP, object, name='garnish', state=2)
 
