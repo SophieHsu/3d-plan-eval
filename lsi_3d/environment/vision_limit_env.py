@@ -183,7 +183,7 @@ class VisionLimitEnv(LsiEnv):
                         if o_state['state'] is None:
                             self.kitchen.execute_action(ACTION_COMMANDS.DROP, object)
                         elif object.current_index == 1 and o_state['state'] < 2:
-                            self.kitchen.chop_onion(object)
+                            self.kitchen.execute_action(ACTION_COMMANDS.CHOP, object, name='garnish', state=2)
 
                         if in_human_hand == object:
                             in_human_hand = None
