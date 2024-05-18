@@ -181,7 +181,7 @@ class VisionLimitEnv(LsiEnv):
                     o_state = self.kitchen.overcooked_object_states[object]
                     if self.tracking_env.get_position(b) == self.tracking_env.get_position(object):
                         if o_state['state'] is None:
-                            self.kitchen.drop_onion(object)
+                            self.kitchen.execute_action(ACTION_COMMANDS.DROP, object)
                         elif object.current_index == 1 and o_state['state'] < 2:
                             self.kitchen.chop_onion(object)
 
