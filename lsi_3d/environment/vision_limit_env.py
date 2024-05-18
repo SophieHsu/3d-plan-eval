@@ -168,7 +168,12 @@ class VisionLimitEnv(LsiEnv):
                     if self.tracking_env.get_position(p) == self.tracking_env.get_position(object):
                         # if p.states[object_states.Inside].get_value(object):
                         if state['name'] == 'meat':
-                            self.kitchen.drop_meat(object)
+                            self.kitchen.execute_action(
+                                ACTION_COMMANDS.DROP,
+                                object,
+                                name='steak',
+                                state=('steak', 1, 10)
+                            )
                         if in_human_hand == object:
                             in_human_hand = None
 
