@@ -10,6 +10,7 @@ import pybullet as p
 from igibson import object_states
 from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
+from lsi_3d.environment.actions import ACTION_EXECUTORS
 from lsi_3d.environment.object_config import (
     OBJECT_AWAY_POSES_OFFSETS,
     OBJECT_KEYS,
@@ -90,6 +91,9 @@ class Kitchen:
         self.stored_overcooked_object_states = {}
 
         self.overcooked_hot_plates_now_dish = []
+
+    def execute_action(self, action, target, **kwargs):
+        ACTION_EXECUTORS[action](target, self, **kwargs)
 
     def drop_plate(self, plate):
         id = self.overcooked_max_id
