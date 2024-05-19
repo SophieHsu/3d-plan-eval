@@ -6,7 +6,7 @@ import numpy as np
 
 class HighLevelMdpPlanner(object):
 
-    def __init__(self, mdp, num_rounds = 0, epsilon = 0.01, discount = 0.8):
+    def __init__(self, mdp, num_rounds=0, epsilon=0.01, discount=0.8):
         self.mdp = mdp
         self.state_dict = {}
         self.state_idx_dict = {}
@@ -20,6 +20,8 @@ class HighLevelMdpPlanner(object):
         self.policy_matrix = None
         self.num_states = None
         self.num_actions = None
+        self.cost_matrix = None
+        self.reward_matrix = None
 
     def init_states(self, order_list=None):
         """
@@ -32,11 +34,11 @@ class HighLevelMdpPlanner(object):
         objects = ['onion', 'soup', 'dish', 'None']
         max_in_soup = self.mdp.num_items_for_soup
 
-        for order_num in range(len(order_list)+1): # +1 for case where nothing is held
-            for onion_count in range(max_in_soup+1):
-                for object in objects:
-                    key = f'{object}_{onion_count}'
-                    value = [object, onion_count]
+        for order_num in range(len(order_list) + 1):  # +1 for case where nothing is held
+            for onion_count in range(max_in_soup + 1):
+                for obj in objects:
+                    key = f'{obj}_{onion_count}'
+                    value = [obj, onion_count]
 
                     for order in order_list[:order_num]:
                         key += f'_{order}'
@@ -44,25 +46,25 @@ class HighLevelMdpPlanner(object):
 
                     self.state_dict[key] = value
 
-        self.state_idx_dict = {k:i for i, k in enumerate(self.state_dict.keys())}
+        self.state_idx_dict = {k: i for i, k in enumerate(self.state_dict.keys())}
         return
 
     def init_actions(self, actions=None):
-        objects = ['onion', 'dish'] # 'tomato'
+        objects = ['onion', 'dish']  # 'tomato'
         common_actions = ['pickup', 'drop']
-        addition_actions = [['deliver','soup'], ['pickup', 'soup']]
+        addition_actions = [['deliver', 'soup'], ['pickup', 'soup']]
 
         common_action_obj_pair = list(itertools.product(common_actions, objects))
         common_action_obj_pair = [list(i) for i in common_action_obj_pair]
         actions = common_action_obj_pair + addition_actions
-        self.action_dict = {action[0]+'_'+action[1]:action for action in actions}
-        self.action_idx_dict = {action[0]+'_'+action[1]:i for i, action in enumerate(actions)}
+        self.action_dict = {action[0] + '_' + action[1]: action for action in actions}
+        self.action_idx_dict = {action[0] + '_' + action[1]: i for i, action in enumerate(actions)}
 
     def init_transition_matrix(self, transition_matrix=None):
-        self.transition_matrix = transition_matrix if transition_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
+        self.transition_matrix = transition_matrix if transition_matrix is not None else np.zeros(
+            (len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
 
         game_logic_transition = self.transition_matrix.copy()
-        # distance_transition = self.transition_matrix.copy()
 
         # state transition calculation
         for state_key, state_obj in self.state_dict.items():
@@ -70,7 +72,7 @@ class HighLevelMdpPlanner(object):
                 state_idx = self.state_idx_dict[state_key]
                 next_state_idx = state_idx
                 next_action_idx = action_idx
-        
+
                 # define state and action game transition logic
                 player_obj, soup_finish, orders = self.ml_state_to_objs(state_obj)
                 next_actions, next_state_keys = self.state_action_nxt_state(player_obj, soup_finish, orders)
@@ -80,29 +82,28 @@ class HighLevelMdpPlanner(object):
 
                 game_logic_transition[next_action_idx][state_idx][next_state_idx] += 1.0
 
-            # print(state_key)
-        # print(game_logic_transition[:, 25])
-        # tmp = input()
-
         self.transition_matrix = game_logic_transition
         return
 
     def init_cost(self, cost_matrix=None):
-        self.cost_matrix = cost_matrix if cost_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
-
+        self.cost_matrix = cost_matrix if cost_matrix is not None else \
+            np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
 
     def ml_state_to_objs(self, state_obj):
         # state: obj + action + bool(soup nearly finish) + orders
-        player_obj = state_obj[0]; soup_finish = state_obj[1];
+        player_obj = state_obj[0]
+        soup_finish = state_obj[1]
         orders = []
         if len(state_obj) > 2:
             orders = state_obj[2:]
 
         return player_obj, soup_finish, orders
-        
+
     def state_action_nxt_state(self, player_obj, soup_finish, orders, other_obj=''):
         # game logic
-        actions = ''; next_obj = player_obj; next_soup_finish = soup_finish
+        actions = ''
+        next_obj = player_obj
+        next_soup_finish = soup_finish
         if player_obj == 'None':
             if (soup_finish == self.mdp.num_items_for_soup) and (other_obj != 'dish'):
                 actions = 'pickup_dish'
@@ -117,7 +118,7 @@ class HighLevelMdpPlanner(object):
                     next_obj = 'onion'
 
                 elif next_order == 'tomato':
-                    actions = 'pickup_tomato' 
+                    actions = 'pickup_tomato'
                     next_obj = 'tomato'
 
                 else:
@@ -165,23 +166,26 @@ class HighLevelMdpPlanner(object):
     def init_reward(self, reward_matrix=None):
         # state: obj + action + bool(soup nearly finish) + orders
 
-        self.reward_matrix = reward_matrix if reward_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict)), dtype=float)
+        self.reward_matrix = reward_matrix if reward_matrix is not None else np.zeros(
+            (len(self.action_dict), len(self.state_idx_dict)), dtype=float)
 
-        # when deliver order, pickup onion. probabily checking the change in states to give out rewards: if action is correct, curr_state acts and changes to rewardable next state. Then, we reward.
+        # when deliver order, pickup onion. probabily checking the change in states to give out rewards:
+        # if action is correct, curr_state acts and changes to rewardable next state. Then, we reward.
 
         for state_key, state_obj in self.state_dict.items():
             # state: obj + action + bool(soup nearly finish) + orders
-            player_obj = state_obj[0]; soup_finish = state_obj[1]
+            player_obj = state_obj[0]
+            soup_finish = state_obj[1]
             orders = []
             if len(state_obj) > 2:
                 orders = state_obj[2:]
 
             if player_obj == 'soup':
-                self.reward_matrix[self.action_idx_dict['deliver_soup']][self.state_idx_dict[state_key]] += self.mdp.delivery_reward
-        
-            if len(orders) == 0:
-                self.reward_matrix[:,self.state_idx_dict[state_key]] += self.mdp.delivery_reward
+                self.reward_matrix[self.action_idx_dict['deliver_soup']][
+                    self.state_idx_dict[state_key]] += self.mdp.delivery_reward
 
+            if len(orders) == 0:
+                self.reward_matrix[:, self.state_idx_dict[state_key]] += self.mdp.delivery_reward
 
     def init_mdp(self, order_list):
         self.init_states(order_list=order_list)
@@ -189,16 +193,6 @@ class HighLevelMdpPlanner(object):
         self.init_transition_matrix()
         self.init_reward()
         self.init_cost()
-
-    # def bellman_operator(self, V=None):
-    #     if V is None:
-    #         V = self.value_matrix
-
-    #     Q = np.zeros((self.num_actions, self.num_states))
-    #     for a in range(self.num_actions):
-    #         Q[a] = self.reward_matrix[a] + self.discount * self.transition_matrix[a].dot(V)
-
-    #     return Q.max(axis=0), Q.argmax(axis=0)
 
     def bellman_operator(self, V=None, normalize_constant=50):
         if V is None:
@@ -208,14 +202,15 @@ class HighLevelMdpPlanner(object):
         self.cost_matrix /= normalize_constant
         for a in range(self.num_actions):
             # Q[a] = self.reward_matrix[a] - self.cost_matrix[a] + self.discount * self.transition_matrix[a].dot(V)
-            Q[a] = self.reward_matrix[a] + np.sum(self.transition_matrix[a]*((self.discount*V)-self.cost_matrix[a]), axis=1)
+            Q[a] = self.reward_matrix[a] + np.sum(
+                self.transition_matrix[a] * ((self.discount * V) - self.cost_matrix[a]), axis=1)
 
         return Q.max(axis=0), Q.argmax(axis=0)
 
     @staticmethod
     def get_span(arr):
         # print('in get span arr.max():', arr.max(), ' - arr.min():', arr.min(), ' = ', (arr.max()-arr.min()))
-        return arr.max()-arr.min()
+        return arr.max() - arr.min()
 
     def value_iteration(self, value_matrix=None):
         self.value_matrix = value_matrix if value_matrix is not None else np.zeros((self.num_states), dtype=float)
@@ -233,40 +228,33 @@ class HighLevelMdpPlanner(object):
 
             self.value_matrix, self.policy_matrix = self.bellman_operator()
 
-            variation = self.get_span(self.value_matrix-V_prev)
+            variation = self.get_span(self.value_matrix - V_prev)
 
             if variation < thresh:
-                #self.log_value_iter(iter_count)
                 break
-            #elif iter_count % LOGUNIT == 0:
-                #self.log_value_iter(iter_count)
-            else:
-                pass
+
             iter_count += 1
 
     def compute_mdp_policy(self, order_list):
         start_time = time.time()
         self.init_mdp(order_list)
-        #self.init_mdp()
         self.num_states = len(self.state_dict)
         self.num_actions = len(self.action_dict)
 
         self.value_iteration()
 
         print("It took {} seconds to create MediumLevelMdpPlanner".format(time.time() - start_time))
-        return 
+        return
 
     def post_mdp_setup(self):
         return
 
-    def map_action_to_location(self, world_state, agent_state, action_obj, p0_obj = None):
+    def map_action_to_location(self, world_state, agent_state, action_obj, p0_obj=None):
         """
         Get the next location the agent will be in based on current world state and medium level actions.
         """
         p0_obj = p0_obj if p0_obj is not None else agent_state.holding
-        # p0_obj = agent_state.holding
         action, obj = action_obj
-        #pots_states_dict = self.mdp.get_pot_states()
         location = []
         if action == 'pickup' and obj != 'soup':
             if p0_obj != 'None':
@@ -289,11 +277,10 @@ class HighLevelMdpPlanner(object):
                 location = self.mdp.get_dish_dispenser_locations()
                 print(f'Next Dish Location: {location}')
             else:
-                location = self.mdp.get_pot_locations() # + self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
+                location = self.mdp.get_pot_locations()
 
         elif action == 'drop':
             if obj == 'onion' or obj == 'tomato':
-                #location = self.mdp.get_partially_full_pots(pots_states_dict) + self.mdp.get_empty_pots(pots_states_dict)
                 location = self.mdp.get_pot_locations()
             elif obj == 'dish':
                 location = self.drop_item(world_state, agent_state)
@@ -304,7 +291,6 @@ class HighLevelMdpPlanner(object):
         elif action == 'deliver':
             if p0_obj != 'soup':
                 # TODO: Implement function
-                # location = self.mdp.get_empty_counter_locations(world_state)
                 location = self.drop_item(world_state, agent_state)
             else:
                 location = self.mdp.get_serving_locations()
@@ -323,8 +309,7 @@ class HighLevelMdpPlanner(object):
         return key
 
     def drop_item(self, world_state, agent_state=None):
-        if agent_state == None:
-            return [(0,0)]
+        if agent_state is None:
+            return [(0, 0)]
         agent_state.holding = 'None'
         return [agent_state.ml_state[0:2]]
-
