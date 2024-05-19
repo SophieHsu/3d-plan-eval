@@ -6,13 +6,12 @@ from igibson.objects.visual_marker import VisualMarker
 from utils import real_to_grid_coord, grid_to_real_coord
 
 
-class AStarPlanner():
+class AStarPlanner:
 
     def __init__(self, env):
         self.env = env
         self.markers = []
         self.grid_size = 10
-        # self.initialize_markers()
 
     def initialize_markers(self):
         for i in range(30):
@@ -82,7 +81,6 @@ class AStarPlanner():
 
     def get_neighbor_locs(self, loc):
         relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-        # relative_neighbor_locs = [ (-1, 0), (0, -1), (0, 1), (1, 0)]
         neighbor_locs = []
         for n in relative_neighbor_locs:
             x_neighbor = loc[0] + n[0]
@@ -102,7 +100,6 @@ class AStarPlanner():
             x_neighbor = n[0]
             y_neighbor = n[1]
             if self.is_valid_location(loc, (x_neighbor, y_neighbor), occupancy_grid):
-                # if self.occupancy_grid[x_neighbor][y_neighbor] == 'X':
                 g_cost = None
                 if abs(x) == 1 and abs(y) == 1:
                     g_cost = node.g_cost + math.sqrt(2)
@@ -117,10 +114,9 @@ class AStarPlanner():
         y_diff = neighbor_loc[1] - loc[1]
         neighbor_1 = (loc[0] + x_diff, loc[1])
         neighbor_2 = (loc[0], loc[1] + y_diff)
-        if occupancy_grid[neighbor_loc[0]][neighbor_loc[1]] == 'X' and occupancy_grid[neighbor_1[0]][
-            neighbor_1[1]] == 'X' and occupancy_grid[neighbor_2[0]][neighbor_2[1]] == 'X':
-            return True
-        return False
+        return occupancy_grid[neighbor_loc[0]][neighbor_loc[1]] == 'X' and \
+            occupancy_grid[neighbor_1[0]][neighbor_1[1]] == 'X' and \
+            occupancy_grid[neighbor_2[0]][neighbor_2[1]] == 'X'
 
     def set_f_cost(self, node, end_node):
         start = node.loc
@@ -132,7 +128,7 @@ class AStarPlanner():
         node.f_cost = node.g_cost + heuristic
 
 
-class AStarNode():
+class AStarNode:
 
     def __init__(self, loc, parent=None, g_cost=None, f_cost=None):
         self.loc = loc
