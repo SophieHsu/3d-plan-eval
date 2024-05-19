@@ -9,7 +9,8 @@ import numpy as np
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.planners.steak_mdp_planner import SteakMediumLevelMDPPlanner
 
-PLANNERS_DIR = 'C:\\Users\\icaro\\3d-plan-eval'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+PLANNERS_DIR = os.path.join(script_dir, '..', '..')
 
 
 class SteakHumanSubtaskQMDPPlanner(SteakMediumLevelMDPPlanner):
