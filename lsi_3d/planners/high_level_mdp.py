@@ -50,7 +50,7 @@ class HighLevelMdpPlanner(object):
         return
 
     def init_actions(self, actions=None):
-        objects = ['onion', 'dish']  # 'tomato'
+        objects = ['onion', 'dish']
         common_actions = ['pickup', 'drop']
         addition_actions = [['deliver', 'soup'], ['pickup', 'soup']]
 
