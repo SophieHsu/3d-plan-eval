@@ -1,15 +1,20 @@
 import copy
 import math
-import time
-from datetime import datetime
-
-from igibson.objects.articulated_object import URDFObject
+import numpy as np
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.utils.functions import norm_cardinal_to_orn
 from utils import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_radians
+from agent import Agent
+from lsi_3d.environment.lsi_env import LsiEnv
+from lsi_3d.mdp.state import AgentState, WorldState
+import time
+from igibson.objects.multi_object_wrappers import ObjectGrouper, ObjectMultiplexer
+from igibson.objects.articulated_object import URDFObject
+from igibson.objects.visual_marker import VisualMarker
+import pybullet as p
+from datetime import datetime
 
-
-class HumanAgent:
+class HumanAgent():
 
     def __init__(self,
                  human,
@@ -18,7 +23,7 @@ class HumanAgent:
                  occupancy_grid,
                  hlp,
                  lsi_env,
-                 tracking_env: TrackingEnv,
+                 tracking_env:TrackingEnv,
                  vr=False,
                  insight_threshold=5):
 
@@ -51,15 +56,23 @@ class HumanAgent:
 
     def change_state(self):
         # pass
-        self.env.update_human_hl_state("onion_0_onion_onion", ("pickup", "onion"))
-        self.env.update_human_hl_state("None_1_onion_onion", ("drop", "onion"))
-        self.env.update_human_hl_state("onion_1_onion_onion", ("pickup", "onion"))
-        self.env.update_human_hl_state("None_2_onion_onion", ("drop", "onion"))
+        self.env.update_human_hl_state("onion_0_onion_onion",
+                                           ("pickup", "onion"))
+        self.env.update_human_hl_state("None_1_onion_onion",
+                                           ("drop", "onion"))
+        self.env.update_human_hl_state("onion_1_onion_onion",
+                                           ("pickup", "onion"))
+        self.env.update_human_hl_state("None_2_onion_onion",
+                                           ("drop", "onion"))
+        # self.lsi_env.update_human_hl_state("onion_2_onion_onion", ("pickup", "onion"))
+        # self.lsi_env.update_human_hl_state("None_3_onion_onion", ("drop", "onion"))
+        # self.lsi_env.update_human_hl_state("dish_3_onion_onion", ("pickup", "dish"))
+        # self.lsi_env.update_human_hl_state("soup_3_onion_onion", ("pickup", "soup"))
         self.env.update_joint_ml_state()
 
     def stuck_handler(self):
         end = None
-        if self.stuck_time is None or self.stuck_ml_pos is None:
+        if self.stuck_time == None or self.stuck_ml_pos == None:
             # start timer
             self.stuck_time = time.time()
             self.stuck_ml_pos = self.env.human_state.ml_state
@@ -71,6 +84,10 @@ class HumanAgent:
 
         elapsed = time.time() - self.stuck_time
         if elapsed > self.STUCK_TIME_LIMIT:
+            # set a new ml goal to adjacent square and recalculate plan
+            # self.recalculate_ml_plan = True
+            # self.avoiding_start_time = datetime.now()
+            # self.stuck_time = time.time()
             end = self.loc_to_avoid_robot()
 
         return end
@@ -88,18 +105,18 @@ class HumanAgent:
         else:
             x, y, z = self.human.get_position()
 
-            if not self.arrived:
+            if self.arrived == False:
                 end = self.get_next_goal()
 
-                if end is not None:
-                    r, c, f = end
-                    end = grid_to_real_coord((r, c))
+                if end != None:
+                    r,c,f = end
+                    end = grid_to_real_coord((r,c))
 
                     self.interacting = False
                     orn = norm_cardinal_to_orn(f)
                     self.arrived = self._step(end, orn)
                     self.env.update_human_world_state()
-
+                    
             else:
                 self.stuck_time = None
                 self._arrival_step()
@@ -113,6 +130,7 @@ class HumanAgent:
         # check if holding bowl collision radius is larger
         collision_radius = 0.8
         if self.tracking_env.is_human_holding_bowl():
+            # collision_radius = 1.05
             collision_radius = 1
 
         if math.dist([x, y], [robot_x, robot_y]) < collision_radius and self.avoiding_start_time is None:
@@ -120,26 +138,29 @@ class HumanAgent:
         if math.dist([x, y], [robot_x, robot_y]) > 1.2:
             self.avoiding_start_time = None
         stuck_goal = self.stuck_handler()
-        if stuck_goal:
+        if stuck_goal: 
+            #end = stuck_goal
             asdf = 4
-
+        
         if self.avoiding_start_time is not None:
             if (datetime.now() - self.avoiding_start_time).total_seconds() < self.WAIT_COLLISION_TIME:
                 return False
             else:
                 end = self.loc_to_avoid_robot()
-
+        
         path = self.planner.find_path((x, y), end, self.occupancy_grid)
 
-        round_prev_end = [round(p, 3) for p in self.prev_end] if self.prev_end is not None else self.prev_end
+        round_prev_end = [round(p, 3) for p in self.prev_end
+                          ] if self.prev_end is not None else self.prev_end
         round_end = [round(e, 3) for e in end] if end is not None else end
 
         is_new_end = True if round_prev_end != round_end else False
 
         if len(path) > 0:
             self.prev_end = end
-
-        return self.motion_controller.step(self.human, self.robot, final_ori, path, is_new_end)
+            
+        return self.motion_controller.step(self.human, self.robot, final_ori,
+                                           path, is_new_end)
 
     def _arrival_step(self):
 
@@ -149,9 +170,13 @@ class HumanAgent:
         object = self.action_object[1]
         if action == "pickup" and object == "onion":
             if self.object_position is None:
-                self.target_object = self.tracking_env.get_closest_onion()
+                self.target_object = self.tracking_env.get_closest_onion(
+                )
                 self.object_position = self.target_object.get_position()
 
+            # marker_2 = VisualMarker(visual_shape=p.GEOM_SPHERE, radius=0.06)
+            # self.igibson_env.simulator.import_object(marker_2)
+            # marker_2.set_position(self.object_position)
             is_holding_onion = self.tracking_env.is_obj_in_human_hand(self.target_object)
             done = self.pick(self.object_position, [0, 0, 0.05])
 
@@ -162,7 +187,8 @@ class HumanAgent:
                     self.object_position = None
         elif action == "drop" and object == "onion":
             if self.object_position is None:
-                self.object_position = self.tracking_env.get_closest_pan().get_position()
+                self.object_position = self.tracking_env.get_closest_pan(
+                ).get_position()
             done = self.drop(self.object_position, [0, -0.1, 0.25])
             if done:
                 self.completed_goal(next_hl_state, action_object)
@@ -194,7 +220,8 @@ class HumanAgent:
                 done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
                 if done:
                     self.step_index = self.step_index + 1
-                    onion = self.tracking_env.get_closest_onion(on_pan=True)
+                    onion = self.tracking_env.get_closest_onion(
+                        on_pan=True)
                     self.object_position = onion.get_position()
                     self.target_object = onion
             elif self.step_index == 1:
@@ -202,7 +229,8 @@ class HumanAgent:
                 done = self.pick(self.object_position, [0, -0.05, 0.05]) and is_holding_onion
                 if done:
                     self.step_index = self.step_index + 1
-                    self.object_position = self.tracking_env.get_closest_bowl().get_position()
+                    self.object_position = self.tracking_env.get_closest_bowl(
+                    ).get_position()
             elif self.step_index == 2:
                 done = self.drop(self.object_position, [0, -0.1, 0.3])
                 if done:
@@ -217,6 +245,30 @@ class HumanAgent:
                         bowl = self.tracking_env.get_closest_bowl()
                         self.object_position = bowl.get_position()
                         self.target_object = bowl
+            # elif self.step_index == 3:
+            #     done = self.pick(self.object_position, [0, 0, 0.05])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_bowl(
+            #         ).get_position()
+            # elif self.step_index == 4:
+            #     done = self.drop(self.object_position, [0, -0.1, 0.3])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_onion(
+            #             on_pan=True).get_position()
+            # elif self.step_index == 5:
+            #     done = self.pick(self.object_position, [0, 0, 0.05])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_bowl(
+            #         ).get_position()
+            # elif self.step_index == 6:
+            #     done = self.drop(self.object_position, [0, -0.1, 0.3])
+            #     if done:
+            #         self.step_index = self.step_index + 1
+            #         self.object_position = self.tracking_env.get_closest_bowl(
+            #         ).get_position()
             elif self.step_index == 3:
                 is_holding_bowl = self.tracking_env.is_obj_in_human_hand(self.target_object)
                 done = self.pick(self.object_position, [0, -0.3, 0.1]) and is_holding_bowl
@@ -225,6 +277,7 @@ class HumanAgent:
             else:
                 self.completed_goal(next_hl_state, action_object)
                 self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
+        # print(next_hl_state, action_object)
 
     def pick(self, loc, offset=[0, 0, 0]):
         return self.motion_controller.pick(self.human, loc, offset)
@@ -234,6 +287,8 @@ class HumanAgent:
 
     def completed_goal(self, next_hl_state, action_object):
         self.step_index = 0
+        #self.env.human_state.update_hl_state(next_hl_state,
+        #                                         self.env.world_state)
         self.object_position = None
         self.arrived = False
 
@@ -242,12 +297,10 @@ class HumanAgent:
         world_state = self.env.world_state
         action, object = 'stay', agent_state.holding
         if agent_state.holding == 'None':
-            if world_state.in_pot == self.tracking_env.kitchen.onions_for_soup - 1 and \
-                    self.env.robot_state.holding == 'onion':
+            if world_state.in_pot == self.tracking_env.kitchen.onions_for_soup - 1 and self.env.robot_state.holding == 'onion':
                 action, object = ('pickup', 'dish')
                 next_hl_state = f'dish_{world_state.in_pot}'
-            elif world_state.in_pot >= self.tracking_env.kitchen.onions_for_soup and \
-                    self.env.robot_state.holding != 'dish':
+            elif world_state.in_pot >= self.tracking_env.kitchen.onions_for_soup and self.env.robot_state.holding != 'dish':
                 action, object = ('pickup', 'dish')
                 next_hl_state = f'dish_{world_state.in_pot}'
             else:
@@ -256,15 +309,15 @@ class HumanAgent:
                 agent_state.next_holding = 'onion'
         elif agent_state.holding == 'onion':
             action, object = ('drop', 'onion')
-            next_hl_state = f'None_{world_state.in_pot + 1}'
+            next_hl_state = f'None_{world_state.in_pot+1}'
             agent_state.next_holding = 'None'
         elif world_state.in_pot <= 3 and agent_state.holding == 'None':
             action, object = ('pickup', 'dish')
             next_hl_state = f'dish_{world_state.in_pot}'
             agent_state.next_holding = 'dish'
-        elif agent_state.holding == 'dish' and (
-                world_state.in_pot >= self.env.mdp.num_items_for_soup or self.interacting == True):
+        elif agent_state.holding == 'dish' and (world_state.in_pot >= self.env.mdp.num_items_for_soup or self.interacting == True):
             action, object = ('pickup', 'soup')
+            # world_state.in_pot = 0
             next_hl_state = f'soup_{world_state.in_pot}'
             agent_state.next_holding = 'soup'
         elif agent_state.holding == 'soup':
@@ -281,25 +334,28 @@ class HumanAgent:
         self.next_hl_state = next_hl_state
         self.action_object = (action, object)
         return goal
-
+    
     def check_interact_objects(self):
         human_holding = self.tracking_env.get_human_holding()
         if human_holding == 'soup':
             onions = self.tracking_env.get_onions_in_human_soup()
-            if not self.ingredients:
+            if self.ingredients == []:
                 self.ingredients = onions
                 print(len(self.ingredients))
         elif human_holding == 'None':
             self.ingredients = []
             # make sure onions are in bowl since they sometimes bounce out
 
+        
+
         for onion in self.ingredients:
             bowl = self.tracking_env.obj_in_human_hand()
             bowl_loc = bowl.get_position()
             if not self.tracking_env.is_item_in_object(onion, bowl):
                 # spawn onion back into bowl
-                x, y, z = bowl_loc
-                onion.set_position([x, y, z + 0.05])
+                x,y,z = bowl_loc
+                onion.set_position([x,y,z+0.05])
+                # self.tracking_env.set_item_in_object(onion, bowl)
 
     def transform_end_location(self, loc):
         # objects = self.igibson_env.simulator.scene.get_objects()
@@ -312,7 +368,7 @@ class HumanAgent:
             if type(objects[o]) == list:
                 for o_loc in objects[o]:
                     if o_loc == loc: selected_object = o
-                    # pos = grid_to_real_coord(loc)
+                        # pos = grid_to_real_coord(loc)
             elif objects[o] == loc:
                 selected_object = o
 
@@ -326,8 +382,11 @@ class HumanAgent:
         return pos[0:2], normalize_radians(ori + math.pi)
 
     def is_at_location(self, loc, dest, tolerance):
-        return (dest[0] - tolerance) < loc[0] < (dest[0] + tolerance) and \
-            (dest[1] - tolerance) < loc[1] < (dest[1] + tolerance)
+        if (dest[0] - tolerance) < loc[0] < (dest[0] + tolerance) and (
+                dest[1] - tolerance) < loc[1] < (dest[1] + tolerance):
+            return True
+        else:
+            return False
 
     def update_occupancy_grid(self):
         # if self.is_observable(self.robot):
@@ -344,6 +403,7 @@ class HumanAgent:
         human_pos_grid = real_to_grid_coord([human_x, human_y])
         robot_x, robot_y, _ = self.robot.get_position()
 
+        # relative_neighbor_locs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         relative_neighbor_locs = [(-1, 0), (0, -1), (0, 1), (1, 0)]
         farthest_neighbor = None
         dist = -1
@@ -351,7 +411,8 @@ class HumanAgent:
             x_neighbor = human_pos_grid[0] + n[0]
             y_neighbor = human_pos_grid[1] + n[1]
 
-            if 0 <= x_neighbor < 8 and 0 <= y_neighbor < 8 and self.occupancy_grid[x_neighbor][y_neighbor] == "X":
+            if 0 <= x_neighbor < 8 and 0 <= y_neighbor < 8 and self.occupancy_grid[
+                    x_neighbor][y_neighbor] == "X":
                 neighbor_continuous = grid_to_real_coord(
                     [x_neighbor, y_neighbor])
                 neighbor_dist = math.dist(
@@ -364,6 +425,72 @@ class HumanAgent:
                     farthest_neighbor = neighbor
                     dist = neighbor_dist
         return farthest_neighbor
+
+    # def is_observed(self, object, track):
+    #     '''
+    #     An object is defined to be observed if it is in sight for a period of time.
+    #     track: an array containing True/False. The length should be the same as the insight threshold.
+    #     '''
+    #     track.pop(0)
+    #     track.append(self.is_observable(object))
+
+    #     return all(track), track
+
+    # def is_observable(self, object):
+    #     object_x, object_y, _ = object.get_position()
+
+    #     human_x, human_y, _ = self.human.get_position()
+    #     qx, qy, qz, qw = self.human.get_orientation()
+    #     _, _, theta = quat2euler(qx, qy, qz, qw)
+
+    #     slope_x = object_x - human_x
+    #     slope_y = object_y - human_y
+
+    #     # calculate angle between human and object
+    #     ori_vec_x = math.cos(theta)
+    #     ori_vec_y = math.sin(theta)
+
+    #     ori_vec = [ori_vec_x, ori_vec_y]
+    #     vec = [slope_x, slope_y]
+
+    #     ori_vec = ori_vec / np.linalg.norm(ori_vec)
+    #     vec = vec / np.linalg.norm(vec)
+    #     dot_product = np.dot(ori_vec, vec)
+    #     angle = np.arccos(dot_product)
+
+    #     # calculate gridspaces line of sight intersects with
+    #     line_of_sight = False
+    #     block_flag = False
+    #     grid_spaces = set()
+    #     slope_x = object_x - human_x
+    #     slope_y = object_y - human_y
+    #     dx = 0 if slope_x == 0 else slope_x / (abs(slope_x) * 10)
+    #     dy = slope_y / (abs(slope_y) *
+    #                     10) if slope_x == 0 else slope_y / (abs(slope_x) * 10)
+    #     current_x = human_x
+    #     current_y = human_y
+    #     object_coord = real_to_grid_coord((object_x, object_y))
+    #     # print(object_x, object_y)
+    #     while True:
+    #         grid_coord = real_to_grid_coord((current_x, current_y))
+    #         # print(current_x, current_y)
+    #         if math.dist([current_x, current_y], [object_x, object_y]) < 0.2:
+    #             break
+    #         else:
+    #             grid_spaces.add(grid_coord)
+    #         current_x += dx
+    #         current_y += dy
+    #         # print(current_x, current_y)
+
+    #     for grid in grid_spaces:
+    #         if self.occupancy_grid[grid[0]][
+    #                 grid[1]] != 'X' and self.occupancy_grid[grid[0]][
+    #                     grid[1]] != 'R':
+    #             block_flag = True
+
+    #     line_of_sight = not block_flag
+
+    #     return line_of_sight and angle <= self.vision_range / 2
 
     def get_position(self):
         return self.human.get_position()
