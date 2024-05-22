@@ -7,55 +7,15 @@ from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 
 class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
     def __init__(self, mdp, mlp: AStarMotionPlanner):
-
-        # , mlp_params, \
-        #     state_dict = {}, state_idx_dict = {}, action_dict = {}, action_idx_dict = {}, transition_matrix = None, reward_matrix = None, policy_matrix = None, value_matrix = None, \
-        #     num_states = 0, num_rounds = 0, epsilon = 0.01, discount = 0.8):
-
         super().__init__(mdp)
 
         self.world_state_cost_dict = {}
-        # self.jmp = JointMotionPlanner(mdp, mlp_params)
-        # self.mp = self.jmp.motion_planner
         self.subtask_dict = {}
         self.subtask_idx_dict = {}
 
         self.mlp = mlp
 
-    # @staticmethod
-    # def from_pickle_or_compute(mdp, mlp_params, custom_filename=None, force_compute_all=False, info=True, force_compute_more=False):
-
-    #     # assert isinstance(mdp, OvercookedGridworld)
-
-    #     filename = custom_filename if custom_filename is not None else mdp.layout_name + '_' + 'steak_medium_mdp' + '.pkl'
-
-    #     if force_compute_all:
-    #         mdp_planner = SteakMediumLevelMDPPlanner(mdp, mlp_params)
-    #         mdp_planner.compute_mdp_policy(filename)
-    #         return mdp_planner
-        
-    #     try:
-    #         mdp_planner = SteakMediumLevelMDPPlanner.from_mdp_planner_file(filename)
-            
-    #         if force_compute_more:
-    #             print("Stored mdp_planner computed ", str(mdp_planner.num_rounds), " rounds. Compute another " + str(TRAINNINGUNIT) + " more...")
-    #             mdp_planner.compute_mdp_policy(filename)
-    #             return mdp_planner
-
-    #     except (FileNotFoundError, ModuleNotFoundError, EOFError, AttributeError) as e:
-    #         print("Recomputing planner due to:", e)
-    #         mdp_planner = SteakMediumLevelMDPPlanner(mdp, mlp_params)
-    #         mdp_planner.compute_mdp_policy(filename)
-    #         return mdp_planner
-
-    #     if info:
-    #         print("Loaded SteakMediumLevelMDPPlanner from {}".format(os.path.join(PLANNERS_DIR, filename)))
-
-    #     return mdp_planner
-    
     def gen_state_dict_key(self, world_state, player, other_player=None, env=None, RETURN_OBJ=False):
-        # a0 pos, a0 dir, a0 hold, a1 pos, a1 dir, a1 hold, pot_state, chop_state, sink_state, len(order_list)
-
         player_obj = 'None'
         if player.holding is not None:
             player_obj = player.holding
@@ -66,7 +26,6 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
 
         pot_state, chop_state, sink_state = 0, -1, -1
 
-        # for obj in state.objects.values():
         if len(env.kitchen.ready_sinks) > 0:
             sink_state = 2
         elif len(env.kitchen.rinsing_sinks) > 0:
@@ -75,13 +34,13 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
             sink_state = 0
         elif len(world_state.state_dict['sink_states']['empty']) > 0:
             sink_state = 'None'
-        
+
         # steaks
         if len(world_state.state_dict['pot_states']['empty']) > 0:
             pot_state = 0
         else:
             pot_state = 1
-        
+
         if len(world_state.state_dict['chop_states']['empty']) > 0:
             chop_state = 'None'
         elif len(world_state.state_dict['chop_states']['full']) > 0:
@@ -91,44 +50,38 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
                 chop_state = 0
         else:
             chop_state = 2
-            
+
         if RETURN_OBJ:
             return [player_obj, pot_state, chop_state, sink_state, world_state.orders]
 
-        state_str = str(player_obj)+'_'+str(pot_state)+'_'+str(chop_state)+'_'+str(sink_state)
+        state_str = str(player_obj) + '_' + str(pot_state) + '_' + str(chop_state) + '_' + str(sink_state)
         if order_str != '':
             state_str = state_str + '_' + order_str
 
         return state_str
-    
-    def init_states(self, state_idx_dict=None, order_list=None):
-        # print('In init_states()...')
-        # player_obj, num_items_for_steak, chop_time, sink_time, order_list
 
+    def init_states(self, state_idx_dict=None, order_list=None):
         if state_idx_dict is None:
             objects = ['meat', 'onion', 'plate', 'hot_plate', 'steak', 'dish', 'None']
-            # common_actions = ['pickup', 'drop']
-            # addition_actions = [('soup','deliver'), ('soup', 'pickup'), ('dish', 'pickup'), ('None', 'None')]
-            # obj_action_pair = list(itertools.product(objects, common_actions)) + addition_actions
 
-            state_keys = []; state_obj = []; tmp_state_obj = []; tmp_state_obj_1 = []
+            state_keys = []
+            state_obj = []
+            tmp_state_obj = []
 
             for obj in objects:
                 tmp_state_obj.append(([obj]))
 
             # include key object state 
             objects_only_arr = [obj.copy() for obj in tmp_state_obj]
-            for i in range(self.mdp.num_items_for_steak+1):
-                tmp_keys = [val+'_'+str(i) for val in objects]
-                # for obj in tmp_state_obj:
-                #     obj.append(i)
+            for i in range(self.mdp.num_items_for_steak + 1):
+                tmp_keys = [val + '_' + str(i) for val in objects]
 
                 state_keys = state_keys + tmp_keys
                 tmp_state_obj = [obj.copy() for obj in objects_only_arr]
                 for obj in tmp_state_obj:
                     obj.append(i)
                 state_obj = state_obj + [obj for obj in tmp_state_obj]
-                
+
             tmp_state_key = state_keys
             prev_state_obj = [obj.copy() for obj in state_obj]
             tmp_state_obj = [obj.copy() for obj in state_obj]
@@ -136,8 +89,8 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
             tmp_state_key = []
             state_obj = []
 
-            for i in range(self.mdp.chopping_time+1):
-                tmp_keys = [k+'_'+str(i) for k in prev_keys]
+            for i in range(self.mdp.chopping_time + 1):
+                tmp_keys = [k + '_' + str(i) for k in prev_keys]
                 tmp_state_key += tmp_keys
 
                 for obj in tmp_state_obj:
@@ -145,9 +98,8 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
                 state_obj = state_obj + [obj for obj in tmp_state_obj]
                 tmp_state_obj = [obj.copy() for obj in prev_state_obj]
 
-            tmp_keys = [k+'_None' for k in prev_keys]
+            tmp_keys = [k + '_None' for k in prev_keys]
             tmp_state_key += tmp_keys
-            # state_keys = tmp_state_key.copy()
             prev_keys = tmp_state_key.copy()
 
             for obj in tmp_state_obj:
@@ -160,9 +112,8 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
             tmp_state_key = []
             state_obj = []
 
-            for i in range(self.mdp.wash_time+1):
-                tmp_keys = [k+'_'+str(i) for k in prev_keys]
-                # state_keys = state_keys + tmp_keys
+            for i in range(self.mdp.wash_time + 1):
+                tmp_keys = [k + '_' + str(i) for k in prev_keys]
                 tmp_state_key += tmp_keys
 
                 for obj in tmp_state_obj:
@@ -170,24 +121,20 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
                 state_obj = state_obj + [obj for obj in tmp_state_obj]
                 tmp_state_obj = [obj.copy() for obj in prev_state_obj]
 
-            tmp_keys = [k+'_None' for k in prev_keys]
-            # state_keys = state_keys + tmp_keys
+            tmp_keys = [k + '_None' for k in prev_keys]
             tmp_state_key += tmp_keys
-            # prev_keys = tmp_state_key.copy()
-            # tmp_state_key = []
             for obj in tmp_state_obj:
                 obj.append('None')
             state_obj = state_obj + [obj for obj in tmp_state_obj]
             # tmp_state_key = state_keys
             prev_state_obj = [obj.copy() for obj in state_obj]
             tmp_state_obj = [obj.copy() for obj in state_obj]
-            state_obj = [] 
+            state_obj = []
 
             # include order list items in state
-
             for order in order_list:
                 prev_keys = tmp_state_key.copy()
-                tmp_keys = [i+'_'+order for i in prev_keys]
+                tmp_keys = [i + '_' + order for i in prev_keys]
                 # state_keys = state_keys + tmp_keys
                 tmp_state_key += tmp_keys
 
@@ -196,42 +143,35 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
                 tmp_state_obj = prev_state_obj + [obj for obj in tmp_state_obj]
                 prev_state_obj = [obj.copy() for obj in tmp_state_obj]
 
-            # print(state_keys, state_obj)
-
-            self.state_idx_dict = {k:i for i, k in enumerate(tmp_state_key)}
-            self.state_dict = {key:obj for key, obj in zip(tmp_state_key, tmp_state_obj)} 
+            self.state_idx_dict = {k: i for i, k in enumerate(tmp_state_key)}
+            self.state_dict = {key: obj for key, obj in zip(tmp_state_key, tmp_state_obj)}
 
         else:
             self.state_idx_dict = state_idx_dict
             self.state_dict = state_dict
-
-        # print('Initialize states:', self.state_idx_dict.items())
         return
-    
-    def init_actions(self, actions=None, action_dict=None, action_idx_dict=None):
-        # print('In init_actions()...')
 
+    def init_actions(self, actions=None, action_dict=None, action_idx_dict=None):
         if actions is None:
             objects = ['meat', 'onion', 'plate', 'hot_plate', 'steak']
             common_actions = ['pickup', 'drop']
-            addition_actions = [['chop', 'onion'], ['heat', 'hot_plate'], ['pickup', 'garnish'], ['deliver','dish']]
+            addition_actions = [['chop', 'onion'], ['heat', 'hot_plate'], ['pickup', 'garnish'], ['deliver', 'dish']]
 
             common_action_obj_pair = list(itertools.product(common_actions, objects))
             common_action_obj_pair = [list(i) for i in common_action_obj_pair]
             actions = common_action_obj_pair + addition_actions
-            self.action_dict = {action[0]+'_'+action[1]:action for action in actions}
-            self.action_idx_dict = {action[0]+'_'+action[1]:i for i, action in enumerate(actions)}
+            self.action_dict = {action[0] + '_' + action[1]: action for action in actions}
+            self.action_idx_dict = {action[0] + '_' + action[1]: i for i, action in enumerate(actions)}
 
         else:
             self.action_dict = action_dict
             self.action_idx_dict = action_idx_dict
 
-        # print('Initialize actions:', self.action_dict)
-        
         return
-    
+
     def init_transition_matrix(self, transition_matrix=None):
-        self.transition_matrix = transition_matrix if transition_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
+        self.transition_matrix = transition_matrix if transition_matrix is not None else np.zeros(
+            (len(self.action_dict), len(self.state_idx_dict), len(self.state_idx_dict)), dtype=float)
 
         game_logic_transition = self.transition_matrix.copy()
         distance_transition = self.transition_matrix.copy()
@@ -242,34 +182,38 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
                 state_idx = self.state_idx_dict[state_key]
                 next_state_idx = state_idx
                 next_action_idx = action_idx
-        
+
                 # define state and action game transition logic
                 player_obj, num_item_in_pot, chop_time, wash_time, orders = self.ml_state_to_objs(state_obj)
-                next_actions, next_state_keys = self.state_action_nxt_state(player_obj, num_item_in_pot, chop_time, wash_time, orders)
+                next_actions, next_state_keys = self.state_action_nxt_state(player_obj, num_item_in_pot, chop_time,
+                                                                            wash_time, orders)
 
                 if next_actions == action_key:
                     next_state_idx = self.state_idx_dict[next_state_keys]
 
                 game_logic_transition[next_action_idx][state_idx][next_state_idx] += 1.0
 
-            # print(state_key)
-        # print(game_logic_transition[:, 25])
-        # tmp = input()
-
         self.transition_matrix = game_logic_transition
 
     def ml_state_to_objs(self, state_obj):
         # state: obj + action + bool(soup nearly finish) + orders
-        player_obj = state_obj[0]; num_item_in_pot = state_obj[1]; chop_time = state_obj[2]; wash_time = state_obj[3];
+        player_obj = state_obj[0];
+        num_item_in_pot = state_obj[1];
+        chop_time = state_obj[2];
+        wash_time = state_obj[3];
         orders = []
         if len(state_obj) > 4:
             orders = state_obj[4:]
 
         return player_obj, num_item_in_pot, chop_time, wash_time, orders
-        
+
     def state_action_nxt_state(self, player_obj, num_item_in_pot, chop_time, wash_time, orders, other_obj=''):
         # game logic
-        actions = ''; next_obj = player_obj; next_num_item_in_pot = num_item_in_pot; next_chop_time = chop_time; next_wash_time = wash_time;
+        actions = ''
+        next_obj = player_obj
+        next_num_item_in_pot = num_item_in_pot
+        next_chop_time = chop_time
+        next_wash_time = wash_time
         if wash_time == 'None':
             wash_time = -1
         if chop_time == 'None':
@@ -351,12 +295,13 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
                 print(player_obj)
                 raise ValueError()
 
-        next_state_keys = next_obj + '_' + str(next_num_item_in_pot) + '_' + str(next_chop_time) + '_' + str(next_wash_time)
+        next_state_keys = next_obj + '_' + str(next_num_item_in_pot) + '_' + str(next_chop_time) + '_' + str(
+            next_wash_time)
         for order in orders:
             next_state_keys = next_state_keys + '_' + order
 
         return actions, next_state_keys
-    
+
     def map_action_to_location(self, world_state, state_obj, action, obj, p0_obj=None):
         """
         Get the next location the agent will be in based on current world state and medium level actions.
@@ -372,11 +317,14 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
             elif obj == 'meat':
                 location = self.mdp.get_meat_dispenser_locations()
             elif obj == 'hot_plate':
-                location = self.mdp.get_sink_status(world_state)['full'] + self.mdp.get_sink_status(world_state)['ready']
+                location = self.mdp.get_sink_status(world_state)['full'] + self.mdp.get_sink_status(world_state)[
+                    'ready']
             elif obj == 'garish':
-                location = self.mdp.get_chopping_board_status(world_state)['full'] + self.mdp.get_chopping_board_status(world_state)['ready']
+                location = self.mdp.get_chopping_board_status(world_state)['full'] + \
+                           self.mdp.get_chopping_board_status(world_state)['ready']
             elif obj == 'steak':
-                location = self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_ready_pots(pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
+                location = self.mdp.get_cooking_pots(pots_states_dict) + self.mdp.get_ready_pots(
+                    pots_states_dict) + self.mdp.get_full_pots(pots_states_dict)
             else:
                 print(p0_obj, action, obj)
                 ValueError()
@@ -405,31 +353,28 @@ class SteakMediumLevelMDPPlanner(HighLevelMdpPlanner):
             ValueError()
 
         return location
-    
+
     def init_reward(self, reward_matrix=None):
-        # state: obj + action + bool(soup nearly finish) + orders
-
-        self.reward_matrix = reward_matrix if reward_matrix is not None else np.zeros((len(self.action_dict), len(self.state_idx_dict)), dtype=float)
-
-        # when deliver order, pickup onion. probabily checking the change in states to give out rewards: if action is correct, curr_state acts and changes to rewardable next state. Then, we reward.
+        self.reward_matrix = reward_matrix if reward_matrix is not None else np.zeros(
+            (len(self.action_dict), len(self.state_idx_dict)), dtype=float)
 
         for state_key, state_obj in self.state_dict.items():
             # state: obj + action + bool(soup nearly finish) + orders
-            player_obj = state_obj[0]; soup_finish = state_obj[1]
+            player_obj = state_obj[0];
+            soup_finish = state_obj[1]
             orders = []
             if len(state_obj) > 5:
                 orders = state_obj[4:-1]
 
             if player_obj == 'dish':
-                self.reward_matrix[self.action_idx_dict['deliver_dish']][self.state_idx_dict[state_key]] += self.mdp.delivery_reward
-        
-            if len(orders) == 0:
-                self.reward_matrix[:,self.state_idx_dict[state_key]] += self.mdp.delivery_reward
+                self.reward_matrix[self.action_idx_dict['deliver_dish']][
+                    self.state_idx_dict[state_key]] += self.mdp.delivery_reward
 
-            # if soup_finish == self.mdp.num_items_for_soup and player_obj == 'dish':
-            #     self.reward_matrix[self.action_idx_dict['pickup_soup'], self.state_idx_dict[state_key]] += self.mdp.delivery_reward/5.0
+            if len(orders) == 0:
+                self.reward_matrix[:, self.state_idx_dict[state_key]] += self.mdp.delivery_reward
+
         return
-    
+
     def get_mdp_key_from_state(self, env):
         key = f"{env.robot_state.holding}_{len(env.world_state.state_dict['pot_states'])}"
         for order in env.world_state.orders:
