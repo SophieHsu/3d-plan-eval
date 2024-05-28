@@ -3,6 +3,7 @@ from igibson import object_states
 
 from utils import real_to_grid_coord, to_overcooked_grid
 
+# only those actions that change the object (type of object, it's state, or swap it out)
 ACTION_COMMANDS = SimpleNamespace(
     DROP='drop_action',
     CLEAN='clean_action',
@@ -22,6 +23,7 @@ class DropCommandExecutor(ActionExecutor):
     def __init__(self):
         super().__init__()
 
+    # only called there needs to be a change in the object (new object replacing an older object)
     def execute(self, target, kitchen, **state_args):
         obj_id = kitchen.overcooked_max_id
         kitchen.overcooked_max_id += 1
