@@ -146,14 +146,14 @@ class VisionLimitEnv(LsiEnv):
                     elif s in self.world_state.state_dict['sink_states']['ready'] and p_state['state'] < 2:
                         self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, p, name='hot_plate')
 
-                if real_to_grid_coord(s.get_position()) == real_to_grid_coord(
-                        plate.get_position()) and sink in self.kitchen.ready_sinks:
+                if real_to_grid_coord(s.get_position()) == real_to_grid_coord(plate.get_position()) and \
+                        sink in self.kitchen.ready_sinks:
                     # if plate is in same location as sink and sink is in ready sinks then heat it
                     p_state = self.kitchen.overcooked_object_states[plate]
                     if p_state['state'] is None:
                         self.kitchen.execute_action(ACTION_COMMANDS.DROP, plate, name='hot_plate')
                     elif p_state['state'] < 2:
-                        self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, p, name='hot_plate')
+                        self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, plate, name='hot_plate')
 
                     if in_human_hand == plate:
                         in_human_hand = None
