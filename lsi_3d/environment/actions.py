@@ -70,6 +70,6 @@ class ChopCommandExecutor(ActionExecutor):
 
 ACTION_EXECUTORS = {
     ACTION_COMMANDS.DROP: DropCommandExecutor(),
-    ACTION_COMMANDS.HEAT: CleanCommandCommandExecutor(),
+    ACTION_COMMANDS.CLEAN: CleanCommandCommandExecutor(),
     ACTION_COMMANDS.CHOP: ChopCommandExecutor(),
 }
