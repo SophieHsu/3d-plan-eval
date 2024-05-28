@@ -5,7 +5,7 @@ from utils import real_to_grid_coord, to_overcooked_grid
 
 ACTION_COMMANDS = SimpleNamespace(
     DROP='drop_action',
-    HEAT='heat_action',
+    CLEAN='heat_action',
     CHOP='chop_action',
 )
 
@@ -36,7 +36,7 @@ class DropCommandExecutor(ActionExecutor):
         }
 
 
-class HeatCommandCommandExecutor(ActionExecutor):
+class CleanCommandCommandExecutor(ActionExecutor):
     def __init__(self):
         super().__init__()
 
@@ -68,6 +68,6 @@ class ChopCommandExecutor(ActionExecutor):
 
 ACTION_EXECUTORS = {
     ACTION_COMMANDS.DROP: DropCommandExecutor(),
-    ACTION_COMMANDS.HEAT: HeatCommandCommandExecutor(),
+    ACTION_COMMANDS.HEAT: CleanCommandCommandExecutor(),
     ACTION_COMMANDS.CHOP: ChopCommandExecutor(),
 }
