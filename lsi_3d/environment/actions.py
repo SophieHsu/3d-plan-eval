@@ -5,7 +5,7 @@ from utils import real_to_grid_coord, to_overcooked_grid
 
 ACTION_COMMANDS = SimpleNamespace(
     DROP='drop_action',
-    CLEAN='heat_action',
+    CLEAN='clean_action',
     CHOP='chop_action',
 )
 
