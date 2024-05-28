@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from igibson import object_states
 
 from utils import real_to_grid_coord, to_overcooked_grid
 
@@ -49,8 +50,8 @@ class HeatCommandCommandExecutor(ActionExecutor):
             **state_args
         }
 
-        # plate.states[object_states.Dusty].set_value(False)
-        # plate.states[object_states.Stained].set_value(False)
+        target.states[object_states.Dusty].set_value(False)
+        target.states[object_states.Stained].set_value(False)
 
 
 class ChopCommandExecutor(ActionExecutor):
