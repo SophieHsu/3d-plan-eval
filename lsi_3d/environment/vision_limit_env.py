@@ -1,16 +1,17 @@
-import json
 import math
 import time
+
 from igibson import object_states
 from igibson.envs.igibson_env import iGibsonEnv
 from igibson.robots.manipulation_robot import IsGraspingState
 from lsi_3d.agents.igibson_agent import iGibsonAgent
+from lsi_3d.environment.actions import ACTION_COMMANDS
 from lsi_3d.environment.kitchen import Kitchen
 from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.mdp.state import AgentState, WorldState
-from lsi_3d.utils.functions import find_nearby_open_spaces, grid_transition
+from lsi_3d.utils.functions import find_nearby_open_spaces
 from utils import grid_to_real_coord, quat2euler, real_to_grid_coord
 
 STICKY_ITEMS = False
@@ -140,19 +141,19 @@ class VisionLimitEnv(LsiEnv):
                 for p in ps:
                     # if plate is in sink and its state is none, change to 0
                     p_state = self.kitchen.overcooked_object_states[p]
-                    if p_state['state'] == None:
-                        self.kitchen.drop_plate(p)
+                    if p_state['state'] is None:
+                        self.kitchen.execute_action(ACTION_COMMANDS.DROP, p, name='hot_plate')
                     elif s in self.world_state.state_dict['sink_states']['ready'] and p_state['state'] < 2:
-                        self.kitchen.heat_plate(p)
+                        self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, p, name='hot_plate')
 
                 if real_to_grid_coord(s.get_position()) == real_to_grid_coord(
                         plate.get_position()) and sink in self.kitchen.ready_sinks:
                     # if plate is in same location as sink and sink is in ready sinks then heat it
                     p_state = self.kitchen.overcooked_object_states[plate]
-                    if p_state['state'] == None:
-                        self.kitchen.drop_plate(plate)
+                    if p_state['state'] is None:
+                        self.kitchen.execute_action(ACTION_COMMANDS.DROP, plate, name='hot_plate')
                     elif p_state['state'] < 2:
-                        self.kitchen.heat_plate(p)
+                        self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, p, name='hot_plate')
 
                     if in_human_hand == plate:
                         in_human_hand = None
@@ -167,7 +168,12 @@ class VisionLimitEnv(LsiEnv):
                     if self.tracking_env.get_position(p) == self.tracking_env.get_position(object):
                         # if p.states[object_states.Inside].get_value(object):
                         if state['name'] == 'meat':
-                            self.kitchen.drop_meat(object)
+                            self.kitchen.execute_action(
+                                ACTION_COMMANDS.DROP,
+                                object,
+                                name='steak',
+                                state=('steak', 1, 10)
+                            )
                         if in_human_hand == object:
                             in_human_hand = None
 
@@ -179,10 +185,10 @@ class VisionLimitEnv(LsiEnv):
                     # for o in objs:
                     o_state = self.kitchen.overcooked_object_states[object]
                     if self.tracking_env.get_position(b) == self.tracking_env.get_position(object):
-                        if o_state['state'] == None:
-                            self.kitchen.drop_onion(object)
+                        if o_state['state'] is None:
+                            self.kitchen.execute_action(ACTION_COMMANDS.DROP, object, name='garnish')
                         elif object.current_index == 1 and o_state['state'] < 2:
-                            self.kitchen.chop_onion(object)
+                            self.kitchen.execute_action(ACTION_COMMANDS.CHOP, object, name='garnish', state=2)
 
                         if in_human_hand == object:
                             in_human_hand = None

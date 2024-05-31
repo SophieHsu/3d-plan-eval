@@ -10,6 +10,7 @@ import pybullet as p
 from igibson import object_states
 from igibson.objects.multi_object_wrappers import ObjectMultiplexer
 from igibson.robots.manipulation_robot import IsGraspingState
+from lsi_3d.environment.actions import ACTION_EXECUTORS
 from lsi_3d.environment.object_config import (
     OBJECT_AWAY_POSES_OFFSETS,
     OBJECT_KEYS,
@@ -91,79 +92,8 @@ class Kitchen:
 
         self.overcooked_hot_plates_now_dish = []
 
-    def drop_plate(self, plate):
-        id = self.overcooked_max_id
-        self.overcooked_max_id += 1
-        self.overcooked_obj_to_id[plate] = id
-        curr_state = self.overcooked_object_states[plate]['state']
-        state = 0 if curr_state is None else curr_state + 1
-        self.overcooked_object_states[plate] = {
-            'id': id,
-            'name': 'hot_plate',
-            'position': to_overcooked_grid(real_to_grid_coord(plate.get_position())),
-            'state': state
-        }
-
-        return
-
-    def heat_plate(self, plate):
-        curr_state = self.overcooked_object_states[plate]['state']
-        state = 0 if curr_state is None else curr_state + 1
-        self.overcooked_object_states[plate] = {
-            'id': self.overcooked_obj_to_id[plate],
-            'name': 'hot_plate',
-            'position': to_overcooked_grid(real_to_grid_coord(plate.get_position())),
-            'state': state
-        }
-
-        plate.states[object_states.Dusty].set_value(False)
-        plate.states[object_states.Stained].set_value(False)
-
-        return
-
-    def drop_meat(self, obj):
-        id = self.overcooked_max_id
-        self.overcooked_max_id += 1
-        self.overcooked_obj_to_id[obj] = id
-        curr_state = self.overcooked_object_states[obj]['state']
-        state = 1 if curr_state is None else curr_state + 1
-        self.overcooked_object_states[obj] = {
-            'id': id,
-            'name': 'steak',
-            'position': to_overcooked_grid(real_to_grid_coord(obj.get_position())),
-            'state': ('steak', 1, 10)
-        }
-
-        self.stove.states[object_states.ToggledOn].set_value(True)
-
-        return
-
-    def drop_onion(self, obj):
-        id = self.overcooked_max_id
-        self.overcooked_max_id += 1
-        self.overcooked_obj_to_id[obj] = id
-        curr_state = self.overcooked_object_states[obj]['state']
-        state = 0 if curr_state is None else curr_state + 1
-        self.overcooked_object_states[obj] = {
-            'id': id,
-            'name': 'garnish',
-            'position': to_overcooked_grid(real_to_grid_coord(obj.get_position())),
-            'state': state
-        }
-
-        return
-
-    def chop_onion(self, obj):
-        curr_state = self.overcooked_object_states[obj]['state']
-        state = 2
-        self.overcooked_object_states[obj] = {
-            'id': self.overcooked_obj_to_id[obj],
-            'name': 'garnish',
-            'position': to_overcooked_grid(real_to_grid_coord(obj.current_selection().objects[0].get_position())),
-            'state': state
-        }
-
-        return
+    def execute_action(self, action, target, **kwargs):
+        ACTION_EXECUTORS[action].execute(target, self, **kwargs)
 
     def update_overcooked_human_holding(self, holding, obj):
         # need to delay human holding for overcooked 

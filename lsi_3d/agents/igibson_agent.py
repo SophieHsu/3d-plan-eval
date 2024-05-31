@@ -16,6 +16,7 @@ from igibson.external.pybullet_tools.utils import (
     joints_from_names,
     set_joint_positions,
 )
+from lsi_3d.environment.actions import ACTION_COMMANDS
 from igibson.utils.utils import l2_distance, restoreState
 from igibson.utils.utils import quatToXYZW
 from lsi_3d.utils.constants import DIRE2POSDIFF, TARGET_ORNS
@@ -437,7 +438,7 @@ class iGibsonAgent:
             if plate is not None:
                 # immediately done
                 self.interact_step_index = -1
-                tracking_env.kitchen.heat_plate(plate)
+                tracking_env.kitchen.execute_action(ACTION_COMMANDS.CLEAN, plate, name='hot_plate')
                 self.object_position = None
 
         elif action == "pickup" and object == "dish":
