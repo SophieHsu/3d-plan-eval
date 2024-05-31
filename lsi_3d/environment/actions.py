@@ -30,7 +30,7 @@ class DropCommandExecutor(ActionExecutor):
         kitchen.overcooked_obj_to_id[target] = obj_id
         curr_state = kitchen.overcooked_object_states[target]['state']
         state = 0 if curr_state is None else curr_state + 1
-        return {
+        kitchen.overcooked_object_states[target] = {
             'id': obj_id,
             'position': to_overcooked_grid(real_to_grid_coord(target.get_position())),
             'state': state,
