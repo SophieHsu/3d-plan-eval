@@ -115,6 +115,7 @@ class GreenOnion(KitchenObject):
         super().__init__()
         self._params = Namespace(**kwargs)
         self._multiplexed_obj = None
+        self._obj = None
 
     def _get_object_parts(self):
         object_parts = []
@@ -140,6 +141,12 @@ class GreenOnion(KitchenObject):
     @property
     def multiplexed_obj(self):
         return self._multiplexed_obj
+
+    @property
+    def obj(self):
+        if self._obj is None:
+            self._obj = super().obj
+        return self._multiplexed_obj or self._obj
 
     def load(self):
         object_parts = self._get_object_parts()
