@@ -146,7 +146,7 @@ class GreenOnion(KitchenObject):
     def obj(self):
         if self._obj is None:
             self._obj = super().obj
-        return self._multiplexed_obj or self._obj
+        return self.multiplexed_obj
 
     def load(self):
         object_parts = self._get_object_parts()
