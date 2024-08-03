@@ -119,22 +119,22 @@ class GreenOnion(KitchenObject):
 
     def _get_object_parts(self):
         object_parts = []
-        for i, part in enumerate(self.obj.metadata['object_parts']):
+        for i, part in enumerate(self._obj.metadata['object_parts']):
             part_category = part['category']
             part_model = part['model']
-            part_pos = part['pos'] * self.obj.scale
+            part_pos = part['pos'] * self._obj.scale
             part_orn = part['orn']
             part_model_path = get_ig_model_path(part_category, part_model)
             part_filename = os.path.join(part_model_path, '{}.urdf'.format(part_model))
-            part_obj_name = '{}_part_{}'.format(self.obj.name, i)
+            part_obj_name = '{}_part_{}'.format(self._obj.name, i)
             part_obj = self.GreenOnionPart(
                 filename=part_filename,
                 name=part_obj_name,
                 category=part_category,
                 model_path=part_model_path,
-                scale=self.obj.scale
+                scale=self._obj.scale
             )
-            object_parts.append((part_obj.obj, (part_pos, part_orn)))
+            object_parts.append((part_obj._obj, (part_pos, part_orn)))
 
         return object_parts
 
@@ -152,8 +152,8 @@ class GreenOnion(KitchenObject):
         object_parts = self._get_object_parts()
         grouped_parts_obj = ObjectGrouper(object_parts)
         self._multiplexed_obj = ObjectMultiplexer(
-            '{}_multiplexer'.format(self.obj.name),
-            [self.obj, grouped_parts_obj],
+            '{}_multiplexer'.format(self._obj.name),
+            [self._obj, grouped_parts_obj],
             0
         )
 
