@@ -26,4 +26,17 @@ Adapt to humans' changing subtask intentions while considering their limited FOV
 This research addresses a gap in human-AI collaboration by accounting for humans' perceptual 
 limitations, potentially leading to more natural and efficient teamwork between humans and AI
 agents.
- 
+
+## Installation Instructions ## 
+
+## Usage ##
+
+## Project Structure ##
+
+## Results ##
+
+## Citation ##
+
+## Licence ##
+
+## Contact ##
