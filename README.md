@@ -36,7 +36,8 @@ agents.
 ## Results ##
 
 ## Citation ##
-
-## Licence ##
+```
+Coming soon
+```
 
 ## Contact ##
