@@ -29,6 +29,12 @@ agents.
 
 ## Installation Instructions ## 
 
+### Versions ###
+This project has mainly two versions:
+- `v1.0` is the version used for experimentation.
+- `v2.1` is the latest version which is identical to `v1.0` accept the code has been refactored in some places.
+For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
+
 ## Usage ##
 
 ## Project Structure ##
