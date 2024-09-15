@@ -81,3 +81,6 @@ Coming soon
 ```
 
 ## Contact ##
+```
+For any questions, reach out to: yachuanh at usc dot edu
+```
