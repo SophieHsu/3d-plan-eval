@@ -38,6 +38,10 @@ This project has mainly two versions:
 For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
 
 ### Clone the Project ###
+Cloning the version of the code you want to run.
+```
+git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
+```
 
 ### Install Oculus ###
 
