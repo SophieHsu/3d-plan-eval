@@ -17,9 +17,16 @@
 <!-- TOC -->
 
 # Integrating Human Field of View in Human-Aware Collaborative #
+#### FOV Unaware Planner ####
 <p align="center">
   <img src="assets/unaware_top.gif" width="45%" />
   <img src="assets/unaware_fpv.gif" width="45%" />
+</p>
+
+#### FOV Aware Planner ####
+<p align="center">
+  <img src="assets/aware_top.gif" width="45%" />
+  <img src="assets/aware_fpv.gif" width="45%" />
 </p>
 
 ## Project Overview ##
