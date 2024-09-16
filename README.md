@@ -43,12 +43,13 @@ Cloning the version of the code you want to run.
 git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
 ```
 
+### Install SteamVR ###
+Install the SteamVR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
+
+
 ### Install Oculus ###
-TODO: add instructions
-
-### Install Steam VR ###
-Install the Steam VR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
-
+- Perform the initial setup of your VR headset. For quest see [this](https://www.meta.com/blog/quest/you-got-a-quest-2-heres-how-to-set-it-up/).
+- Set the VR headset to run with SteamVR. For oculus see [this](https://docs.varwin.com/latest/en/instructions-for-using-the-oculus-quest-2-headset-2260861409.html).
 ## Usage ##
 - Setup
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
