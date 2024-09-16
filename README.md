@@ -17,6 +17,10 @@
 <!-- TOC -->
 
 # Integrating Human Field of View in Human-Aware Collaborative #
+<p align="center">
+  <img src="assets/unaware_top.gif.gif" width="45%" />
+  <img src="assets/unaware_fpv.gif.gif" width="45%" />
+</p>
 
 ## Project Overview ##
 Most research on human-AI collaboration assumes that humans have full knowledge of their surroundings, 
