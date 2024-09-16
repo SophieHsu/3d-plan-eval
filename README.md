@@ -29,6 +29,8 @@
   <img src="assets/aware_fpv.gif" width="45%" />
 </p>
 
+#### Note: Due to difference in the sizes of the GIFs, they may start at different times and be unaligned. 
+
 ## Project Overview ##
 Most research on human-AI collaboration assumes that humans have full knowledge of their surroundings, 
 which is unrealistic given their limited field of view (FOV). This project aims to adapt AI systems to humans' 
