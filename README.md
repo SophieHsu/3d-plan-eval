@@ -44,8 +44,10 @@ git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
 ```
 
 ### Install Oculus ###
+TODO: add instructions
 
-### Install Steam VR ###![belief-tree.png](../../Downloads/belief-tree.png)
+### Install Steam VR ###
+TODO: add instructions
 
 ## Usage ##
 - Setup
