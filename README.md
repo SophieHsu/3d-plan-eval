@@ -3,31 +3,17 @@
 ![belief tree image from paper](assets/belief-tree.png)
 
 ## Project Overview ##
+Most research on human-AI collaboration assumes that humans have full knowledge of their surroundings, 
+which is unrealistic given their limited field of view (FOV). This project aims to adapt AI systems to humans' 
+changing intentions while accounting for these perception limitations. To achieve this, we integrate FOV into 
+a human-aware probabilistic planning framework and develop a hierarchical online planner that efficiently 
+navigates large state spaces. The AI agent is designed to explore actions that enter the human's FOV, 
+influencing their intended subtask. We validated our approach through a user study conducted in a 2D cooking 
+domain and extended our findings to a VR kitchen environment. Results showed that the FOV-aware planner reduced 
+interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 
+2D and VR environments. This research addresses a critical gap in human-AI collaboration by accounting for human 
+perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
-### Problem ###
-Most research on human-AI collaboration assumes humans have full knowledge of their surroundings, 
-which is unrealistic.
-
-### Goal ###
-Adapt to humans' changing subtask intentions while considering their limited FOV.
-
-### Approach ###
-- Integrate FOV into a human-aware probabilistic planning framework.
-- Develop a hierarchical online planner to handle large state spaces efficiently.
-- Enable the AI agent to explore actions that enter the human's FOV to influence their intended subtask.
-
-### Validation ###
-- Conducted a user study using a 2D cooking domain.
-- Extended findings to a VR kitchen environment.
-
-### Results ###
-- The FOV-aware planner reduced interruptions and redundant actions during collaboration.
-- Similar collaborative behaviors were observed in both 2D and VR environments.
-
-### Significance ###
-This research addresses a gap in human-AI collaboration by accounting for humans' perceptual 
-limitations, potentially leading to more natural and efficient teamwork between humans and AI
-agents.
 
 ## Installation Instructions ## 
 
