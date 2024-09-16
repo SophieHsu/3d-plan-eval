@@ -133,6 +133,7 @@ The most relevant components in the project are described below.
 ## Results ##
 
 ## Citation ##
+Please cite this work using the following Bibtex:
 ```
 Coming soon
 ```
