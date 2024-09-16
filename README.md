@@ -18,8 +18,8 @@
 
 # Integrating Human Field of View in Human-Aware Collaborative #
 <p align="center">
-  <img src="assets/unaware_top.gif.gif" width="45%" />
-  <img src="assets/unaware_fpv.gif.gif" width="45%" />
+  <img src="assets/unaware_top.gif" width="45%" />
+  <img src="assets/unaware_fpv.gif" width="45%" />
 </p>
 
 ## Project Overview ##
