@@ -64,7 +64,7 @@ For all the tags available please check the releases page associated with this p
 - Playing the Level
   - While playing the level, the system will generate a JSON log file, which is saved in the `lsi_3d/logs` directory. 
     The log file will have a unique ID associated with the run.
-- Running the Practise Room
+- Running the Practice Room
   - Start Overcooked:
     ```
     python overcooked_ai_py/steak_api_test.py -l steak_practice -v 1
