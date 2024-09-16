@@ -36,6 +36,43 @@ This project has mainly two versions:
 For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
 
 ## Usage ##
+- Setup
+  - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
+    provided config files. This has already been done for you. 
+- Starting the overcooked server
+  - Begin by running the Overcooked server. You can use the following script
+      ```
+      python overcooked_ai_py/steak_api_test.py -l steak_side_2 -v 1
+      ```
+    where, `-v`: Defines the vision limitation of the AI agent. <br>
+      1 = Aware (vision limited to the agent's field of view) <br>
+      0 = Unaware (omniscient agent) <br>
+    and `-l`: Defines the layout file (exclude the .tml extension).
+  - Note: If planner files need to be recalculated, make sure to delete old planner files.
+  - Alternatively, you can run the server with a restart mechanism (up to 5 restarts in case of crashes):
+      ```
+      ./steak_api_restart.sh
+      ```
+- Running the iGibson Simulator
+  - Once the Overcooked server is running, start the iGibson simulation:
+    ```
+    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+    ```
+  - `-m vr`: Runs the program in VR mode. If left out, the program will simulate a greedy human model operating in 
+    the world. Other options are: [`headless`, `headless_tensor`, `gui_non_interactive`, `gui_interactive`, `vr`].
+  - `-c steak_none_3.tml`: Defines the configuration file, which must match the config used in Overcooked.
+- Playing the Level
+  - While playing the level, the system will generate a JSON log file, which is saved in the `lsi_3d/logs` directory. 
+    The log file will have a unique ID associated with the run.
+- Running the Practise Room
+  - Start Overcooked:
+    ```
+    python overcooked_ai_py/steak_api_test.py -l steak_practice -v 1
+    ```
+  - Start iGibson in VR mode:
+    ```
+    python 3d_plan_eval_main.py -m vr -c steak_practice.tml -p 1
+    ```
 
 ## Project Structure ##
 The most relevant components in the project are described below.
