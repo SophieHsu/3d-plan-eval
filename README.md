@@ -152,4 +152,4 @@ Coming soon
 ```
 
 ## Contact ##
-For any questions, reach out to: [yachuanh@usc.edu](mailto:yachuanh@usc.edu)
+For any questions, please reach out to: [yachuanh@usc.edu](mailto:yachuanh@usc.edu)
