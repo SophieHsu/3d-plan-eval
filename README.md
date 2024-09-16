@@ -18,8 +18,6 @@
 
 # Integrating Human Field of View in Human-Aware Collaborative #
 
-![belief tree image from paper](assets/belief-tree.png)
-
 ## Project Overview ##
 Most research on human-AI collaboration assumes that humans have full knowledge of their surroundings, 
 which is unrealistic given their limited field of view (FOV). This project aims to adapt AI systems to humans' 
@@ -32,6 +30,7 @@ interruptions and redundant actions during collaboration, with similar collabora
 2D and VR environments. This research addresses a critical gap in human-AI collaboration by accounting for human 
 perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
+![belief tree image from paper](assets/belief-tree.png)
 
 ## Installation Instructions ## 
 
