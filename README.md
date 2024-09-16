@@ -136,8 +136,8 @@ The most relevant components in the project are described below.
 - `planners` - Different planner implementations for different environment typer for different agents (human vs AI).
 - `utils` - Common utility functions.
 
-## Instructions ##
-![instructions to play the game](assets/game_instructions.png)
+## Task Instructions ##
+![instructions to complete the task](assets/game_instructions.png)
 
 ## Results ##
 Our study shows that FOV-aware agents reduce Knowledge Base (KB) gaps and interruptions in environments with limited 
