@@ -51,8 +51,8 @@ Install the SteamVR (found [here](https://store.steampowered.com/app/250820/Stea
 
 
 ### Install Oculus ###
-- Perform the initial setup of your VR headset. For quest see [this](https://www.meta.com/blog/quest/you-got-a-quest-2-heres-how-to-set-it-up/).
-- Set the VR headset to run with SteamVR. For oculus see [this](https://docs.varwin.com/latest/en/instructions-for-using-the-oculus-quest-2-headset-2260861409.html).
+- Perform the initial setup of your VR headset. For oculus/quest see [this](https://www.meta.com/blog/quest/you-got-a-quest-2-heres-how-to-set-it-up/).
+- Set the VR headset to run with SteamVR. For oculus/quest see [this](https://docs.varwin.com/latest/en/instructions-for-using-the-oculus-quest-2-headset-2260861409.html).
 ## Usage ##
 - Setup
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
