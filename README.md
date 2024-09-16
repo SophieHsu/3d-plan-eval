@@ -35,6 +35,12 @@ This project has mainly two versions:
 - `v2.1` is the latest version which is identical to `v1.0` accept the code has been refactored in some places.
 For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
 
+### Clone the Project ###
+
+### Install Oculus ###
+
+### Install Steam VR ###![belief-tree.png](../../Downloads/belief-tree.png)
+
 ## Usage ##
 - Setup
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
