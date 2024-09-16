@@ -1,3 +1,21 @@
+<!-- TOC -->
+* [Integrating Human Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
+  * [Project Overview](#project-overview)
+  * [Installation Instructions](#installation-instructions)
+    * [Versions](#versions)
+    * [Clone the Project](#clone-the-project)
+    * [Install SteamVR](#install-steamvr)
+    * [Install Oculus](#install-oculus)
+  * [Usage](#usage)
+  * [Project Structure](#project-structure)
+    * [Main Scripts](#main-scripts)
+    * [`iGibson`](#igibson)
+    * [`lsi_3d` Components](#lsi_3d-components)
+  * [Results](#results)
+  * [Citation](#citation)
+  * [Contact](#contact)
+<!-- TOC -->
+
 # Integrating Human Field of View in Human-Aware Collaborative #
 
 ![belief tree image from paper](assets/belief-tree.png)
