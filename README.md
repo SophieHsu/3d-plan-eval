@@ -159,6 +159,17 @@ human visibility, like the ∩-shaped kitchen. In open environments, such as the
 negligible. We validated these findings in a VR kitchen, where FOV-aware agents adapted to human behavior by staying 
 within the human's field of view, enhancing collaboration.
 
+#### Behavior 1: Robot prolongs its visibility to the human ####
+![behavior-1-1](assets/b_1_1.png)
+Fig 1.1: The human starts by picking up a green onion. In the top row, the unaware robot goes to the sink to wash dishes. In the bottom row, the aware robot moves closer to the human, allowing them to see the robot and its actions for at least three consecutive timesteps when the human turns to drop off the green onion.
+
+![behavior-1-2](assets/b_1_2.png)
+Fig 1.2: The unaware robot (top row) picks up the cooked meat and moves to the chopping board. The aware robot (bottom row) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
+
+#### Behavior 2: Robot chose to take a longer path to enter the human's FOV ####
+![behavior-2-1](assets/b_2_1.png)
+Fig 2: In the top row (unaware robot), the robot collects garnish from the chopping board and takes the shorter path on the left to deliver the dish. In the bottom row (aware robot), the robot waits for the human to notice it is picking up the garnish and, afterward, takes the longer route to deliver the dish, which enables it to remain within the human's FOV.
+
 ## Citation ##
 Please cite this work using the following Bibtex:
 ```
