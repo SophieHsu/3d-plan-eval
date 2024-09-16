@@ -32,6 +32,8 @@ perceptual limitations, contributing to more natural and efficient teamwork betw
 
 ![belief tree image from paper](assets/belief-tree.png)
 
+![example view from the VR environment](assets/vr_fpv.png)
+
 ## Installation Instructions ## 
 
 ### Versions ###
@@ -134,7 +136,14 @@ The most relevant components in the project are described below.
 - `planners` - Different planner implementations for different environment typer for different agents (human vs AI).
 - `utils` - Common utility functions.
 
+## Instructions ##
+![instructions to play the game](assets/game_instructions.png)
+
 ## Results ##
+Our study shows that FOV-aware agents reduce Knowledge Base (KB) gaps and interruptions in environments with limited 
+human visibility, like the ∩-shaped kitchen. In open environments, such as the kitchen island, the difference is 
+negligible. We validated these findings in a VR kitchen, where FOV-aware agents adapted to human behavior by staying 
+within the human's field of view, enhancing collaboration.
 
 ## Citation ##
 Please cite this work using the following Bibtex:
