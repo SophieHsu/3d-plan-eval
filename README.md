@@ -1,5 +1,7 @@
 # Integrating Human Field of View in Human-Aware Collaborative #
 
+![belief tree image from paper](assets/belief-tree.png)
+
 ## Project Overview ##
 
 ### Problem ###
