@@ -138,6 +138,4 @@ Coming soon
 ```
 
 ## Contact ##
-```
-For any questions, reach out to: yachuanh at usc dot edu
-```
+For any questions, reach out to: [yachuanh@usc.edu](mailto:yachuanh@usc.edu)
