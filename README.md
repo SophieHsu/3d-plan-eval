@@ -174,7 +174,7 @@ Fig 1.2: The unaware robot (top row) picks up the cooked meat and moves to the c
 Fig 2: In the top row (unaware robot), the robot collects garnish from the chopping board and takes the shorter path on the left to deliver the dish. In the bottom row (aware robot), the robot waits for the human to notice it is picking up the garnish and, afterward, takes the longer route to deliver the dish, which enables it to remain within the human's FOV.
 
 ## Citation ##
-Please cite this work using the following Bibtex:
+Please cite this work using the following BibTex:
 ```
 Coming soon
 ```
