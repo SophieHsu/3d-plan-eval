@@ -26,20 +26,10 @@
 <!-- TOC -->
 
 # Integrating Human Field of View in Human-Aware Collaborative #
-#### FOV Unaware Planner ####
 <p align="center">
-  <img src="assets/fig11_baseline_trimmed.gif" width="90%" alt="Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view (behavior 1)." />
-  <br>
-  <img src="assets/fig12_baseline_trimmed.gif" width="90%" alt="Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view (behavior 2)." />
-  <br> Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view.  
-</p>
-
-#### FOV Aware Planner ####
-<p align="center">
-  <img src="assets/fig11_fov_trimmed.gif" width="90%" alt="Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly (behavior 1)." />
-  <br>
-  <img src="assets/fig12_fov_trimmed.gif" width="90%" alt="Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly (behavior 2)." />
-  <br> <i>Top-Down View (left) and First-Person View (right) of the FOV-aware planner showcasing behavior 1 (top) and behavior 2 (bottom): The FOV-aware robot adjusts its path to account for the human's limited field of view, staying within the human's line of sight to enhance collaboration.</i>  
+  <img src="assets/fig12_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig12_fov_trimmed.gif" width="42%" />
+  <br> Baseline (left) shows the robot turning right to go around the counters, whereas the FOV-aware robot (right) goes around the left so that it stays inside the human's field of view for longer showing what it is holding. 
 </p>
 
 ## Project Overview ##
@@ -177,8 +167,12 @@ within the human's field of view, enhancing collaboration.
 ![behavior-1-1](assets/b_1_1.png)
 Fig 1.1: The human starts by picking up a green onion. In the top row, the unaware robot goes to the sink to wash dishes. In the bottom row, the aware robot moves closer to the human, allowing them to see the robot and its actions for at least three consecutive timesteps when the human turns to drop off the green onion.
 
-![behavior-1-2](assets/b_1_2.png)
-Fig 1.2: The unaware robot (top row) picks up the cooked meat and moves to the chopping board. The aware robot (bottom row) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
+Another example is the following where the unaware robot (left) picks up the cooked meat and moves to the chopping board. The FOV-aware robot (right) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
+<p align="center">
+  <img src="assets/fig11_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig11_fov_trimmed.gif" width="43%" />
+</p>
+
 
 #### Behavior 2: Robot chose to take a longer path to enter the human's FOV ####
 ![behavior-2-1](assets/b_2_1.png)
