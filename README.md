@@ -19,12 +19,14 @@
 # Integrating Human Field of View in Human-Aware Collaborative #
 #### FOV Unaware Planner ####
 <p align="center">
-  <img src="assets/unaware_combined.gif" />
+  <img src="assets/unaware_top.gif" width="45%" />
+  <img src="assets/unaware_fpv.gif" width="45%" />
 </p>
 
 #### FOV Aware Planner ####
 <p align="center">
-  <img src="assets/aware_combined.gif" width="45%" />
+  <img src="assets/aware_top.gif" width="45%" />
+  <img src="assets/aware_fpv.gif" width="45%" />
 </p>
 
 #### Note: Due to differences in the sizes of the GIFs, they may start at different times and be unaligned. 
