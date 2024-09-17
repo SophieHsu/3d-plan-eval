@@ -20,13 +20,17 @@
 #### FOV Unaware Planner ####
 <p align="center">
   <img src="assets/fig12_baseline_trimmed.gif" width="90%" alt="Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view." />
+  <br>
+  <img src="assets/fig11_baseline_trimmed.gif" width="90%" alt="Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view." />
   <br> Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view.  
 </p>
 
 #### FOV Aware Planner ####
 <p align="center">
   <img src="assets/fig12_fov_trimmed.gif" width="90%" alt="Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly." />
-  <br> <i>Top-Down View (left) and First-Person View (right) of the FOV-aware planner: The FOV-aware robot adjusts its path to account for the human's limited field of view, staying within the human's line of sight to enhance collaboration by turning to the left instead of going around the counters from the right.</i>  
+  <br>
+  <img src="assets/fig11_fov_trimmed.gif" width="90%" alt="Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly." />
+  <br> <i>Top-Down View (left) and First-Person View (right) of the FOV-aware planner: The FOV-aware robot adjusts its path to account for the human's limited field of view, staying within the human's line of sight to enhance collaboration.</i>  
 </p>
 
 ## Project Overview ##
