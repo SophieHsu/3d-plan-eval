@@ -1,7 +1,5 @@
 <!-- TOC -->
 * [Integrating Human Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
-      * [FOV Unaware Planner](#fov-unaware-planner)
-      * [FOV Aware Planner](#fov-aware-planner)
   * [Project Overview](#project-overview)
   * [Installation Instructions](#installation-instructions)
     * [Versions](#versions)
