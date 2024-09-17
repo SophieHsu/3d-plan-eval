@@ -1,5 +1,5 @@
 <!-- TOC -->
-* [Integrating Human Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
+* [Integrating Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
   * [Project Overview](#project-overview)
   * [Installation Instructions](#installation-instructions)
     * [Versions](#versions)
