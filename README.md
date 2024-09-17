@@ -32,26 +32,17 @@
 #### Note: Due to difference in the sizes of the GIFs, they may start at different times and be unaligned. 
 
 ## Project Overview ##
-Most research on human-AI collaboration assumes that humans have full knowledge of their surroundings, 
-which is unrealistic given their limited field of view (FOV). This project aims to adapt AI systems to humans' 
-changing intentions while accounting for these perception limitations. To achieve this, we integrate FOV into 
-a human-aware probabilistic planning framework and develop a hierarchical online planner that efficiently 
-navigates large state spaces. The AI agent is designed to explore actions that enter the human's FOV, 
-influencing their intended subtask. We validated our approach through a user study conducted in a 2D cooking 
-domain and extended our findings to a VR kitchen environment. Results showed that the FOV-aware planner reduced 
-interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 
-2D and VR environments. This research addresses a critical gap in human-AI collaboration by accounting for human 
-perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
+This open-source code provides a virtual reality (VR) version of the Steak House domain, designed to study human-robot collaboration. It focuses on how knowledge base (KB) gaps—differences between what a human perceives and the actual state of the environment—naturally occur due to the human's limited field of view (FOV) and the time required to complete tasks at specific stations. Researchers can use this code to explore how KB gaps affect human decision-making and task efficiency during collaboration. (Note: the FOV-aware robot planner is found separately [here](https://github.com/SophieHsu/FOV-aware-planner))
+
+Results showed that the FOV-aware planner reduced interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 2D (mentioned in the paper) and VR environments. This research addresses a critical gap in human-robot collaboration by accounting for human perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
 ![belief tree image from paper](assets/belief-tree.png)
-
-![example view from the VR environment](assets/vr_fpv.png)
 
 ## Installation Instructions ## 
 
 ### Versions ###
 This project has mainly two versions:
-- `v1.0` is the version used for experimentation.
+- `v1.0` is the version used for the VR demonstration presented in the 2025 ICRA submission paper.
 - `v2.2` is the latest version which is identical to `v1.0` accept the code has been refactored in some places and 
   includes this readme with the instructions.
 For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
