@@ -20,7 +20,7 @@
   * [Contact](#contact)
 <!-- TOC -->
 
-# Integrating Human Field of View in Human-Aware Collaborative #
+# Integrating Field of View in Human-Aware Collaborative #
 <p align="center">
   <img src="assets/fig12_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="assets/fig12_fov_trimmed.gif" width="42%" />
