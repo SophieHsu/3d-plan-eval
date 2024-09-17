@@ -1,9 +1,12 @@
 <!-- TOC -->
 * [Integrating Human Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
+      * [FOV Unaware Planner](#fov-unaware-planner)
+      * [FOV Aware Planner](#fov-aware-planner)
   * [Project Overview](#project-overview)
   * [Installation Instructions](#installation-instructions)
     * [Versions](#versions)
     * [Clone the Project](#clone-the-project)
+    * [Setup the Planner Project Repo](#setup-the-planner-project-repo)
     * [Install SteamVR](#install-steamvr)
     * [Install Oculus](#install-oculus)
   * [Usage](#usage)
@@ -11,28 +14,23 @@
     * [Main Scripts](#main-scripts)
     * [`iGibson`](#igibson)
     * [`lsi_3d` Components](#lsi_3d-components)
+  * [Task Instructions](#task-instructions)
   * [Results](#results)
+      * [Behavior 1: Robot prolongs its visibility to the human](#behavior-1-robot-prolongs-its-visibility-to-the-human)
+      * [Behavior 2: Robot chose to take a longer path to enter the human's FOV](#behavior-2-robot-chose-to-take-a-longer-path-to-enter-the-humans-fov)
+    * [Complete runs showcasing the differences in FOV-aware vs FOV-unaware planners](#complete-runs-showcasing-the-differences-in-fov-aware-vs-fov-unaware-planners)
+      * [FOV-Unaware Planner](#fov-unaware-planner-1)
+      * [FOV-Aware Planner](#fov-aware-planner-1)
   * [Citation](#citation)
   * [Contact](#contact)
 <!-- TOC -->
 
 # Integrating Human Field of View in Human-Aware Collaborative #
-#### FOV Unaware Planner ####
 <p align="center">
-  <img src="assets/unaware_top.gif" width="45%" alt="Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view." />
-  <img src="assets/unaware_fpv.gif" width="45%" alt="First-Person View (Unaware): From the human's perspective, the unaware robot moves through the environment, possibly exiting the human's field of view." />
-  <br> Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view.  
+  <img src="assets/fig12_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig12_fov_trimmed.gif" width="42%" />
+  <br> Baseline (left) shows the robot turning right to go around the counters, whereas the FOV-aware robot (right) goes around the left so that it stays inside the human's field of view for longer showing what it is holding. 
 </p>
-
-#### FOV Aware Planner ####
-<p align="center">
-  <img src="assets/aware_top.gif" width="45%" alt="Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly." />
-  <img src="assets/aware_fpv.gif" width="45%" alt="First-Person View (Aware): The FOV-aware robot stays within the human's line of sight, enhancing collaboration." />
-  <br> <i>Top-Down View (left) and First-Person View (right) of the FOV-aware planner: The FOV-aware robot adjusts its path to account for the human's limited field of view, staying within the human's line of sight to enhance collaboration.</i>  
-</p>
-
-
-#### Note: Due to differences in the sizes of the GIFs, they may start at different times and be unaligned. 
 
 ## Project Overview ##
 This open-source code provides a virtual reality (VR) version of the Steak House domain, designed to study human-robot collaboration. It focuses on how knowledge base (KB) gaps—differences between what a human perceives and the actual state of the environment—naturally occur due to the human's limited field of view (FOV) and the time required to complete tasks at specific stations. Researchers can use this code to explore how KB gaps affect human decision-making and task efficiency during collaboration. (Note: the FOV-aware robot planner is found separately [here](https://github.com/SophieHsu/FOV-aware-planner))
@@ -58,6 +56,13 @@ Cloning the version of the code you want to run.
 ```
 git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
 ```
+
+### Setup the Planner Project Repo ###
+Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
+```
+git clone git@github.com:SophieHsu/FOV-aware-planner.git
+```
+Follow along the instructions in the [README](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md) to setup this repo.
 
 ### Install SteamVR ###
 Install the SteamVR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
@@ -162,15 +167,27 @@ within the human's field of view, enhancing collaboration.
 ![behavior-1-1](assets/b_1_1.png)
 Fig 1.1: The human starts by picking up a green onion. In the top row, the unaware robot goes to the sink to wash dishes. In the bottom row, the aware robot moves closer to the human, allowing them to see the robot and its actions for at least three consecutive timesteps when the human turns to drop off the green onion.
 
-![behavior-1-2](assets/b_1_2.png)
-Fig 1.2: The unaware robot (top row) picks up the cooked meat and moves to the chopping board. The aware robot (bottom row) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
+Another example is the following where the unaware robot (left) picks up the cooked meat and moves to the chopping board. The FOV-aware robot (right) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
+<p align="center">
+  <img src="assets/fig11_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig11_fov_trimmed.gif" width="43%" />
+</p>
+
 
 #### Behavior 2: Robot chose to take a longer path to enter the human's FOV ####
 ![behavior-2-1](assets/b_2_1.png)
 Fig 2: In the top row (unaware robot), the robot collects garnish from the chopping board and takes the shorter path on the left to deliver the dish. In the bottom row (aware robot), the robot waits for the human to notice it is picking up the garnish and, afterward, takes the longer route to deliver the dish, which enables it to remain within the human's FOV.
 
+### Complete runs showcasing the differences in FOV-aware vs FOV-unaware planners ###
+
+#### FOV-Unaware Planner ####
+![complete-unaware](https://github.com/SophieHsu/3d-plan-eval/blob/refactor-readme/assets/unaware_combined.gif)
+
+#### FOV-Aware Planner ####
+![complete-aware](https://github.com/SophieHsu/3d-plan-eval/blob/refactor-readme/assets/aware_combined.gif)
+
 ## Citation ##
-Please cite this work using the following Bibtex:
+Please cite this work using the following BibTex:
 ```
 Coming soon
 ```
