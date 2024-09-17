@@ -31,9 +31,6 @@
   <br> <i>Top-Down View (left) and First-Person View (right) of the FOV-aware planner: The FOV-aware robot adjusts its path to account for the human's limited field of view, staying within the human's line of sight to enhance collaboration.</i>  
 </p>
 
-
-#### Note: Due to differences in the sizes of the GIFs, they may start at different times and be unaligned. 
-
 ## Project Overview ##
 This open-source code provides a virtual reality (VR) version of the Steak House domain, designed to study human-robot collaboration. It focuses on how knowledge base (KB) gaps—differences between what a human perceives and the actual state of the environment—naturally occur due to the human's limited field of view (FOV) and the time required to complete tasks at specific stations. Researchers can use this code to explore how KB gaps affect human decision-making and task efficiency during collaboration. (Note: the FOV-aware robot planner is found separately [here](https://github.com/SophieHsu/FOV-aware-planner))
 
