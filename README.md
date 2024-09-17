@@ -41,7 +41,7 @@ Results showed that the FOV-aware planner reduced interruptions and redundant ac
 
 <p align="center">
   <img src="assets/belief-tree.png" width="75%" alt="Belief Tree Representation: The belief tree illustrates the possible future states and actions considered by the planner, factoring in human perceptual limitations." />
-  <br> *Belief Tree Representation: The belief tree illustrates the possible future states and actions considered by the planner, factoring in human perceptual limitations.*  
+  <br> Human FOV-aware collaboration planning method
 </p>
 
 ## Installation Instructions ## 
