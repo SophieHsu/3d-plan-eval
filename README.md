@@ -19,14 +19,12 @@
 # Integrating Human Field of View in Human-Aware Collaborative #
 #### FOV Unaware Planner ####
 <p align="center">
-  <img src="assets/unaware_top.gif" width="45%" />
-  <img src="assets/unaware_fpv.gif" width="45%" />
+  <img src="assets/unaware_combined.gif" />
 </p>
 
 #### FOV Aware Planner ####
 <p align="center">
-  <img src="assets/aware_top.gif" width="45%" />
-  <img src="assets/aware_fpv.gif" width="45%" />
+  <img src="assets/aware_combined.gif" width="45%" />
 </p>
 
 #### Note: Due to difference in the sizes of the GIFs, they may start at different times and be unaligned. 
@@ -36,7 +34,9 @@ This open-source code provides a virtual reality (VR) version of the Steak House
 
 Results showed that the FOV-aware planner reduced interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 2D (mentioned in the paper) and VR environments. This research addresses a critical gap in human-robot collaboration by accounting for human perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
-![belief tree image from paper](assets/belief-tree.png)
+<p align="center">
+  <img src="assets/belief-tree" width="50%" />
+</p>
 
 ## Installation Instructions ## 
 
@@ -142,7 +142,9 @@ The most relevant components in the project are described below.
 - `utils` - Common utility functions.
 
 ## Task Instructions ##
-![instructions to complete the task](assets/game_instructions.png)
+<p align="center">
+  <img src="assets/game_instructions.png" width="50%" />
+</p>
 
 ## Results ##
 Our study shows that FOV-aware agents reduce Knowledge Base (KB) gaps and interruptions in environments with limited 
