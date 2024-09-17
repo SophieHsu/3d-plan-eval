@@ -27,8 +27,8 @@
 
 # Integrating Human Field of View in Human-Aware Collaborative #
 <p align="center">
-  <img src="assets/fig12_baseline_trimmed.gif" width="49%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/fig12_fov_trimmed.gif" width="48%" />
+  <img src="assets/fig12_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig12_fov_trimmed.gif" width="42%" />
   <br> Baseline (left) shows the robot turning right to go around the counters, whereas the FOV-aware robot (right) goes around the left so that it stays inside the human's field of view for longer showing what it is holding. 
 </p>
 
@@ -169,8 +169,8 @@ Fig 1.1: The human starts by picking up a green onion. In the top row, the unawa
 
 Another example is the following where the unaware robot (left) picks up the cooked meat and moves to the chopping board. The FOV-aware robot (right) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
 <p align="center">
-  <img src="assets/fig11_baseline_trimmed.gif" width="48%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/fig11_fov_trimmed.gif" width="49%" />
+  <img src="assets/fig11_baseline_trimmed.gif" width="42%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig11_fov_trimmed.gif" width="43%" />
 </p>
 
 #### Behavior 2: Robot chose to take a longer path to enter the human's FOV ####
