@@ -19,15 +19,24 @@
 # Integrating Human Field of View in Human-Aware Collaborative #
 #### FOV Unaware Planner ####
 <p align="center">
-  <img src="assets/unaware_top.gif" width="45%" />
-  <img src="assets/unaware_fpv.gif" width="45%" />
+  <img src="assets/unaware_top.gif" width="45%" alt="Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view." />
+  <br> *Top-Down View (Unaware): The unaware robot operates with full knowledge of the environment, without considering the human's limited field of view.*  
+</p>
+<p align="center">
+  <img src="assets/unaware_fpv.gif" width="45%" alt="First-Person View (Unaware): From the human's perspective, the unaware robot moves through the environment, possibly exiting the human's field of view." />
+  <br> *First-Person View (Unaware): From the human's perspective, the unaware robot moves through the environment, possibly exiting the human's field of view.*  
 </p>
 
 #### FOV Aware Planner ####
 <p align="center">
-  <img src="assets/aware_top.gif" width="45%" />
-  <img src="assets/aware_fpv.gif" width="45%" />
+  <img src="assets/aware_top.gif" width="45%" alt="Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly." />
+  <br> *Top-Down View (Aware): The FOV-aware robot takes into account the human's limited field of view and adjusts its path accordingly.*  
 </p>
+<p align="center">
+  <img src="assets/aware_fpv.gif" width="45%" alt="First-Person View (Aware): The FOV-aware robot stays within the human's line of sight, enhancing collaboration." />
+  <br> *First-Person View (Aware): The FOV-aware robot stays within the human's line of sight, enhancing collaboration.*  
+</p>
+
 
 #### Note: Due to differences in the sizes of the GIFs, they may start at different times and be unaligned. 
 
@@ -37,7 +46,8 @@ This open-source code provides a virtual reality (VR) version of the Steak House
 Results showed that the FOV-aware planner reduced interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 2D (mentioned in the paper) and VR environments. This research addresses a critical gap in human-robot collaboration by accounting for human perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
 <p align="center">
-  <img src="assets/belief-tree.png" width="50%" />
+  <img src="assets/belief-tree.png" width="75%" alt="Belief Tree Representation: The belief tree illustrates the possible future states and actions considered by the planner, factoring in human perceptual limitations." />
+  <br> *Belief Tree Representation: The belief tree illustrates the possible future states and actions considered by the planner, factoring in human perceptual limitations.*  
 </p>
 
 ## Installation Instructions ## 
