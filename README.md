@@ -27,8 +27,8 @@
 
 # Integrating Human Field of View in Human-Aware Collaborative #
 <p align="center">
-  <img src="assets/fig12_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/fig12_fov_trimmed.gif" width="42%" />
+  <img src="assets/fig12_baseline_trimmed.gif" width="49%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig12_fov_trimmed.gif" width="48%" />
   <br> Baseline (left) shows the robot turning right to go around the counters, whereas the FOV-aware robot (right) goes around the left so that it stays inside the human's field of view for longer showing what it is holding. 
 </p>
 
@@ -38,7 +38,7 @@ This open-source code provides a virtual reality (VR) version of the Steak House
 Results showed that the FOV-aware planner reduced interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 2D (mentioned in the paper) and VR environments. This research addresses a critical gap in human-robot collaboration by accounting for human perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
 <p align="center">
-  <img src="assets/belief-tree.png" width="75%" alt="Belief Tree Representation: The belief tree illustrates the possible future states and actions considered by the planner, factoring in human perceptual limitations." />
+  <img src="assets/belief-tree.png" width="80%" alt="Belief Tree Representation: The belief tree illustrates the possible future states and actions considered by the planner, factoring in human perceptual limitations." />
   <br> Human FOV-aware collaboration planning method
 </p>
 
@@ -169,22 +169,13 @@ Fig 1.1: The human starts by picking up a green onion. In the top row, the unawa
 
 Another example is the following where the unaware robot (left) picks up the cooked meat and moves to the chopping board. The FOV-aware robot (right) stopped halfway to the chopping board and continued until the human turned over and had the robot in FOV for three steps.
 <p align="center">
-  <img src="assets/fig11_baseline_trimmed.gif" width="43%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/fig11_fov_trimmed.gif" width="43%" />
+  <img src="assets/fig11_baseline_trimmed.gif" width="48%"  style="float:left; margin-left: 20px;" /> &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/fig11_fov_trimmed.gif" width="49%" />
 </p>
-
 
 #### Behavior 2: Robot chose to take a longer path to enter the human's FOV ####
 ![behavior-2-1](assets/b_2_1.png)
 Fig 2: In the top row (unaware robot), the robot collects garnish from the chopping board and takes the shorter path on the left to deliver the dish. In the bottom row (aware robot), the robot waits for the human to notice it is picking up the garnish and, afterward, takes the longer route to deliver the dish, which enables it to remain within the human's FOV.
-
-### Complete runs showcasing the differences in FOV-aware vs FOV-unaware planners ###
-
-#### FOV-Unaware Planner ####
-![complete-unaware](https://github.com/SophieHsu/3d-plan-eval/blob/refactor-readme/assets/unaware_combined.gif)
-
-#### FOV-Aware Planner ####
-![complete-aware](https://github.com/SophieHsu/3d-plan-eval/blob/refactor-readme/assets/aware_combined.gif)
 
 ## Citation ##
 Please cite this work using the following BibTex:
