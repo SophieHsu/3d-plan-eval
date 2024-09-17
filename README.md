@@ -18,9 +18,6 @@
   * [Results](#results)
       * [Behavior 1: Robot prolongs its visibility to the human](#behavior-1-robot-prolongs-its-visibility-to-the-human)
       * [Behavior 2: Robot chose to take a longer path to enter the human's FOV](#behavior-2-robot-chose-to-take-a-longer-path-to-enter-the-humans-fov)
-    * [Complete runs showcasing the differences in FOV-aware vs FOV-unaware planners](#complete-runs-showcasing-the-differences-in-fov-aware-vs-fov-unaware-planners)
-      * [FOV-Unaware Planner](#fov-unaware-planner-1)
-      * [FOV-Aware Planner](#fov-aware-planner-1)
   * [Citation](#citation)
   * [Contact](#contact)
 <!-- TOC -->
