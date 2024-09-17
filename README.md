@@ -175,6 +175,14 @@ Fig 1.2: The unaware robot (top row) picks up the cooked meat and moves to the c
 ![behavior-2-1](assets/b_2_1.png)
 Fig 2: In the top row (unaware robot), the robot collects garnish from the chopping board and takes the shorter path on the left to deliver the dish. In the bottom row (aware robot), the robot waits for the human to notice it is picking up the garnish and, afterward, takes the longer route to deliver the dish, which enables it to remain within the human's FOV.
 
+### Complete runs showcasing the differences in FOV-aware vs FOV-unaware planners ###
+
+#### FOV-Unaware Planner ####
+![complete-unaware](https://github.com/SophieHsu/3d-plan-eval/blob/refactor-readme/assets/unaware_combined.gif)
+
+#### FOV-Aware Planner ####
+![complete-aware](https://github.com/SophieHsu/3d-plan-eval/blob/refactor-readme/assets/aware_combined.gif)
+
 ## Citation ##
 Please cite this work using the following BibTex:
 ```
