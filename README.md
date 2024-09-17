@@ -56,6 +56,13 @@ Cloning the version of the code you want to run.
 git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
 ```
 
+### Setup the Planner Project Repo ###
+Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
+```
+git clone git@github.com:SophieHsu/FOV-aware-planner.git
+```
+Follow along the instructions in the [README](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md) to setup this repo.
+
 ### Install SteamVR ###
 Install the SteamVR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
 
