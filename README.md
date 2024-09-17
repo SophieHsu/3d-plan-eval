@@ -27,7 +27,7 @@
   <img src="assets/aware_combined.gif" width="45%" />
 </p>
 
-#### Note: Due to difference in the sizes of the GIFs, they may start at different times and be unaligned. 
+#### Note: Due to differences in the sizes of the GIFs, they may start at different times and be unaligned. 
 
 ## Project Overview ##
 This open-source code provides a virtual reality (VR) version of the Steak House domain, designed to study human-robot collaboration. It focuses on how knowledge base (KB) gaps—differences between what a human perceives and the actual state of the environment—naturally occur due to the human's limited field of view (FOV) and the time required to complete tasks at specific stations. Researchers can use this code to explore how KB gaps affect human decision-making and task efficiency during collaboration. (Note: the FOV-aware robot planner is found separately [here](https://github.com/SophieHsu/FOV-aware-planner))
@@ -35,7 +35,7 @@ This open-source code provides a virtual reality (VR) version of the Steak House
 Results showed that the FOV-aware planner reduced interruptions and redundant actions during collaboration, with similar collaborative behaviors observed in both 2D (mentioned in the paper) and VR environments. This research addresses a critical gap in human-robot collaboration by accounting for human perceptual limitations, contributing to more natural and efficient teamwork between humans and AI agents.
 
 <p align="center">
-  <img src="assets/belief-tree" width="50%" />
+  <img src="assets/belief-tree.png" width="50%" />
 </p>
 
 ## Installation Instructions ## 
@@ -119,7 +119,7 @@ The most relevant components in the project are described below.
 ```
 
 ### Main Scripts ###
-- `3d_plan_eval_main.py` is the main entrypoint of the project that defines the necessary `RUNNER` class to 
+- `3d_plan_eval_main.py` is the main entry point of the project that defines the necessary `RUNNER` class to 
     run the project.
 ### `iGibson` ###
 - The `iGibson` directory contains the core components for the iGibson simulation framework. Please refer 
@@ -129,13 +129,13 @@ The most relevant components in the project are described below.
 - `agents` - This directory contains various files to define the agent classes that are responsible for low and high 
     level control of both the AI agents and the human player.
 - `config` - This directory contains the files to set up configurations of the various components of this 
-  project, namely, agent, algorithm, experiment and map. These configs are defined in
+  project, namely, agent, algorithm, experiment, and map. These configs are defined in
   [`toml`](https://toml.io/en/) files. 
 - `environment` - This directory consists of files defining the elements of the environment. `vision_limit_env`, 
-  `tracking_env` and `lsi_env` files contain implementations of different kinds of environments. The `kitchen` file
+  `tracking_env`, and `lsi_env` files contain implementations of different kinds of environments. The `kitchen` file
   defines the main class used to tie all components (VR environment, iGibson, planners, etc.) together. Other files, 
-  `objects`, `object_configs` and `actions` define the objects, their configs within the environments and the actions
-  that can be applied on them in the environment respectively.
+  `objects`, `object_configs`, and `actions` define the objects, their configs within the environments, and the actions
+  that can be applied to them in the environment respectively.
 - `logs` - Directory to store logs from experimental runs of the project.
 - `mdp` - Implementation of out mdp solver.
 - `planners` - Different planner implementations for different environment typer for different agents (human vs AI).
