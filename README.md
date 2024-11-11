@@ -53,7 +53,7 @@ git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
 ```
 
 ### Setup the Planner Project Repo ###
-Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
+Install the planner outside of this project folder. Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
 ```
 git clone git@github.com:SophieHsu/FOV-aware-planner.git
 ```
@@ -71,7 +71,7 @@ Install the SteamVR (found [here](https://store.steampowered.com/app/250820/Stea
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
     provided config files. This has already been done for you. 
 - Starting the overcooked server
-  - Begin by running the Overcooked server. You can use the following script
+  - Begin running the Overcooked server by navigating to the FOV-aware-planner and run the following script
       ```
       python overcooked_ai_py/steak_api_test.py -l steak_side_2 -v 1
       ```
