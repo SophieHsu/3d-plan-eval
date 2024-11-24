@@ -6,7 +6,7 @@ import bpy
 script_dir = os.path.dirname(os.path.abspath(__file__))
 utils_dir = os.path.join(script_dir, "../../blender_utils")
 sys.path.append(utils_dir)
-from lsi_3d.utils.helpers import clean_unused, export_obj_folder, import_obj_folder
+from src.utils.helpers import clean_unused, export_obj_folder, import_obj_folder
 
 obj_dir = sys.argv[-2]
 save_dir = sys.argv[-1]

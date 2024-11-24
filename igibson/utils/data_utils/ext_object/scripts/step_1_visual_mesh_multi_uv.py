@@ -7,7 +7,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 utils_dir = os.path.join(script_dir, "../../blender_utils")
 sys.path.append(utils_dir)
 
-from lsi_3d.utils.helpers import bake_model, clean_unused, export_ig_object, import_obj_folder
+from src.utils.helpers import bake_model, clean_unused, export_ig_object, import_obj_folder
 
 """
 to run it:

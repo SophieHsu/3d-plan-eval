@@ -10,20 +10,20 @@ from igibson.envs.igibson_env import iGibsonEnv
 from igibson.robots.behavior_robot import BehaviorRobot
 from igibson.utils.utils import parse_config
 
-from lsi_3d.agents.fixed_policy_human_agent import SteakFixedPolicyHumanAgent
-from lsi_3d.agents.igibson_agent import iGibsonAgent
-from lsi_3d.agents.vision_limit_human import VisionLimitHumanAgent
-from lsi_3d.agents.vision_limit_robot import VisionLimitRobotAgent
-from lsi_3d.config.reader import get_configs
-from lsi_3d.environment.kitchen import Kitchen
-from lsi_3d.environment.tracking_env import TrackingEnv
-from lsi_3d.environment.vision_limit_env import VisionLimitEnv
-from lsi_3d.mdp.lsi_mdp import LsiMdp
-from lsi_3d.motion_controllers.motion_controller_human import MotionControllerHuman
-from lsi_3d.planners.a_star_planner import AStarPlanner
-from lsi_3d.planners.high_level_mdp import HighLevelMdpPlanner
-from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
-from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
+from src.agents.fixed_policy_human_agent import SteakFixedPolicyHumanAgent
+from src.agents.igibson_agent import iGibsonAgent
+from src.agents.vision_limit_human import VisionLimitHumanAgent
+from src.agents.vision_limit_robot import VisionLimitRobotAgent
+from src.config.reader import get_configs
+from src.environment.kitchen import Kitchen
+from src.environment.tracking_env import TrackingEnv
+from src.environment.vision_limit_env import VisionLimitEnv
+from src.mdp.lsi_mdp import LsiMdp
+from src.motion_controllers.motion_controller_human import MotionControllerHuman
+from src.planners.a_star_planner import AStarPlanner
+from src.planners.high_level_mdp import HighLevelMdpPlanner
+from src.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
+from src.planners.mid_level_motion import AStarMotionPlanner
 
 
 class Runner:
@@ -39,7 +39,7 @@ class Runner:
         self._kitchen = None
 
     def _init_logfile(self, start_locations):
-        with open('lsi_3d/logs{}_log.txt'.format(self._kitchen.kitchen_name), 'w') as fh:
+        with open('src/logs{}_log.txt'.format(self._kitchen.kitchen_name), 'w') as fh:
             fh.write('Start Locations (robot, human): {}\n'.format(start_locations))
 
             grid_str = functools.reduce(
@@ -143,14 +143,14 @@ class Runner:
 
     def _check_completion(self, start_time):
         if not self._env.world_state.orders:
-            with open('lsi_3d/logs/{}_log.txt'.format(self._kitchen.kitchen_name), 'a') as fh:
+            with open('src/logs/{}_log.txt'.format(self._kitchen.kitchen_name), 'a') as fh:
                 fh.write('success')
             print('orders completed')
             return True
 
         elapsed = time.time() - start_time
         if elapsed > self._TIME_LIMIT_FAILURE:
-            with open('lsi_3d/test_logs/{}_log.txt'.format(self._kitchen.kitchen_name), 'a') as fh:
+            with open('src/test_logs/{}_log.txt'.format(self._kitchen.kitchen_name), 'a') as fh:
                 fh.write('failure by timeout')
             print('timed out')
             return True
