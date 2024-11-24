@@ -50,14 +50,20 @@ For all the tags available please check the releases page associated with this p
 Cloning the version of the code you want to run.
 ```
 git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
+conda create -y -n igibson python=3.8
+conda activate igibson
+pip install -e .
+pip install pygame toml
 ```
+Download the [data](https://drive.google.com/file/d/1tVj27p_H2acWC53tl-BdVRsnJfH-0-XX/view?usp=sharing) and unzip it under the `igibson` folder.
 
 ### Setup the Planner Project Repo ###
-Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
+Install the planner outside of this project folder. Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
 ```
 git clone git@github.com:SophieHsu/FOV-aware-planner.git
 ```
 Follow along the instructions in the [README](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md) to setup this repo.
+
 
 ### Install SteamVR ###
 Install the SteamVR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
@@ -71,19 +77,20 @@ Install the SteamVR (found [here](https://store.steampowered.com/app/250820/Stea
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
     provided config files. This has already been done for you. 
 - Starting the overcooked server
-  - Begin by running the Overcooked server. You can use the following script
+  - Begin running the Overcooked server by navigating to the FOV-aware-planner and run the following script (a baked in restart mechanism for up to 5 restarts in case of crashes due to dropped connections)
       ```
-      python overcooked_ai_py/steak_api_test.py -l steak_side_2 -v 1
+      cd overcooked_ai_py/
+      ./steak_api_restart.sh
+      ```
+  - Note: If planner files need to be recalculated, make sure to delete old planner files.
+  - Alternatively, you can run the server without a restart mechanism:
+      ```
+      python overcooked_ai_py/steak_api_test.py -l steak_none_3 -v 1
       ```
     where, `-v`: Defines the vision limitation of the AI agent. <br>
       1 = Aware (vision limited to the agent's field of view) <br>
       0 = Unaware (omniscient agent) <br>
     and `-l`: Defines the layout file (exclude the .tml extension).
-  - Note: If planner files need to be recalculated, make sure to delete old planner files.
-  - Alternatively, you can run the server with a restart mechanism (up to 5 restarts in case of crashes):
-      ```
-      ./steak_api_restart.sh
-      ```
 - Running the iGibson Simulator
   - Once the Overcooked server is running, start the iGibson simulation:
     ```
@@ -102,8 +109,25 @@ Install the SteamVR (found [here](https://store.steampowered.com/app/250820/Stea
     ```
   - Start iGibson in VR mode:
     ```
-    python 3d_plan_eval_main.py -m vr -c steak_practice.tml -p 1
+    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
     ```
+
+### Project Structure ###
+To try your own layout, you can create a `{layout_name}.txt` file in the `kitchen_layout_grid_text` folder.
+Then, creat an experiment config in `lsi/config/experiment` with parameter `layout={layout_name}.txt`.
+You can also add more steak orders or even include [your own new dish](google.com) by setting the `order_list` parameter.
+
+Here are some additional layouts we provide for you to try out:
+```
+  python 3d_plan_eval_main.py -m vr -c steak_side_1.tml
+  python 3d_plan_eval_main.py -m vr -c steak_mid_1.tml
+  python 3d_plan_eval_main.py -m vr -c steak_mid_2.tml
+```
+Remember to also change the layout and order parameters on the FOV-aware-planner side.
+```
+python overcooked_ai_py/steak_api_test.py -l {layout_name} -v 1
+```
+Highly recommand to use the restart mechanism by altering the commend in `overcooked_ai_py/steak_api_restart.sh`
 
 ## Project Structure ##
 The most relevant components in the project are described below.
