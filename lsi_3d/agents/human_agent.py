@@ -6,7 +6,7 @@ from datetime import datetime
 from igibson.objects.articulated_object import URDFObject
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.utils.functions import norm_cardinal_to_orn
-from utils import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_radians
+from lsi_3d.utils.helpers import quat2euler, real_to_grid_coord, grid_to_real_coord, normalize_radians
 
 
 class HumanAgent:

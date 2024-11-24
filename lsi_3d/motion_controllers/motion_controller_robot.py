@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from utils import quat2euler
+from lsi_3d.utils.helpers import quat2euler
 
 
 class MotionControllerRobot:

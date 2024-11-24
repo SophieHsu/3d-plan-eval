@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 from igibson import object_states
 
-from utils import real_to_grid_coord, to_overcooked_grid
+from lsi_3d.utils.helpers import real_to_grid_coord, to_overcooked_grid
 
 # only those actions that change the object (type of object, it's state, or swap it out)
 ACTION_COMMANDS = SimpleNamespace(

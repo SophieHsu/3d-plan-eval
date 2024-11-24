@@ -21,7 +21,7 @@ from igibson.utils.utils import l2_distance, restoreState
 from igibson.utils.utils import quatToXYZW
 from lsi_3d.utils.constants import DIRE2POSDIFF, TARGET_ORNS
 from lsi_3d.utils.functions import quat2euler
-from utils import grid_to_real_coord, quat2euler, normalize_radians
+from lsi_3d.utils.helpers import grid_to_real_coord, quat2euler, normalize_radians
 
 ONE_STEP = 0.02
 

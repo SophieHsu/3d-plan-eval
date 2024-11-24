@@ -4,7 +4,7 @@ import numpy as np
 import pybullet as p
 from numpy.linalg import inv
 
-from utils import quat2euler, normalize_radians
+from lsi_3d.utils.helpers import quat2euler, normalize_radians
 
 
 class MotionControllerHuman:

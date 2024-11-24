@@ -8,7 +8,7 @@ from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.mdp.lsi_mdp import LsiMdp
 from lsi_3d.mdp.state import AgentState, WorldState
 from lsi_3d.utils.functions import find_nearby_open_spaces, norm_orn_to_cardinal, orn_to_cardinal, quat2euler
-from utils import grid_to_real_coord, normalize_radians, real_to_grid_coord
+from lsi_3d.utils.helpers import grid_to_real_coord, normalize_radians, real_to_grid_coord
 
 
 class LsiEnv(object):

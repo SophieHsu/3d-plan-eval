@@ -35,7 +35,7 @@ from lsi_3d.environment.objects import (
     VidaliaOnion
 )
 from lsi_3d.utils.constants import DIRE2POSDIFF
-from utils import normalize_radians, real_to_grid_coord, to_overcooked_grid
+from lsi_3d.utils.helpers import normalize_radians, real_to_grid_coord
 
 
 class Kitchen:

@@ -3,7 +3,7 @@ import math
 import pybullet as p
 
 from igibson.objects.visual_marker import VisualMarker
-from utils import real_to_grid_coord, grid_to_real_coord
+from lsi_3d.utils.helpers import real_to_grid_coord, grid_to_real_coord
 
 
 class AStarPlanner:

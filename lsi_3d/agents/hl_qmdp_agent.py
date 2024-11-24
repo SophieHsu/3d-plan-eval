@@ -13,7 +13,7 @@ from lsi_3d.planners.hl_qmdp_planner import HumanSubtaskQMDPPlanner
 from lsi_3d.planners.mid_level_motion import AStarMotionPlanner
 from lsi_3d.utils.constants import DIRE2POSDIFF
 from lsi_3d.utils.functions import grid_transition, norm_orn_to_cardinal
-from utils import grid_to_real_coord, normalize_radians, quat2euler, real_to_grid_coord
+from lsi_3d.utils.helpers import grid_to_real_coord, normalize_radians, quat2euler, real_to_grid_coord
 
 STUCK_TIME_LIMIT = 45
 MAX_DELAY_TIME = 5

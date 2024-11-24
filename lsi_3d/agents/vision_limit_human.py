@@ -8,7 +8,7 @@ from lsi_3d.agents.human_agent import HumanAgent
 from lsi_3d.environment.lsi_env import LsiEnv
 from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.utils.functions import find_nearby_open_spaces
-from utils import grid_to_real_coord, real_to_grid_coord
+from lsi_3d.utils.helpers import grid_to_real_coord, real_to_grid_coord
 
 
 class VisionLimitHumanAgent(HumanAgent):
