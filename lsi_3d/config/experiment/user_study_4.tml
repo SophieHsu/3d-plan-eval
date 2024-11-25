@@ -4,6 +4,8 @@ human_start_y=2
 robot_start_x=5
 robot_start_y=5
 
+rinse_count_threshold = 2
+chop_count_threshold = 2
 ig_config_file = "igibson/configs/fetch_motion_planning_3d_lsi.yaml"
 
 layout="""kitchen_layouts_grid_text/kitchen2.txt"""

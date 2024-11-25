@@ -10,15 +10,15 @@ from lsi_3d.environment.tracking_env import TrackingEnv
 from lsi_3d.utils.functions import find_nearby_open_spaces
 from utils import grid_to_real_coord, real_to_grid_coord
 
-
 class VisionLimitHumanAgent(HumanAgent):
     def __init__(self, human, planner, motion_controller, occupancy_grid, hlp, lsi_env: LsiEnv,
-                 tracking_env: TrackingEnv, vr=False, insight_threshold=5, log_dict={}):
+                 tracking_env: TrackingEnv, vr=False, insight_threshold=5, rinse_count_threshold=2, log_dict={}):
         super().__init__(human, planner, motion_controller, occupancy_grid, hlp, lsi_env, tracking_env, vr,
                          insight_threshold)
         self.knowledge_base = None
         self.vision_limit = True
         self.vision_bound = 120
+        self.rinse_count_threshold = rinse_count_threshold
         self.log_dict = log_dict
 
     def deepcopy(self, world_state=None):
@@ -129,7 +129,7 @@ class VisionLimitHumanAgent(HumanAgent):
                         if self.in_bound(agent_rcf, real_to_grid_coord(sink.get_position())):
                             if obj in sink_status[sink]:
                                 tmp_kb['mobile'][obj]['sink'] = sink
-                                if self.env.kitchen.overcooked_object_states[obj]['state'] != 2:
+                                if self.env.kitchen.overcooked_object_states[obj]['state'] < self.rinse_count_threshold:
                                     tmp_kb['mobile'][obj]['status'] = 'cold'
                                 else:
                                     tmp_kb['mobile'][obj]['status'] = 'hot'
@@ -171,7 +171,7 @@ class VisionLimitHumanAgent(HumanAgent):
                         tmp_kb['immobile'][obj]['objects'] = None
                     else:
                         plate = self.tracking_env.get_sink_status()[obj][0]
-                        if self.env.kitchen.overcooked_object_states[plate]['state'] != 2:
+                        if self.env.kitchen.overcooked_object_states[plate]['state'] >= self.rinse_count_threshold:
                             tmp_kb['immobile'][obj]['status'] = 'ready'
                             tmp_kb['immobile'][obj]['objects'] = in_sink[0]
                         else:
@@ -243,9 +243,9 @@ class VisionLimitHumanAgent(HumanAgent):
                 items.append(k)
         return items
 
-    def get_kb_closest_fridge(self, pos):
-        fridges = self.get_kb_item_by_name('counter')
-        return self.tracking_env.dist_sort(fridges, pos)[0]
+    def get_kb_closest_counter(self, pos):
+        counter = self.get_kb_item_by_name('counter')
+        return self.tracking_env.dist_sort(counter, pos)[0]
 
     def get_kb_closest_whole_onion(self, pos):
         onions = self.get_kb_item_by_name('green_onion')
@@ -283,12 +283,6 @@ class VisionLimitHumanAgent(HumanAgent):
         return self.tracking_env.dist_sort(items, pos)[0]
 
     def get_plate_station(self, pos):
-        plates = self.get_kb_item_by_name('plate')
-        # items = []
-        # for plate in plates:
-        #     if self.knowledge_base['mobile'][plate]['status'] == 'on_counter':
-        #         items.append(plate)
-        #self.tracking_env.dist_sort(items, pos)[0]
         return self.tracking_env.kitchen.where_grid_is('D')[0]
 
     def get_kb_closest_empty_sink(self, pos):
@@ -383,7 +377,6 @@ class VisionLimitHumanAgent(HumanAgent):
         hot_plate_ready = len(sink_status['ready']) > 0
         rinsing = len(sink_status['full']) > 0
         sink_empty = len(sink_status['empty']) > 0
-        motion_goals = []
 
         ready_soups = pot_states_dict['ready']
         cooking_soups = pot_states_dict['cooking']
@@ -451,6 +444,9 @@ class VisionLimitHumanAgent(HumanAgent):
 
             elif player_obj == 'dish':
                 action, object = ('deliver', 'dish')
+            
+            else:
+                return None
 
         possible_motion_goals = self.kb_map_action_to_location(
             (action, object), self.human.get_position())
@@ -523,7 +519,7 @@ class VisionLimitHumanAgent(HumanAgent):
             location = sink.get_position()
 
         elif action == "pickup" and object == "meat":
-            location = self.get_kb_closest_fridge(agent_pos).get_position()
+            location = self.get_kb_closest_counter(agent_pos).get_position()
 
         elif action == "pickup" and object == "steak":
             ready_pans = self.knowledge_base["pot_states"]["ready"]
@@ -556,7 +552,7 @@ class VisionLimitHumanAgent(HumanAgent):
 
     def _arrival_step(self):
         hand_pos = self.human._parts["right_hand"].get_position()
-        action, object = action_object = self.action_object
+        action, object = self.action_object
         if action == "pickup" and object == "meat":
             if self.object_position is None:
                 self.target_object = self.tracking_env.get_closest_meat(self.human.get_position())
@@ -567,8 +563,7 @@ class VisionLimitHumanAgent(HumanAgent):
 
             if done:
                 if is_holding:
-                    self.completed_goal(None, action_object)
-                    human_ml_pos = real_to_grid_coord(self.human.get_position())
+                    self.completed_goal()
                 else:
                     self.object_position = None
 
@@ -577,7 +572,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.object_position = self.tracking_env.get_closest_pan().get_position()
             done = self.drop(self.object_position, [0, -0.1, 0.25])
             if done:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
 
         elif action == "pickup" and object == "plate":
             if self.object_position is None:
@@ -587,7 +582,9 @@ class VisionLimitHumanAgent(HumanAgent):
             is_holding = self.tracking_env.is_obj_in_human_hand(self.target_object)
             done = self.pick(self.object_position, [0, -0.3, 0.1]) and is_holding
             if done:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
+        elif action == "heat" and object == "hot_plate":
+            self.completed_goal()
         elif action == "pickup" and object == "hot_plate":
             if self.object_position is None:
                 self.target_object, sink = self.tracking_env.get_closest_hot_plate_sink(hand_pos)
@@ -600,16 +597,16 @@ class VisionLimitHumanAgent(HumanAgent):
             is_holding = self.tracking_env.is_obj_in_human_hand(self.target_object)
             done = self.pick(self.object_position, [0, -0.3, 0.1]) and is_holding
             if done:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
         elif action == "drop" and object == "plate":
             if self.object_position is None:
                 sink = self.tracking_env.get_closest_sink(hand_pos)
                 self.object_position = sink.get_position()
-            done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
+            done = self.drop(self.human.get_position(), [0, 0.8, 0.4])
             if done:
                 sink = self.tracking_env.get_closest_sink(hand_pos)
                 self.env.kitchen.rinse_sink(sink)
-                self.completed_goal(None, action_object)
+                self.completed_goal()
         elif action == "pickup" and object == "steak":
             if self.object_position is None:
                 pan = self.tracking_env.get_closest_pan()
@@ -617,7 +614,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.interact_obj = pan
                 self.object_position = pan.get_position()
             if self.step_index == 0:
-                done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
+                done = self.drop(self.object_position, [-0.4, -0.25, 0.5])
                 if done:
                     self.step_index = self.step_index + 1
                     steak = self.tracking_env.get_closest_steak(self.human.get_position())
@@ -650,7 +647,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 if done:
                     self.step_index = self.step_index + 1
             else:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
                 self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
         elif action == "pickup" and object == "garnish":
             if self.object_position is None:
@@ -660,7 +657,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.object_position = chopped_onion.current_selection().objects[0].get_position()
                 self.target_object = chopped_onion
             if self.step_index == 0:
-                done = self.drop(self.object_position, [-0.3, -0.22, 0.2])
+                done = self.drop(self.object_position, [0.3, -0.22, 0.5])
                 if done:
                     self.step_index = self.step_index + 1
             elif self.step_index == 1:
@@ -683,7 +680,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 if done:
                     self.step_index = self.step_index + 1
             else:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
                 self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
         elif action == "chop" and object == "onion":
             if self.object_position is None:
@@ -717,7 +714,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 if done:
                     o = self.tracking_env.get_closest_green_onion(self.human.get_position())
                     o.states[object_states.Sliced].set_value(True)
-                    self.completed_goal(None, action_object)
+                    self.completed_goal()
                     self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
 
         elif action == "pickup" and object == "onion":
@@ -725,11 +722,11 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.target_object = self.tracking_env.get_closest_green_onion(hand_pos)
             self.object_position = self.target_object.get_position()
             is_holding = self.tracking_env.is_obj_in_human_hand(self.target_object)
-            done = self.pick(self.object_position, [0, -0.1, 0.04])
+            done = self.pick(self.object_position, [0, -0.1, 0.03])
 
             if done:
                 if is_holding:
-                    self.completed_goal(None, action_object)
+                    self.completed_goal()
                 else:
                     self.target_object.set_position(self.object_position + [0, 0, 0.3])
                     self.object_position = None
@@ -738,11 +735,11 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.object_position = self.tracking_env.get_closest_chopping_board(hand_pos).get_position()
             done = self.drop(self.object_position, [0, -0.1, 0.25])
             if done:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
         elif action == "deliver" and (object == "soup" or object == "dish"):
-            done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
+            done = self.drop(self.human.get_position(), [0, 0.5, 0.3])
             if done:
-                self.completed_goal(None, action_object)
+                self.completed_goal()
         elif (action == "pickup" and object == "soup") or self.step_index >= 1:
             if self.object_position is None:
                 pan = self.tracking_env.get_closest_pan()
@@ -782,5 +779,5 @@ class VisionLimitHumanAgent(HumanAgent):
                 if done:
                     self.step_index = self.step_index + 1
             else:
-                self.completed_goal(next_hl_state, action_object)
+                self.completed_goal()
                 self.tracking_env.kitchen.interact_objs[self.interact_obj] = False

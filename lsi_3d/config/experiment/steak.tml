@@ -5,9 +5,11 @@ order_list = ['steak','steak']
 hl_start_state = 'None_0_onion_onion'
 recalculation_resolution = 15
 avoid_radius = 1
+rinse_count_threshold = 2
+chop_count_threshold = 2
 
-human_start_x=2
-human_start_y=5
+human_start_x=5
+human_start_y=3
 
 robot_start_x=3
 robot_start_y=4

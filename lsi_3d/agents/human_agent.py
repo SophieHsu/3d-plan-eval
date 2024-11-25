@@ -86,8 +86,6 @@ class HumanAgent:
             self.check_interact_objects()
             self.env.update_human_world_state()
         else:
-            x, y, z = self.human.get_position()
-
             if not self.arrived:
                 end = self.get_next_goal()
 
@@ -142,9 +140,6 @@ class HumanAgent:
         return self.motion_controller.step(self.human, self.robot, final_ori, path, is_new_end)
 
     def _arrival_step(self):
-
-        next_hl_state = self.next_hl_state
-        action_object = self.action_object
         action = self.action_object[0]
         object = self.action_object[1]
         if action == "pickup" and object == "onion":
@@ -153,11 +148,11 @@ class HumanAgent:
                 self.object_position = self.target_object.get_position()
 
             is_holding_onion = self.tracking_env.is_obj_in_human_hand(self.target_object)
-            done = self.pick(self.object_position, [0, 0, 0.05])
+            done = self.pick(self.object_position, [0, 0, 0.07])
 
             if done:
                 if is_holding_onion:
-                    self.completed_goal(next_hl_state, action_object)
+                    self.completed_goal()
                 else:
                     self.object_position = None
         elif action == "drop" and object == "onion":
@@ -165,7 +160,7 @@ class HumanAgent:
                 self.object_position = self.tracking_env.get_closest_pan().get_position()
             done = self.drop(self.object_position, [0, -0.1, 0.25])
             if done:
-                self.completed_goal(next_hl_state, action_object)
+                self.completed_goal()
         elif action == "pickup" and object == "dish":
             if self.object_position is None:
                 bowls = self.tracking_env.get_bowls_dist_sort()
@@ -179,11 +174,11 @@ class HumanAgent:
             is_holding_bowl = self.tracking_env.is_obj_in_human_hand(self.target_object)
             done = self.pick(self.object_position, [0, -0.25, 0.1]) and is_holding_bowl
             if done:
-                self.completed_goal(next_hl_state, action_object)
+                self.completed_goal()
         elif action == "deliver" and object == "soup":
             done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
             if done:
-                self.completed_goal(next_hl_state, action_object)
+                self.completed_goal()
         elif (action == "pickup" and object == "soup") or self.step_index >= 1:
             if self.object_position is None:
                 pan = self.tracking_env.get_closest_pan()
@@ -223,7 +218,7 @@ class HumanAgent:
                 if done:
                     self.step_index = self.step_index + 1
             else:
-                self.completed_goal(next_hl_state, action_object)
+                self.completed_goal()
                 self.tracking_env.kitchen.interact_objs[self.interact_obj] = False
 
     def pick(self, loc, offset=[0, 0, 0]):
@@ -232,7 +227,7 @@ class HumanAgent:
     def drop(self, loc, offset=[0, 0, 0]):
         return self.motion_controller.drop(self.human, loc, offset)
 
-    def completed_goal(self, next_hl_state, action_object):
+    def completed_goal(self):
         self.step_index = 0
         self.object_position = None
         self.arrived = False
