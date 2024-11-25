@@ -55,7 +55,7 @@ class Runner:
                 os.getcwd(),
                 'src',
                 'logs',
-                'self.log_dir_num',
+                self.log_dir_num,
                 f'{self._kitchen.kitchen_name}_log.txt'
         ), 'w') as fh:
             fh.write('Start Locations (robot, human): {}\n'.format(start_locations))
@@ -163,7 +163,7 @@ class Runner:
                     os.getcwd(),
                     'src',
                     'logs',
-                    'self.log_dir_num',
+                    self.log_dir_num,
                     f'{self._kitchen.kitchen_name}_log.txt'), 'a'
             ) as fh:
                 fh.write('success')
@@ -176,7 +176,7 @@ class Runner:
                     os.getcwd(),
                     'src',
                     'logs',
-                    'self.log_dir_num',
+                    self.log_dir_num,
                     f'{self._kitchen.kitchen_name}_log.txt'
             ), 'a') as fh:
                 fh.write('failure by timeout')
