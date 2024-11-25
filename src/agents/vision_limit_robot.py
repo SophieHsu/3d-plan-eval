@@ -270,7 +270,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                 os.getcwd(),
                 'src',
                 'logs',
-                self.kitchen.log_dir_num,
+                self.env.kitchen.log_dir_num,
                 f"{self.env.kitchen.kitchen_name}_{self.log_dict['log_id']}_log_dict.json"
             )
             open(filename, 'w').close()
