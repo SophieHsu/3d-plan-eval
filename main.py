@@ -56,8 +56,6 @@ class Runner:
         return True
 
     def _set_start_locations(self, exp_config):
-        # TODO consolidate config files
-
         if ARGS.kitchen != 'none':  # if using script select random start
             self._kitchen.read_from_grid_text(ARGS.kitchen)
             open_squares = self._kitchen.get_empty_squares()
