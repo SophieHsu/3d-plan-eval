@@ -43,7 +43,7 @@ class Kitchen:
     _DYNAMIC_OBJECTS = [OBJECT_KEYS.BOWL, OBJECT_KEYS.PAN, OBJECT_KEYS.VIDALIA_ONION, OBJECT_KEYS.STEAK,
                         OBJECT_KEYS.PLATE, OBJECT_KEYS.CHOPPING_BOARD, OBJECT_KEYS.KNIFE, OBJECT_KEYS.GREEN_ONION]
 
-    def __init__(self, env, max_in_pan):
+    def __init__(self, env, max_in_pan, log_dir_num):
         self.env = env
         self.map = None
         self.kitchen_name = None
@@ -91,6 +91,7 @@ class Kitchen:
         self.stored_overcooked_object_states = {}
 
         self.overcooked_hot_plates_now_dish = []
+        self.log_dir_num = log_dir_num
 
     def execute_action(self, action, target, **kwargs):
         ACTION_EXECUTORS[action].execute(target, self, **kwargs)

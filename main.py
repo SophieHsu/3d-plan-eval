@@ -1,6 +1,7 @@
 import argparse
 import functools
 import logging
+import os
 import random
 import sys
 import time
@@ -37,9 +38,19 @@ class Runner:
         self._env = None
         self._igibson_env = None
         self._kitchen = None
+        self._log_dir_num = None
+
+    def _get_log_dir_num(self):
+        if self._log_dir_num is None:
+            dir_path = 'src/logs/'
+            dir_names = [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+            numeric_dirs = [int(d) for d in dir_names if d.isdigit()] + [0]
+            self.log_dir_num = max(numeric_dirs) + 1
+
+        return self.log_dir_num
 
     def _init_logfile(self, start_locations):
-        with open('src/logs{}_log.txt'.format(self._kitchen.kitchen_name), 'w') as fh:
+        with open(f'src/logs/{self.log_dir_num}/{self._kitchen.kitchen_name}_log.txt', 'w') as fh:
             fh.write('Start Locations (robot, human): {}\n'.format(start_locations))
 
             grid_str = functools.reduce(
@@ -82,7 +93,7 @@ class Runner:
             use_pb_gui=True
         )
 
-        self._kitchen = Kitchen(self._igibson_env, exp_config['max_in_pan'])
+        self._kitchen = Kitchen(self._igibson_env, exp_config['max_in_pan'], self._get_log_dir_num())
         self._igibson_env.simulator.scene.floor_plane_rgba = [.5, .5, .5, 1]
 
         robot_start, human_start = self._set_start_locations(exp_config)
@@ -141,14 +152,14 @@ class Runner:
 
     def _check_completion(self, start_time):
         if not self._env.world_state.orders:
-            with open('src/logs/{}_log.txt'.format(self._kitchen.kitchen_name), 'a') as fh:
+            with open(f'src/logs/{self.log_dir_num}/{self._kitchen.kitchen_name}_log.txt', 'a') as fh:
                 fh.write('success')
             print('orders completed')
             return True
 
         elapsed = time.time() - start_time
         if elapsed > self._TIME_LIMIT_FAILURE:
-            with open('src/test_logs/{}_log.txt'.format(self._kitchen.kitchen_name), 'a') as fh:
+            with open(f'src/logs/{self.log_dir_num}/{self._kitchen.kitchen_name}_log.txt', 'a') as fh:
                 fh.write('failure by timeout')
             print('timed out')
             return True
