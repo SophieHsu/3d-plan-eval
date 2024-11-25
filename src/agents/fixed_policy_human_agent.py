@@ -1,4 +1,4 @@
-from agent import Agent
+from src.agents.agent import Agent
 from src.environment.vision_limit_env import VisionLimitEnv
 from src.mdp.state import AgentState, WorldState
 
