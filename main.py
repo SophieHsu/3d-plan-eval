@@ -41,12 +41,13 @@ class Runner:
         self._log_dir_num = None
 
     def _get_log_dir_num(self):
+        dir_path = os.path.join(os.getcwd(), 'src', 'logs')
         if self._log_dir_num is None:
-            dir_path = 'src/logs/'
             dir_names = [d for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
             numeric_dirs = [int(d) for d in dir_names if d.isdigit()] + [0]
-            self.log_dir_num = max(numeric_dirs) + 1
+            self.log_dir_num = str(max(numeric_dirs) + 1)
 
+        os.makedirs(os.path.join(dir_path, self.log_dir_num), exist_ok=True)
         return self.log_dir_num
 
     def _init_logfile(self, start_locations):
