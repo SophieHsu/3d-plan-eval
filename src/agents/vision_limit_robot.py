@@ -266,9 +266,8 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             self.log_dict['event_start_time'] = time.time()
 
             # try:
-            filename = 'src/logs/' + self.env.kitchen.kitchen_name + self.log_dict['log_id'] + '_log_dict.json'
+            filename = f"src/logs/{self.env.kitchen.log_dir_num}/{self.env.kitchen.kitchen_name}{self.log_dict['log_id']}_log_dict.json"
             open(filename, 'w').close()
-            filename = 'src/logs/' + self.env.kitchen.kitchen_name + self.log_dict['log_id'] + '_log_dict.json'
             f = open(filename, "a")
             json.dump(self.log_dict, f)
             f.close()
@@ -334,7 +333,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         return self.ml_robot_action
 
     def log_state(self):
-        filename = 'src/logs/' + self.env.kitchen.kitchen_name + '_log.txt'
+        filename = f'src/logs/{self.env.kitchen.log_dir_num}/{self.env.kitchen.kitchen_name}_log.txt'
         f = open(filename, "a")
         s = '\n'
         s += 'Plan: ' + str(self.ml_robot_plan) + '\n'

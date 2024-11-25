@@ -463,7 +463,7 @@ class VisionLimitEnv(LsiEnv):
 
         if elapsed > 1:
             self.log_time = time.time()
-            filename = 'src/logs/' + self.kitchen.kitchen_name + '_log.txt'
+            filename = f'src/logs/{self.env.kitchen.log_dir_num}/{self.env.kitchen.kitchen_name}_log.txt'
             f = open(filename, "a")
             s = ''
             s += 'Logging State at Time:\t' + str(self.log_time) + '\n'
