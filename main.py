@@ -90,7 +90,7 @@ class Runner:
         return robot_start, human_start
 
     def _setup(self):
-        exp_config, map_config = get_configs('steak.tml')
+        exp_config, map_config = get_configs(ARGS.config)
 
         self._igibson_env = iGibsonEnv(
             config_file=exp_config['ig_config_file'],
