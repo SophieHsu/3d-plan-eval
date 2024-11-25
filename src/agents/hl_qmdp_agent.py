@@ -1,3 +1,4 @@
+import os
 import math
 import time
 
@@ -302,7 +303,12 @@ class HlQmdpPlanningAgent(Agent):
                     self.take_hl_robot_step = True
 
     def log_state(self):
-        filename = f'src/logs/{self.env.kitchen.log_dir_num}/{self.env.kitchen.kitchen_name}_log.txt'
+        filename = os.path.join(
+            os.getcwd(),
+            'src',
+            'logs',
+            f'{self.env.kitchen.log_dir_num} / {self.env.kitchen.kitchen_name}_log.txt'
+        )
         f = open(filename, "a")
         s = ''
         s += 'QMDP Index: ' + str(self.env.robot_state.hl_state) + '\n'

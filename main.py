@@ -51,7 +51,13 @@ class Runner:
         return self.log_dir_num
 
     def _init_logfile(self, start_locations):
-        with open(f'src/logs/{self.log_dir_num}/{self._kitchen.kitchen_name}_log.txt', 'w') as fh:
+        with open(os.path.join(
+                os.getcwd(),
+                'src',
+                'logs',
+                'self.log_dir_num',
+                f'{self._kitchen.kitchen_name}_log.txt'
+        ), 'w') as fh:
             fh.write('Start Locations (robot, human): {}\n'.format(start_locations))
 
             grid_str = functools.reduce(
@@ -153,14 +159,26 @@ class Runner:
 
     def _check_completion(self, start_time):
         if not self._env.world_state.orders:
-            with open(f'src/logs/{self.log_dir_num}/{self._kitchen.kitchen_name}_log.txt', 'a') as fh:
+            with open(os.path.join(
+                    os.getcwd(),
+                    'src',
+                    'logs',
+                    'self.log_dir_num',
+                    f'{self._kitchen.kitchen_name}_log.txt'), 'a'
+            ) as fh:
                 fh.write('success')
             print('orders completed')
             return True
 
         elapsed = time.time() - start_time
         if elapsed > self._TIME_LIMIT_FAILURE:
-            with open(f'src/logs/{self.log_dir_num}/{self._kitchen.kitchen_name}_log.txt', 'a') as fh:
+            with open(os.path.join(
+                    os.getcwd(),
+                    'src',
+                    'logs',
+                    'self.log_dir_num',
+                    f'{self._kitchen.kitchen_name}_log.txt'
+            ), 'a') as fh:
                 fh.write('failure by timeout')
             print('timed out')
             return True
