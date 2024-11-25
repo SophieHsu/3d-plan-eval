@@ -468,7 +468,7 @@ class VisionLimitEnv(LsiEnv):
                 os.getcwd(),
                 'src',
                 'logs',
-                f'{self.env.kitchen.log_dir_num}/{self.env.kitchen.kitchen_name}_log.txt'
+                f'{self.kitchen.log_dir_num}/{self.kitchen.kitchen_name}_log.txt'
             )
             f = open(filename, "a")
             s = ''
