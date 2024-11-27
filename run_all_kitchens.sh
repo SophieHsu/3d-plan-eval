@@ -28,7 +28,7 @@ do
     fi
 
     # Run the Python command in the background and store the process ID
-    # python 3d_plan_eval_main.py -m "vr" -k "$file_path" &
+    # python main.py -m "vr" -k "$file_path" &
     python 3d_plan_eval_main.py -k "$file_path" &
     python_pid=$!
 
