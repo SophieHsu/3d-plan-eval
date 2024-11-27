@@ -38,6 +38,46 @@ The project uses multiple repositories to run. This repository contains the prim
 find it more helpful to refer to [this](https://github.com/SophieHsu/view-aware-hrc) repository for instructions 
 to set up the project and to be able to run it on your system.
 
+## Usage ##
+- Setup
+  - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
+    provided config files. This has already been done for you. 
+- Starting the overcooked server
+  - Begin running the Overcooked server by navigating to the FOV-aware-planner and run the following script (a baked in restart mechanism for up to 5 restarts in case of crashes due to dropped connections)
+      ```
+      cd overcooked_ai_py/
+      ./steak_api_restart.sh
+      ```
+  - Note: If planner files need to be recalculated, make sure to delete old planner files.
+  - Alternatively, you can run the server without a restart mechanism:
+      ```
+      python overcooked_ai_py/steak_api_test.py -l steak_none_3 -v 1
+      ```
+    where, `-v`: Defines the vision limitation of the AI agent. <br>
+      1 = Aware (vision limited to the agent's field of view) <br>
+      0 = Unaware (omniscient agent) <br>
+    and `-l`: Defines the layout file (exclude the .tml extension).
+- Running the iGibson Simulator
+  - Once the Overcooked server is running, start the iGibson simulation:
+    ```
+    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+    ```
+  - `-m vr`: Runs the program in VR mode. If left out, the program will simulate a greedy human model operating in 
+    the world. Other options are: [`headless`, `headless_tensor`, `gui_non_interactive`, `gui_interactive`, `vr`].
+  - `-c steak_none_3.tml`: Defines the configuration file, which must match the config used in Overcooked.
+- Playing the Level
+  - While playing the level, the system will generate a JSON log file, which is saved in the `lsi_3d/logs` directory. 
+    The log file will have a unique ID associated with the run.
+- Running the Practice Room
+  - Start Overcooked:
+    ```
+    python overcooked_ai_py/steak_api_test.py -l steak_practice -v 1
+    ```
+  - Start iGibson in VR mode:
+    ```
+    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+    ```
+
 ### Project Structure ###
 To try your own layout, you can create a `{layout_name}.txt` file in the `kitchen_layout_grid_text` folder.
 Then, creat an experiment config in `lsi/config/experiment` with parameter `layout={layout_name}.txt`.
