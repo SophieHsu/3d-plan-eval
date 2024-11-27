@@ -34,7 +34,7 @@ Results showed that the FOV-aware planner reduced interruptions and redundant ac
 </p>
 
 ## Installation Instructions ## 
-This project uses multiple repositories to run. Although this repository contains the primary focus of the paper. You would
+The project uses multiple repositories to run. This repository contains the primary focus of the VR experiment mentioned in the paper. You would
 find it more helpful to refer to [this](https://github.com/SophieHsu/view-aware-hrc) repository for instructions 
 to set up the project and to be able to run it on your system.
 
