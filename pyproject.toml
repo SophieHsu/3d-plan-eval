@@ -37,6 +37,8 @@ dependencies = [
     "urllib3>=1.20",
     "progressbar>=2.5",
     "packaging",
+    "toml~=0.10.2",
+    "pygame~=2.5.0"
 ]
 
 [tool.black]

@@ -2,11 +2,6 @@
 * [Integrating Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
   * [Project Overview](#project-overview)
   * [Installation Instructions](#installation-instructions)
-    * [Versions](#versions)
-    * [Clone the Project](#clone-the-project)
-    * [Setup the Planner Project Repo](#setup-the-planner-project-repo)
-    * [Install SteamVR](#install-steamvr)
-    * [Install Oculus](#install-oculus)
   * [Usage](#usage)
   * [Project Structure](#project-structure)
     * [Main Scripts](#main-scripts)
@@ -27,6 +22,7 @@
   <br> Baseline (left) shows the robot turning right to go around the counters, whereas the FOV-aware robot (right) goes around the left so that it stays inside the human's field of view for longer showing what it is holding. 
 </p>
 
+
 ## Project Overview ##
 This open-source code provides a virtual reality (VR) version of the Steak House domain, designed to study human-robot collaboration. It focuses on how knowledge base (KB) gaps—differences between what a human perceives and the actual state of the environment—naturally occur due to the human's limited field of view (FOV) and the time required to complete tasks at specific stations. Researchers can use this code to explore how KB gaps affect human decision-making and task efficiency during collaboration. (Note: the FOV-aware robot planner is found separately [here](https://github.com/SophieHsu/FOV-aware-planner))
 
@@ -38,40 +34,10 @@ Results showed that the FOV-aware planner reduced interruptions and redundant ac
 </p>
 
 ## Installation Instructions ## 
+The project uses multiple repositories to run. This repository contains the primary focus of the VR experiment mentioned in the paper. You would
+find it more helpful to refer to [this](https://github.com/SophieHsu/view-aware-hrc) repository for instructions 
+to set up the project and to be able to run it on your system.
 
-### Versions ###
-This project has mainly two versions:
-- `v1.0` is the version used for the VR demonstration presented in the 2025 ICRA submission paper.
-- `v2.2` is the latest version which is identical to `v1.0` accept the code has been refactored in some places and 
-  includes this readme with the instructions.
-For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
-
-### Clone the Project ###
-Cloning the version of the code you want to run.
-```
-git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
-conda create -y -n igibson python=3.8
-conda activate igibson
-pip install -e .
-pip install pygame toml
-```
-Download the [data](https://drive.google.com/file/d/1tVj27p_H2acWC53tl-BdVRsnJfH-0-XX/view?usp=sharing) and unzip it under the `igibson` folder.
-
-### Setup the Planner Project Repo ###
-Install the planner outside of this project folder. Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
-```
-git clone git@github.com:SophieHsu/FOV-aware-planner.git
-```
-Follow along the instructions in the [README](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md) to setup this repo.
-
-
-### Install SteamVR ###
-Install the SteamVR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
-
-
-### Install Oculus ###
-- Perform the initial setup of your VR headset. For oculus/quest see [this](https://www.meta.com/blog/quest/you-got-a-quest-2-heres-how-to-set-it-up/).
-- Set the VR headset to run with SteamVR. For oculus/quest see [this](https://docs.varwin.com/latest/en/instructions-for-using-the-oculus-quest-2-headset-2260861409.html).
 ## Usage ##
 - Setup
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
