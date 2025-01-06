@@ -133,7 +133,7 @@ The most relevant components of the project are described below.
   that can be applied to them in the environment respectively.
 - `logs` - Directory to store logs from experimental runs of the project.
 - `mdp` - Implementation of out mdp solver.
-- `motion_controllers` - 
+- `motion_controllers` - The controllers that outputs low level movement commends to the VR agent and the robot agent in the VR environment.
 - `planners` - Different planner implementations for different environment typer for different agents (human vs AI).
 - `utils` - Common utility functions.
 
