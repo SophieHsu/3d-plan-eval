@@ -6,7 +6,7 @@
   * [Project Structure](#project-structure)
     * [Main Scripts](#main-scripts)
     * [`iGibson`](#igibson)
-    * [`lsi_3d` Components](#lsi_3d-components)
+    * [`src` Components](#src-components)
   * [Task Instructions](#task-instructions)
   * [Results](#results)
       * [Behavior 1: Robot prolongs its visibility to the human](#behavior-1-robot-prolongs-its-visibility-to-the-human)
@@ -75,32 +75,32 @@ to set up the project and to be able to run it on your system.
     ```
   - Start iGibson in VR mode:
     ```
-    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+    python 3d_plan_eval_main.py -m vr -c steak_practice.tml -p 1
     ```
 
 ### Project Structure ###
 To try your own layout, you can create a `{layout_name}.txt` file in the `kitchen_layout_grid_text` folder.
-Then, creat an experiment config in `lsi/config/experiment` with parameter `layout={layout_name}.txt`.
-You can also add more steak orders or even include [your own new dish](google.com) by setting the `order_list` parameter.
+Then, create an experiment config in `lsi/config/experiment` with parameter `layout={layout_name}.txt`.
+You can also add more steak orders or even include [your own new dish](https://github.com/SophieHsu/3d-plan-eval/blob/main/src/config/experiment/steak_mid_2.tml) by setting the `order_list` parameter.
 
 Here are some additional layouts we provide for you to try out:
 ```
-  python 3d_plan_eval_main.py -m vr -c steak_side_1.tml
-  python 3d_plan_eval_main.py -m vr -c steak_mid_1.tml
   python 3d_plan_eval_main.py -m vr -c steak_mid_2.tml
+  python 3d_plan_eval_main.py -m vr -c steak_side_2.tml
+  python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
 ```
 Remember to also change the layout and order parameters on the FOV-aware-planner side.
 ```
 python overcooked_ai_py/steak_api_test.py -l {layout_name} -v 1
 ```
-Highly recommand to use the restart mechanism by altering the commend in `overcooked_ai_py/steak_api_restart.sh`
+Highly recommend using the restart mechanism by altering the commend in `overcooked_ai_py/steak_api_restart.sh`
 
 ## Project Structure ##
-The most relevant components in the project are described below.
+The most relevant components of the project are described below.
 ```
-├── 3d_plan_eval_main.py
+├── main.py
 ├── igibson/
-├── lsi_3d/
+├── src/
 │   ├── agents/
 │   ├── config/
 │   ├── environment/
@@ -108,20 +108,19 @@ The most relevant components in the project are described below.
 │   ├── mdp
 │   ├── motion_controllers/
 │   ├── planners/
-│   ├── utils/
-│   └── overcooked_state_dump.json
+│   └── utils/
 ├── README.md
 └── utils.py
 ```
 
 ### Main Scripts ###
-- `3d_plan_eval_main.py` is the main entry point of the project that defines the necessary `RUNNER` class to 
+- `main.py` is the main entry point of the project that defines the necessary `RUNNER` class to 
     run the project.
 ### `iGibson` ###
 - The `iGibson` directory contains the core components for the iGibson simulation framework. Please refer 
     [here](https://github.com/StanfordVL/iGibson) for more details.
 
-### `lsi_3d` Components ###
+### `src` Components ###
 - `agents` - This directory contains various files to define the agent classes that are responsible for low and high 
     level control of both the AI agents and the human player.
 - `config` - This directory contains the files to set up configurations of the various components of this 
@@ -134,6 +133,7 @@ The most relevant components in the project are described below.
   that can be applied to them in the environment respectively.
 - `logs` - Directory to store logs from experimental runs of the project.
 - `mdp` - Implementation of out mdp solver.
+- `motion_controllers` - 
 - `planners` - Different planner implementations for different environment typer for different agents (human vs AI).
 - `utils` - Common utility functions.
 
