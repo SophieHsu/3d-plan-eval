@@ -90,7 +90,7 @@ class Runner:
         return robot_start, human_start
 
     def _setup(self):
-        exp_config, map_config = get_configs('steak.tml')
+        exp_config, map_config = get_configs(ARGS.config)
 
         self._igibson_env = iGibsonEnv(
             config_file=exp_config['ig_config_file'],
@@ -108,6 +108,7 @@ class Runner:
         if ARGS.kitchen != 'none':
             self._kitchen.setup(ARGS.kitchen)
         else:
+
             self._kitchen.setup(exp_config["layout"], exp_config["order_list"])
 
         order_list = exp_config['order_list']
@@ -150,7 +151,8 @@ class Runner:
         robot_hlp.compute_mdp(filename='hi')
 
         human_sim_agent = SteakFixedPolicyHumanAgent(self._env, self._human_agent)
-        self._robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, self._env, robot, log_dict=log_dict)
+        awareness = 'aware' if ARGS.vision == 1 else 'unaware'
+        self._robot_agent = VisionLimitRobotAgent(robot_hlp, mlp, human_sim_agent, self._env, robot, awareness=awareness, log_dict=log_dict)
 
         # TODO: Get rid of 4.5 offset
         self._igibson_env.set_pos_orn_with_z_offset(self._igibson_env.robots[1],
@@ -226,6 +228,8 @@ def get_args():
                         default='none', help='Filepath of the kitchen layout')
     parser.add_argument('--config', '-c', type=str, dest='config', action='store',
                         default='steak.tml', help='Name of the config file')
+    parser.add_argument('--vision', '-v', type=int, dest='vision', action='store',
+                        default='1', help='Robot\'s awareness of the human\'s limited field of view. (1 = aware, 0 = unaware)')
     parser.add_argument('--practice', '-p', action='store_true', dest='practice',
                         help='Flag indicating whether it is a practice session')
 
