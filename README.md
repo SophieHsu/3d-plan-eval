@@ -88,9 +88,9 @@ You can also add more steak orders or even include [your own new dish](https://g
 
 Here are some additional layouts we provide for you to try out:
 ```
-  python 3d_plan_eval_main.py -m vr -c steak_mid_2.tml
-  python 3d_plan_eval_main.py -m vr -c steak_side_2.tml
-  python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+  python 3d_plan_eval_main.py -m vr -c steak_mid_2.tml -v 1
+  python 3d_plan_eval_main.py -m vr -c steak_side_2.tml -v 1
+  python 3d_plan_eval_main.py -m vr -c steak_none_3.tml -v 1
 ```
 Remember to also change the layout and order parameters on the FOV-aware-planner side.
 ```
