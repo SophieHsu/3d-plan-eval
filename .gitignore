@@ -128,7 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# igibson/
+ igibson/
 # VS Code files for those working on multiple tools
 .vscode/*
 !.vscode/settings.json
@@ -137,11 +137,11 @@ dmypy.json
 !.vscode/extensions.json
 *.code-workspace
 
-lsi_3d/test_logs/
+src/test_logs/
 
 *.pkl
 
-lsi_3d/logs/
+src/logs/
 
 # IDE files (JetBrains)
 .idea/

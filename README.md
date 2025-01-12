@@ -2,16 +2,11 @@
 * [Integrating Field of View in Human-Aware Collaborative](#integrating-human-field-of-view-in-human-aware-collaborative)
   * [Project Overview](#project-overview)
   * [Installation Instructions](#installation-instructions)
-    * [Versions](#versions)
-    * [Clone the Project](#clone-the-project)
-    * [Setup the Planner Project Repo](#setup-the-planner-project-repo)
-    * [Install SteamVR](#install-steamvr)
-    * [Install Oculus](#install-oculus)
   * [Usage](#usage)
   * [Project Structure](#project-structure)
     * [Main Scripts](#main-scripts)
     * [`iGibson`](#igibson)
-    * [`lsi_3d` Components](#lsi_3d-components)
+    * [`src` Components](#src-components)
   * [Task Instructions](#task-instructions)
   * [Results](#results)
       * [Behavior 1: Robot prolongs its visibility to the human](#behavior-1-robot-prolongs-its-visibility-to-the-human)
@@ -27,6 +22,7 @@
   <br> Baseline (left) shows the robot turning right to go around the counters, whereas the FOV-aware robot (right) goes around the left so that it stays inside the human's field of view for longer showing what it is holding. 
 </p>
 
+
 ## Project Overview ##
 This open-source code provides a virtual reality (VR) version of the Steak House domain, designed to study human-robot collaboration. It focuses on how knowledge base (KB) gaps—differences between what a human perceives and the actual state of the environment—naturally occur due to the human's limited field of view (FOV) and the time required to complete tasks at specific stations. Researchers can use this code to explore how KB gaps affect human decision-making and task efficiency during collaboration. (Note: the FOV-aware robot planner is found separately [here](https://github.com/SophieHsu/FOV-aware-planner))
 
@@ -38,63 +34,43 @@ Results showed that the FOV-aware planner reduced interruptions and redundant ac
 </p>
 
 ## Installation Instructions ## 
+The project uses multiple repositories to run. This repository contains the primary focus of the VR experiment mentioned in the paper. You would
+find it more helpful to refer to [this](https://github.com/SophieHsu/view-aware-hrc) repository for instructions 
+to set up the project and to be able to run it on your system.
 
-### Versions ###
-This project has mainly two versions:
-- `v1.0` is the version used for the VR demonstration presented in the 2025 ICRA submission paper.
-- `v2.2` is the latest version which is identical to `v1.0` accept the code has been refactored in some places and 
-  includes this readme with the instructions.
-For all the tags available please check the releases page associated with this project [here](https://github.com/SophieHsu/3d-plan-eval/tags).
-
-### Clone the Project ###
-Cloning the version of the code you want to run.
-```
-git clone git@github.com:SophieHsu/3d-plan-eval.git -b <version>
-```
-
-### Setup the Planner Project Repo ###
-Link to the FOV-Aware planner repo: [link](https://github.com/SophieHsu/FOV-aware-planner)
-```
-git clone git@github.com:SophieHsu/FOV-aware-planner.git
-```
-Follow along the instructions in the [README](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md) to setup this repo.
-
-### Install SteamVR ###
-Install the SteamVR (found [here](https://store.steampowered.com/app/250820/SteamVR/)) using the steam platform.
-
-
-### Install Oculus ###
-- Perform the initial setup of your VR headset. For oculus/quest see [this](https://www.meta.com/blog/quest/you-got-a-quest-2-heres-how-to-set-it-up/).
-- Set the VR headset to run with SteamVR. For oculus/quest see [this](https://docs.varwin.com/latest/en/instructions-for-using-the-oculus-quest-2-headset-2260861409.html).
 ## Usage ##
 - Setup
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
     provided config files. This has already been done for you. 
 - Starting the overcooked server
-  - Begin by running the Overcooked server. You can use the following script
+  - Begin running the Overcooked server by navigating to the FOV-aware-planner and run the following script (a baked-in restart mechanism for up to 5 restarts in case of crashes due to dropped connections)
       ```
-      python overcooked_ai_py/steak_api_test.py -l steak_side_2 -v 1
+      cd overcooked_ai_py/
+      ./steak_api_restart.sh
+      ```
+  - Note: If planner files need to be recalculated, make sure to delete old planner files.
+  - Alternatively, you can run the server without a restart mechanism:
+      ```
+      python overcooked_ai_py/steak_api_test.py -l steak_none_3 -v 1 
       ```
     where, `-v`: Defines the vision limitation of the AI agent. <br>
       1 = Aware (vision limited to the agent's field of view) <br>
       0 = Unaware (omniscient agent) <br>
     and `-l`: Defines the layout file (exclude the .tml extension).
-  - Note: If planner files need to be recalculated, make sure to delete old planner files.
-  - Alternatively, you can run the server with a restart mechanism (up to 5 restarts in case of crashes):
-      ```
-      ./steak_api_restart.sh
-      ```
 - Running the iGibson Simulator
   - Once the Overcooked server is running, start the iGibson simulation:
     ```
-    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml -v 1
     ```
+    where, `-v` is the same definition as above.
   - `-m vr`: Runs the program in VR mode. If left out, the program will simulate a greedy human model operating in 
     the world. Other options are: [`headless`, `headless_tensor`, `gui_non_interactive`, `gui_interactive`, `vr`].
   - `-c steak_none_3.tml`: Defines the configuration file, which must match the config used in Overcooked.
 - Playing the Level
   - While playing the level, the system will generate a JSON log file, which is saved in the `lsi_3d/logs` directory. 
-    The log file will have a unique ID associated with the run.
+    The log file will have a unique ID associated with the run. If the run generates more than one json file, you could combine them into one.
+  - In order to analyze the run, please copy the entire created folder (e.g. lsi_3d/logs/0) to [here](https://github.com/SophieHsu/FOV-aware-planner/tree/main/overcooked_ai_py/data/logs/vr_study_logs) for the further process described [here](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md#vr-study-log-analysis-instructions).
+    
 - Running the Practice Room
   - Start Overcooked:
     ```
@@ -105,12 +81,29 @@ Install the SteamVR (found [here](https://store.steampowered.com/app/250820/Stea
     python 3d_plan_eval_main.py -m vr -c steak_practice.tml -p 1
     ```
 
-## Project Structure ##
-The most relevant components in the project are described below.
+### Project Structure ###
+To try your own layout, you can create a `{layout_name}.txt` file in the `kitchen_layout_grid_text` folder.
+Then, create an experiment config in `lsi/config/experiment` with parameter `layout={layout_name}.txt`.
+You can also add more steak orders or even include [your own new dish](https://github.com/SophieHsu/3d-plan-eval/blob/main/src/config/experiment/steak_mid_2.tml) by setting the `order_list` parameter.
+
+Here are some additional layouts we provide for you to try out:
 ```
-├── 3d_plan_eval_main.py
+  python 3d_plan_eval_main.py -m vr -c steak_mid_2.tml -v 1
+  python 3d_plan_eval_main.py -m vr -c steak_side_2.tml -v 1
+  python 3d_plan_eval_main.py -m vr -c steak_none_3.tml -v 1
+```
+Remember to also change the layout and order parameters on the FOV-aware-planner side.
+```
+python overcooked_ai_py/steak_api_test.py -l {layout_name} -v 1
+```
+Highly recommend using the restart mechanism by altering the commend in `overcooked_ai_py/steak_api_restart.sh`
+
+## Project Structure ##
+The most relevant components of the project are described below.
+```
+├── main.py
 ├── igibson/
-├── lsi_3d/
+├── src/
 │   ├── agents/
 │   ├── config/
 │   ├── environment/
@@ -118,20 +111,19 @@ The most relevant components in the project are described below.
 │   ├── mdp
 │   ├── motion_controllers/
 │   ├── planners/
-│   ├── utils/
-│   └── overcooked_state_dump.json
+│   └── utils/
 ├── README.md
 └── utils.py
 ```
 
 ### Main Scripts ###
-- `3d_plan_eval_main.py` is the main entry point of the project that defines the necessary `RUNNER` class to 
+- `main.py` is the main entry point of the project that defines the necessary `RUNNER` class to 
     run the project.
 ### `iGibson` ###
 - The `iGibson` directory contains the core components for the iGibson simulation framework. Please refer 
     [here](https://github.com/StanfordVL/iGibson) for more details.
 
-### `lsi_3d` Components ###
+### `src` Components ###
 - `agents` - This directory contains various files to define the agent classes that are responsible for low and high 
     level control of both the AI agents and the human player.
 - `config` - This directory contains the files to set up configurations of the various components of this 
@@ -144,6 +136,7 @@ The most relevant components in the project are described below.
   that can be applied to them in the environment respectively.
 - `logs` - Directory to store logs from experimental runs of the project.
 - `mdp` - Implementation of out mdp solver.
+- `motion_controllers` - The controllers that outputs low level movement commends to the VR agent and the robot agent in the VR environment.
 - `planners` - Different planner implementations for different environment typer for different agents (human vs AI).
 - `utils` - Common utility functions.
 
