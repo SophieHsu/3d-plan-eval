@@ -68,7 +68,7 @@ to set up the project and to be able to run it on your system.
 - Playing the Level
   - While playing the level, the system will generate a JSON log file, which is saved in the `lsi_3d/logs` directory. 
     The log file will have a unique ID associated with the run. If the run generates more than one json file, you could combine them into one.
-  - In order to analyze the run, please copy the entire created folder (e.g. lsi_3d/logs/0) to [here](https://github.com/SophieHsu/FOV-aware-planner/tree/main/overcooked_ai_py/data/logs/vr_study_logs) for the further process described [here](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md#analysis).
+  - In order to analyze the run, please copy the entire created folder (e.g. lsi_3d/logs/0) to [here](https://github.com/SophieHsu/FOV-aware-planner/tree/main/overcooked_ai_py/data/logs/vr_study_logs) for the further process described [here](https://github.com/SophieHsu/FOV-aware-planner/blob/main/README.md#vr-study-log-analysis-instructions).
     
 - Running the Practice Room
   - Start Overcooked:
