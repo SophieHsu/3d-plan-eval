@@ -43,7 +43,7 @@ to set up the project and to be able to run it on your system.
   - Start by setting up the  config and maps to be the same for both igibson and overcooked. If you're using the
     provided config files. This has already been done for you. 
 - Starting the overcooked server
-  - Begin running the Overcooked server by navigating to the FOV-aware-planner and run the following script (a baked in restart mechanism for up to 5 restarts in case of crashes due to dropped connections)
+  - Begin running the Overcooked server by navigating to the FOV-aware-planner and run the following script (a baked-in restart mechanism for up to 5 restarts in case of crashes due to dropped connections)
       ```
       cd overcooked_ai_py/
       ./steak_api_restart.sh
@@ -51,7 +51,7 @@ to set up the project and to be able to run it on your system.
   - Note: If planner files need to be recalculated, make sure to delete old planner files.
   - Alternatively, you can run the server without a restart mechanism:
       ```
-      python overcooked_ai_py/steak_api_test.py -l steak_none_3 -v 1
+      python overcooked_ai_py/steak_api_test.py -l steak_none_3 -v 1 
       ```
     where, `-v`: Defines the vision limitation of the AI agent. <br>
       1 = Aware (vision limited to the agent's field of view) <br>
@@ -60,8 +60,9 @@ to set up the project and to be able to run it on your system.
 - Running the iGibson Simulator
   - Once the Overcooked server is running, start the iGibson simulation:
     ```
-    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml
+    python 3d_plan_eval_main.py -m vr -c steak_none_3.tml -v 1
     ```
+    where, `-v` is the same definition as above.
   - `-m vr`: Runs the program in VR mode. If left out, the program will simulate a greedy human model operating in 
     the world. Other options are: [`headless`, `headless_tensor`, `gui_non_interactive`, `gui_interactive`, `vr`].
   - `-c steak_none_3.tml`: Defines the configuration file, which must match the config used in Overcooked.
