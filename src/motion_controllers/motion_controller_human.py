@@ -90,9 +90,9 @@ class MotionControllerHuman:
         z_diff = loc[2] - position[2]
         norm_val = math.sqrt(x_diff ** 2 + y_diff ** 2 + z_diff ** 2)
 
-        x_diff = x_diff / (norm_val * 100)
-        y_diff = y_diff / (norm_val * 100)
-        z_diff = z_diff / (norm_val * 100)
+        x_diff = x_diff / (norm_val * 60)
+        y_diff = y_diff / (norm_val * 60)
+        z_diff = z_diff / (norm_val * 60)
 
         rotated_basis = self.get_rotated_basis(human)
         diffs = np.array([x_diff, y_diff, z_diff])
@@ -104,6 +104,11 @@ class MotionControllerHuman:
 
         if self.arrived_hand_step == 0:
             self.reset_hand_position = position
+            if mid_action[26] == 1:
+                tmp_mid_action = mid_action
+                # reset closed hand to be open before pickup
+                tmp_mid_action[26] = -1
+                human.apply_action(tmp_mid_action)
             self.arrived_hand_step = 1
         # Go to location
         elif self.arrived_hand_step == 1:
@@ -122,7 +127,7 @@ class MotionControllerHuman:
             self.counters[1] += 1
         # Return to location
         elif self.arrived_hand_step == 3:
-            if math.dist(loc, position) > 0.01:
+            if math.dist(loc, position) > 0.03:
                 action = self.action(0, 0, x_diff, y_diff, z_diff, 0)
                 human.apply_action(action)
             else:
@@ -166,27 +171,22 @@ class MotionControllerHuman:
         return vel
 
     def find_best_velocities(self, x, y, theta, possible_vels, destination, robot, human):
-        robot_x, robot_y, robot_z = robot.get_position()
         selected_vel = (0, 0)
 
-        path = None
         min_dist = 100000
         # print("************")
-        id = 0
         for vel in possible_vels:
             positions = self.predict_path(x, y, theta, vel[0], vel[1])
             # self.markers[id].set_position([positions[-1][0], positions[-1][1], 0.5])
             # p.addUserDebugLine([x, y, 1.0], [positions[-1][0], positions[-1][1], 1.0], lifeTime=0.2)
-            for idx, pos in enumerate(positions):
+            for pos in positions:
                 # p.addUserDebugLine([pos[0], pos[1], 1.0], [pos[0], pos[1] + 0.01, 1.0], lifeTime=20.0)
                 pos_no_theta = [pos[0], pos[1]]
                 dist = math.dist(pos_no_theta, destination)
 
                 if dist < min_dist:
-                    path = positions[0:idx]
                     min_dist = dist
                     selected_vel = vel
-            id += 1
 
         if selected_vel[0] != 0:
             divisor = abs(selected_vel[0]) * 3

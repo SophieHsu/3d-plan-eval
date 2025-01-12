@@ -20,7 +20,7 @@ STICKY_ITEMS = False
 
 class VisionLimitEnv(LsiEnv):
     def __init__(self, mdp: LsiMdp, nav_env: iGibsonEnv, tracking_env: TrackingEnv, ig_human: iGibsonAgent,
-                 ig_robot: iGibsonAgent, kitchen: Kitchen, recalc_res=None, avoid_radius=None, log_dict={}) -> None:
+                 ig_robot: iGibsonAgent, kitchen: Kitchen, recalc_res=None, avoid_radius=None, log_dict={}, rinse_count_threshold=2, chop_count_threshold=2) -> None:
         super().__init__(mdp, nav_env, tracking_env, ig_human, ig_robot, kitchen, recalc_res, avoid_radius)
 
         self.robot_state = AgentState()
@@ -30,6 +30,8 @@ class VisionLimitEnv(LsiEnv):
         self.world_state.state_dict['objects'] = {}
         self.log_time = time.time()
         self.log_dict = log_dict
+        self.rinse_count_threshold = rinse_count_threshold
+        self.chop_count_threshold = chop_count_threshold
 
     def update_world(self):
 
@@ -84,9 +86,9 @@ class VisionLimitEnv(LsiEnv):
                 if len(self.kitchen.ready_sinks) > 0 or len(self.kitchen.rinsing_sinks) > 0:
                     self.kitchen.ready_sinks.clear()
                     self.kitchen.rinsing_sinks.clear()
-            elif self.kitchen.overcooked_object_states[plates[0]]['state'] != 2:
+            elif self.kitchen.overcooked_object_states[plates[0]]['state'] != self.rinse_count_threshold:
                 self.world_state.state_dict['sink_states']['full'].append(sink)
-            elif self.kitchen.overcooked_object_states[plates[0]]['state'] == 2:
+            elif self.kitchen.overcooked_object_states[plates[0]]['state'] == self.rinse_count_threshold:
                 self.world_state.state_dict['sink_states']['ready'].append(sink)
 
         # update orders left get number of bowls on table remove from original list
@@ -144,7 +146,7 @@ class VisionLimitEnv(LsiEnv):
                     p_state = self.kitchen.overcooked_object_states[p]
                     if p_state['state'] is None:
                         self.kitchen.execute_action(ACTION_COMMANDS.DROP, p, name='hot_plate')
-                    elif s in self.world_state.state_dict['sink_states']['ready'] and p_state['state'] < 2:
+                    elif s in self.world_state.state_dict['sink_states']['ready'] and p_state['state'] < self.rinse_count_threshold:
                         self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, p, name='hot_plate')
 
                 if real_to_grid_coord(s.get_position()) == real_to_grid_coord(
@@ -153,7 +155,7 @@ class VisionLimitEnv(LsiEnv):
                     p_state = self.kitchen.overcooked_object_states[plate]
                     if p_state['state'] is None:
                         self.kitchen.execute_action(ACTION_COMMANDS.DROP, plate, name='hot_plate')
-                    elif p_state['state'] < 2:
+                    elif p_state['state'] < self.rinse_count_threshold:
                         self.kitchen.execute_action(ACTION_COMMANDS.CLEAN, p, name='hot_plate')
 
                     if in_human_hand == plate:
@@ -188,8 +190,8 @@ class VisionLimitEnv(LsiEnv):
                     if self.tracking_env.get_position(b) == self.tracking_env.get_position(object):
                         if o_state['state'] is None:
                             self.kitchen.execute_action(ACTION_COMMANDS.DROP, object, name='garnish')
-                        elif object.current_index == 1 and o_state['state'] < 2:
-                            self.kitchen.execute_action(ACTION_COMMANDS.CHOP, object, name='garnish', state=2)
+                        elif object.current_index == 1 and o_state['state'] < self.chop_count_threshold:
+                            self.kitchen.execute_action(ACTION_COMMANDS.CHOP, object, name='garnish', state=self.chop_count_threshold)
 
                         if in_human_hand == object:
                             in_human_hand = None

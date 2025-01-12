@@ -95,6 +95,10 @@ class Kitchen:
 
     def execute_action(self, action, target, **kwargs):
         ACTION_EXECUTORS[action].execute(target, self, **kwargs)
+        print(f'action: {action}')
+        print(f'target: {target}')
+        print(f'kwargs: {kwargs}')
+        print(f'object states: {self.overcooked_object_states}')
 
     def update_overcooked_human_holding(self, holding, obj):
         # need to delay human holding for overcooked 
@@ -108,7 +112,7 @@ class Kitchen:
         if len(self.in_robot_hand) == 1:
             self.overcooked_robot_holding = self.in_robot_hand[0][1]
         elif len(self.in_robot_hand) == 2:
-            steak = steak = [x for x in self.in_robot_hand if 'steak' in x[1].name][0][1]
+            steak = [x for x in self.in_robot_hand if 'steak' in x[1].name][0][1]
             self.overcooked_robot_holding = steak
         elif len(self.in_robot_hand) == 3:
             onion = [x for x in self.in_robot_hand if 'onion' in x[1].name][0][1]
@@ -460,10 +464,16 @@ class Kitchen:
             else:
                 orientation = (0, 0, 0)
         else:
-            if center_x > x:
-                orientation = (0, 0, 1.5707)
+            if x < center_x:
+                if x > center_x - center_x/4:
+                    orientation = (0, 0, -1.5707) # face up
+                else:
+                    orientation = (0, 0, 1.5707) # face down
             else:
-                orientation = (0, 0, -1.5707)
+                if x < center_x + center_x/4:
+                    orientation = (0, 0, 1.5707) # face down
+                else:
+                    orientation = (0, 0, -1.5707) # face up
         return orientation
 
     def get_rotated_basis(self, ori):
@@ -598,7 +608,7 @@ class Kitchen:
             holding_onion = False
             for agent in self.env.robots:
                 body_id = onion.get_body_ids()[0]
-                grasping = agent.is_grasping_all_arms(body_id)
+                grasping = agent.is_grasping_all_arms(body_id) 
                 holding_onion = IsGraspingState.TRUE in grasping
                 if holding_onion:
                     break
@@ -745,7 +755,7 @@ class Kitchen:
                 break
 
         if not onion_in_onion_station:
-            # get farthest plate
+            # get farthest onion
             onion = None
             for o in self.onions:
                 pos = self.get_position(o)

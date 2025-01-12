@@ -11,7 +11,6 @@ class AStarPlanner:
     def __init__(self, env):
         self.env = env
         self.markers = []
-        self.grid_size = 10
 
     def initialize_markers(self):
         for i in range(30):
@@ -22,6 +21,8 @@ class AStarPlanner:
 
     # Run A Star algorithm
     def find_path(self, start, end, occupancy_grid):
+        self.max_height = len(occupancy_grid)
+        self.max_width = len(occupancy_grid[0])
         start = real_to_grid_coord(start)
         end_grid = real_to_grid_coord(end)
 
@@ -41,25 +42,29 @@ class AStarPlanner:
                 return []
             current = min(open, key=lambda node: node.f_cost)
             open.remove(current)
-            closed.append(current)
             if current == end_node:
                 end_node = current
                 break
 
             neighbors = self.get_neighbors(current, occupancy_grid)
             for neighbor in neighbors:
-                if neighbor in closed:
-                    continue
-
                 self.set_f_cost(neighbor, end_node)
                 if neighbor in open:
                     idx = open.index(neighbor)
                     neighbor_in_open = open[idx]
                     if neighbor_in_open.f_cost > neighbor.f_cost:
-                        open[idx] = neighbor
+                        neighbor_in_open.g_cost = neighbor.g_cost
+                        neighbor_in_open.parent = neighbor.parent
+                elif neighbor in closed:
+                    idx = closed.index(neighbor)
+                    neighbor_in_closed = closed[idx]
+                    if neighbor_in_closed.f_cost > neighbor.f_cost:
+                        closed.remove(neighbor_in_closed)
+                        open.append(neighbor)
                 else:
                     open.append(neighbor)
-
+            
+            closed.append(current)
         path = [end]
         while end_node.parent is not None:
             end_node = end_node.parent
@@ -86,7 +91,7 @@ class AStarPlanner:
             x_neighbor = loc[0] + n[0]
             y_neighbor = loc[1] + n[1]
 
-            if 0 <= x_neighbor < self.grid_size and 0 <= y_neighbor < self.grid_size:
+            if 0 <= x_neighbor < self.max_width and 0 <= y_neighbor < self.max_height:
                 neighbor_locs.append((x_neighbor, y_neighbor))
         return neighbor_locs
 
@@ -101,7 +106,7 @@ class AStarPlanner:
             y_neighbor = n[1]
             if self.is_valid_location(loc, (x_neighbor, y_neighbor), occupancy_grid):
                 g_cost = None
-                if abs(x) == 1 and abs(y) == 1:
+                if abs(x- x_neighbor) == 1 and abs(y - y_neighbor) == 1:
                     g_cost = node.g_cost + math.sqrt(2)
                 else:
                     g_cost = node.g_cost + 1

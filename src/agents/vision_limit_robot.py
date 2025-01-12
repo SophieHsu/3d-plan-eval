@@ -246,6 +246,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
             all_objects_ids_dict = self.env.all_objects_ids_dict()
 
             transfer_dict = {'ovc_state': overcooked_state_dict, 'ids_dict': all_objects_ids_dict}
+            print(f'transfer_dict here see this: {transfer_dict}')
 
             for i in range(1, self.log_dict['i']):
                 for j, object in enumerate(self.log_dict[i]['overcooked_state_sent']['objects']):
