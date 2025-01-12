@@ -105,7 +105,7 @@ class EnvEncoder(json.JSONEncoder):
 
 class VisionLimitRobotAgent(HlQmdpPlanningAgent):
     def __init__(self, hlp_planner: SteakHumanSubtaskQMDPPlanner, mlp: AStarMotionPlanner, hl_human_agent: Agent,
-                 env: LsiEnv, ig_robot: iGibsonAgent, log_dict={}):
+                 env: LsiEnv, ig_robot: iGibsonAgent, awareness: str='aware', log_dict={}):
         super().__init__(hlp_planner, mlp, hl_human_agent, env, ig_robot)
 
         self.action_obj = None
@@ -116,6 +116,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
         self.current_q = []
         self.current_ovc_action = None
         self.log_dict = log_dict
+        self.awareness = awareness
 
     def action(self):
         # TODO: Make it so action calls hlp. and hlp takes a state and returns the best action and the next state
@@ -272,7 +273,7 @@ class VisionLimitRobotAgent(HlQmdpPlanningAgent):
                 'src',
                 'logs',
                 self.env.kitchen.log_dir_num,
-                f"{self.env.kitchen.kitchen_name}_{self.log_dict['log_id']}_log_dict.json"
+                f"{self.env.kitchen.log_dir_num}_{self.env.kitchen.kitchen_name.replace('steak_', '')}_{self.awareness}_{self.log_dict['log_id']}_log_dict.json"
             )
             open(filename, 'w').close()
             f = open(filename, "a")
