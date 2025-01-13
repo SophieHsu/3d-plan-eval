@@ -463,9 +463,11 @@ class iGibsonAgent:
             steak = tracking_env.get_closest_steak(tracking_env.kitchen.robot_stash_dish.get_position())
 
             tracking_env.kitchen.overcooked_object_states[plate]['state'] = 'delivered'
-            tracking_env.kitchen.overcooked_object_states.pop(onion)
-            tracking_env.kitchen.overcooked_object_states.pop(steak)
-
+            try:
+                tracking_env.kitchen.overcooked_object_states.pop(onion)
+                tracking_env.kitchen.overcooked_object_states.pop(steak)
+            except:
+                print('')
             tracking_env.kitchen.robot_stash_dish.set_position([closest[0], closest[1], 1.15])
             offset = 1
 

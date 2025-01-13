@@ -120,7 +120,7 @@ def find_nearby_open_spaces(grid, loc):
     open_spaces = []
     locR, locC = loc
     if grid[locR][locC] == 'X':
-        return (*loc, 'S')
+        return [(*loc, 'S')]
     for dir, diff in DIRE2POSDIFF.items():
         diffR, diffC = diff
         newLocR = locR + diffR

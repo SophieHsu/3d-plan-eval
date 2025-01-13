@@ -78,6 +78,7 @@ class Plate(KitchenObject):
             self.obj.states[object_states.Dusty].set_value(True)
         if self._params.stained:
             self.obj.states[object_states.Stained].set_value(True)
+        self._params.obj_handlers.change_pb_dynamics(self.obj.get_body_ids()[0], -1, mass=self._params.mass)
 
 
 class Stove(KitchenObject):

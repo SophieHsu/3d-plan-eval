@@ -112,6 +112,7 @@ class HumanAgent:
         collision_radius = 0.8
         if self.tracking_env.is_human_holding_bowl():
             collision_radius = 1
+            # self.tracking_env.obj_in_human_hand().set_position(self.tracking_env.get_bowl_pos_in_human_hand())
 
         if math.dist([x, y], [robot_x, robot_y]) < collision_radius and self.avoiding_start_time is None:
             self.avoiding_start_time = datetime.now()

@@ -56,10 +56,12 @@ class TrackingEnv():
         return data
     
     def get_closest_hot_plate_sink(self, agent_pos):
-        closest_sink = self.dist_sort(self.kitchen.ready_sinks, agent_pos)[0]
+        closest_sink = self.dist_sort(self.kitchen.ready_sinks, agent_pos)
+        if len(closest_sink) == 0:
+            closest_sink = self.dist_sort(self.kitchen.sinks, agent_pos)
         status = self.get_sink_status()
-        hot_plate = status[closest_sink][0]
-        return (hot_plate, closest_sink)
+        hot_plate = status[closest_sink[0]][0]
+        return (hot_plate, closest_sink[0])
     
     def is_item_in_object(self, item, object):
         if item.states[object_states.Inside].get_value(object):
@@ -197,6 +199,12 @@ class TrackingEnv():
             if self.is_obj_in_human_hand(bowl):
                 ingredients = self.items_in_bowl(bowl)
                 return ingredients
+        return []
+    
+    def get_bowl_pos_in_human_hand(self):
+        for bowl in self.kitchen.bowls:
+            if self.is_obj_in_human_hand(bowl):
+                return bowl.get_position()
         return []
 
     def obj_in_human_hand(self):
@@ -507,7 +515,7 @@ class TrackingEnv():
             position = agent_pos
         for p in self.kitchen.bowls:
             bowl_position = p.get_position()
-            dist = math.dist(position, bowl_position)
+            dist = math.dist(position[0:2], bowl_position[0:2])
             if dist < min_dist:
                 min_dist = dist
                 closest_bowl = p

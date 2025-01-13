@@ -230,7 +230,8 @@ class Kitchen:
                     pos=pos,
                     orn=orn,
                     dusty=True,
-                    stained=True
+                    stained=True,
+                    mass = .001
                 )
                 plate.load()
                 obj = plate.obj
@@ -245,7 +246,8 @@ class Kitchen:
                         pos=[200 + 5 * idx, 200, 1],
                         orn=orn,
                         dusty=True,
-                        stained=True
+                        stained=True,
+                        mass = .001
                     )
                     other_plate.load()
                     self.plates.append(other_plate.obj)
@@ -310,14 +312,14 @@ class Kitchen:
                     orn=orn,
                     dusty=True,
                     stained=True,
-                    mass=.01
+                    mass=.001
                 )
                 obj = bowl.obj
                 bowl.load()
                 self.bowls.append(obj)
 
             elif name == OBJECT_KEYS.KNIFE:
-                knife = Knife(**OBJECT_CONFIG[OBJECT_KEYS.KNIFE], obj_handlers=obj_handlers, pos=pos, orn=orn, mass=.01)
+                knife = Knife(**OBJECT_CONFIG[OBJECT_KEYS.KNIFE], obj_handlers=obj_handlers, pos=pos, orn=orn, mass=.001)
                 knife.load()
                 obj = knife.obj
                 self.knives.append(obj)

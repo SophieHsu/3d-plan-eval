@@ -16,7 +16,7 @@ from src.utils.constants import DIRE2POSDIFF
 from src.utils.functions import grid_transition, norm_orn_to_cardinal
 from src.utils.helpers import grid_to_real_coord, normalize_radians, quat2euler, real_to_grid_coord
 
-STUCK_TIME_LIMIT = 45
+STUCK_TIME_LIMIT = 60
 MAX_DELAY_TIME = 5
 
 

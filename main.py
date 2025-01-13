@@ -29,7 +29,7 @@ from src.planners.mid_level_motion import AStarMotionPlanner
 
 class Runner:
     _TIME_LIMIT_FAILURE = 1000000
-    _IGIBSON_ACTION_TIMESTEP = 1. / 30.
+    _IGIBSON_ACTION_TIMESTEP = 1. / 60.
     _IGIBSON_PHYSICS_TIMESTEP = 1. / 120.
 
     def __init__(self):
@@ -90,7 +90,7 @@ class Runner:
         return robot_start, human_start
 
     def _setup(self):
-        exp_config, map_config = get_configs(ARGS.config)
+        exp_config = get_configs(ARGS.config)
 
         self._igibson_env = iGibsonEnv(
             config_file=exp_config['ig_config_file'],

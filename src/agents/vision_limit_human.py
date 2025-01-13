@@ -287,6 +287,9 @@ class VisionLimitHumanAgent(HumanAgent):
 
     def get_kb_closest_empty_sink(self, pos):
         objs = self.knowledge_base['sink_states']['empty']
+        if len(objs) == 0:
+            objs = self.knowledge_base['sink_states']['full']
+            objs = self.knowledge_base['sink_states']['ready']
         return self.tracking_env.dist_sort(objs, pos)[0]
 
     def update_kb_world_states(self):
@@ -602,7 +605,7 @@ class VisionLimitHumanAgent(HumanAgent):
             if self.object_position is None:
                 sink = self.tracking_env.get_closest_sink(hand_pos)
                 self.object_position = sink.get_position()
-            done = self.drop(self.human.get_position(), [0, 0.8, 0.4])
+            done = self.drop(self.human.get_position(), [0, 0.5, 0.2])
             if done:
                 sink = self.tracking_env.get_closest_sink(hand_pos)
                 self.env.kitchen.rinse_sink(sink)
@@ -614,7 +617,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.interact_obj = pan
                 self.object_position = pan.get_position()
             if self.step_index == 0:
-                done = self.drop(self.object_position, [-0.4, -0.25, 0.5])
+                done = self.drop(self.object_position, [-0.4, -0.25, 0.3])
                 if done:
                     self.step_index = self.step_index + 1
                     steak = self.tracking_env.get_closest_steak(self.human.get_position())
@@ -657,7 +660,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.object_position = chopped_onion.current_selection().objects[0].get_position()
                 self.target_object = chopped_onion
             if self.step_index == 0:
-                done = self.drop(self.object_position, [0.3, -0.22, 0.5])
+                done = self.drop(self.object_position, [0.3, -0.22, 0.2])
                 if done:
                     self.step_index = self.step_index + 1
             elif self.step_index == 1:
@@ -722,7 +725,7 @@ class VisionLimitHumanAgent(HumanAgent):
                 self.target_object = self.tracking_env.get_closest_green_onion(hand_pos)
             self.object_position = self.target_object.get_position()
             is_holding = self.tracking_env.is_obj_in_human_hand(self.target_object)
-            done = self.pick(self.object_position, [0, -0.1, 0.03])
+            done = self.pick(self.object_position, [0, -0.1, 0.04])
 
             if done:
                 if is_holding:
