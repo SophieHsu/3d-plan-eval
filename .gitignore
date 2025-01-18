@@ -141,7 +141,11 @@ src/test_logs/
 
 *.pkl
 
-src/logs/
+# ignore all files in logs
+src/logs/*
+# but don't ignore the .gitkeep file
+!src/logs/.gitkeep
+
 
 # IDE files (JetBrains)
 .idea/
