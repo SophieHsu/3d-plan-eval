@@ -32,6 +32,7 @@ class VisionLimitEnv(LsiEnv):
         self.log_dict = log_dict
         self.rinse_count_threshold = rinse_count_threshold
         self.chop_count_threshold = chop_count_threshold
+        self.served_plates = set()
 
     def update_world(self):
 
@@ -92,10 +93,12 @@ class VisionLimitEnv(LsiEnv):
                 self.world_state.state_dict['sink_states']['ready'].append(sink)
 
         # update orders left get number of bowls on table remove from original list
-        order_list = self.world_state.init_orders.copy()
+        order_list = self.world_state.orders.copy()
         for p in self.kitchen.plates:
-            if self.tracking_env.is_item_on_table(p):
+            if p not in self.served_plates and self.tracking_env.is_item_on_table(p):
                 order_list.pop()
+                self.served_plates.add(p)
+                break
 
         self.world_state.orders = order_list
 

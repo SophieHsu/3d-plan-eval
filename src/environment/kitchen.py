@@ -614,12 +614,12 @@ class Kitchen:
                 holding_onion = IsGraspingState.TRUE in grasping
                 if holding_onion:
                     break
-            if not holding_onion:
-                if onion.current_index == 0 and onion.get_position()[
-                    0] < 50 and onion not in self.overcooked_object_states.keys():
-                    if not onion.states[object_states.OnTop].get_value(self.onion_counter, use_ray_casting_method=True):
-                        onion.states[object_states.OnTop].set_value(self.onion_counter, True,
-                                                                    use_ray_casting_method=True)
+            # if not holding_onion:
+            #     if onion.current_index == 0 and onion.get_position()[
+            #         0] < 50 and onion not in self.overcooked_object_states.keys():
+            #         if not onion.states[object_states.OnTop].get_value(self.onion_counter, use_ray_casting_method=True):
+            #             onion.states[object_states.OnTop].set_value(self.onion_counter, True,
+            #                                                         use_ray_casting_method=True)
 
         for obj, state in self.overcooked_object_states.items():
             if state['name'] == 'hot_plate':
@@ -726,6 +726,13 @@ class Kitchen:
                     plate = plat
             if plate is not None:
                 plate.states[object_states.OnTop].set_value(self.dish_station, True, use_ray_casting_method=True)
+
+        for plat in filter(lambda p: p, self.plates):
+            table_poses = self.where_grid_is('T')
+            if any(map(lambda table_pos: real_to_grid_coord(plat.get_position()) == table_pos, table_poses)):
+                if not plat.states[object_states.OnTop].get_value(self.table):
+                    plat.states[object_states.OnTop].set_value(self.table, True, use_ray_casting_method=True)
+                    break
 
         # if knife not in human hand then make sure on chopping counter
         for knife in self.knives:
